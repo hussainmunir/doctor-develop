@@ -162,7 +162,7 @@
                     {{/each}}
                 </ul>
             </p1>
-            <p1><strong>The Patient has tenderness to palpation at: </strong>
+            <p1><strong>{{physicalExamText}}</strong>
                 <ul style="margin-bottom:0; ">
                     {{#each handFootLandMarks}}
                     <li>{{this}}</li>
@@ -216,14 +216,14 @@
             {{/each}}
         </table>
         <!-- <p>The patient has tenderness to palpation at: </p><ul>{{#each physicalExam}} <li> {{this}} </li> {{/each}}</ul> -->
-        <p>The patient has a positive: </p>
+        <p>{{negativeHeading}}</p>
         
         <ul>
             {{#each negativeST}}
             <li>{{this}}</li>
             {{/each}}
         </ul>
-        <p>The patient has a negative: </p>
+        <p>{{positiveHeading}}</p>
         <ul>
             {{#each ST}}
             <li>{{this}}</li>
