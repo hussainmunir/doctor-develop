@@ -498,62 +498,89 @@ const getProbAreasChiefCom = (areas) => {
   return str;
 }
 
+// const getProblemConcatenated = (symptoms) => {
+//   var problems = ''
+
+//   if (symptoms.length > 1) {
+//     for (w = 0; w <= symptoms.length - 1; w++) {
+//       if (w >= symptoms.length - 1) {
+//         if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull'
+//           || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//           || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing'
+//           || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial'
+//           || symptoms[w] === 'Bruising') {
+//           problems = problems + ` and pain`
+//           // problems = "pain,"
+//         }
+//         else {
+//           problems = problems + ` and ${symptoms[w]}`
+//         }
+//       }
+//       else {
+//         if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//           || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
+//           problems = problems + `pain, `
+//           // problems = "pain,"
+//         }
+//         else {
+//           problems = problems + `${symptoms[w]}, `
+//         }
+//       }
+//     }
+//   }
+//   else {
+//     if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//       || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
+//       problems = problems + `pain`
+//       // problems = "pain," 
+//     }
+//     else {
+//       problems = problems + `${symptoms[0]}`
+//     }
+//   }
+
+//   if (problems == "undefined") {
+//     return false
+//   }
+//   else {
+//     return problems;
+//   }
+// }
+
 const getProblemConcatenated = (symptoms) => {
-  var problems = ''
-
-  if (symptoms.length > 1) {
-    for (w = 0; w <= symptoms.length - 1; w++) {
-      if (w >= symptoms.length - 1) {
-        if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull'
-          || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-          || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing'
-          || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial'
-          || symptoms[w] === 'Bruising') {
-          // problems = problems + ` and pain`
-          problems = "pain,"
-        }
-        else {
-          problems = problems + ` and ${symptoms[w]}`
-        }
-      }
-      else {
-        if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-          || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
-          // problems = problems + `pain, `
-          problems = "pain,"
-        }
-        else {
-          problems = problems + `${symptoms[w]}, `
-        }
-      }
-    }
+  var pain = [];
+  var painless = []
+ for(i=0; i<symptoms.length; i++){
+   if(symptoms[i] === 'Achy' || symptoms[i] === 'Sharp' || symptoms[i] === 'Dull' || 
+    symptoms[i] === 'Sore' || symptoms[i] === 'Tender'|| symptoms[i] === 'Burning' ||
+     symptoms[i] === 'Stabbing' || symptoms[i] === 'Deep' || symptoms[i] === 'Superficial' || symptoms[i] === 'Bruising')
+     {
+     pain[0] = "pain"
+   }
   }
-  else {
-    if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-      || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
-      // problems = problems + `pain`
-      problems = "pain," 
-    }
-    else {
-      problems = problems + `${symptoms[0]}`
-    }
-  }
-
-  if (problems == "undefined") {
-    return false
-  }
-  else {
-    return problems;
-  }
+  
+  for(i=0; i<symptoms.length; i++){
+    if(symptoms[i] === 'Numbness' || symptoms[i] === 'Weakness' || symptoms[i] === 'Buckling' || 
+   symptoms[i] === 'Catching' || symptoms[i] === 'Swelling'|| symptoms[i] === 'Grinding' ||
+    symptoms[i] === 'Tingling' ){
+     painless.push(` ${symptoms[i]},`);
+     
+   }
 }
-
+if(painless.length >= 1){
+painless.splice(painless.length-1,0," and")
+}
+const painlessCopy = painless.join("")
+let concatenstedArray = [pain,painlessCopy]
+console.log(concatenstedArray)
+return concatenstedArray ;
+}
 
 exports.generateReport = async (req, res, next) => {
   try {
     const problem = await Problem.findOne({ _id: req.params.pID }).lean();
     console.log("test",problem)
     const patient = await Patient.findOne({ _id: problem.patientID }).lean();
-    console.log("testtttttttttttttttt",patient)
    
     if (!problem || !patient || !problem.isChecked) {
       return res.status(400).json({
