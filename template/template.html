@@ -251,6 +251,11 @@
                 {{this.treatmentName}}{{this.treatmentDetail}}
             </li>
             {{/each}}   
+            {{#each medicalEquipment}}
+            <li>
+                {{this}}
+            </li>
+            {{/each}} 
         </ul>
         <p>The patient will follow up in {{followup}}. </p>
     </div>
