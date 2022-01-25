@@ -553,7 +553,9 @@ const getProblemConcatenated = (symptoms) => {
  for(i=0; i<symptoms.length; i++){
    if(symptoms[i] === 'Achy' || symptoms[i] === 'Sharp' || symptoms[i] === 'Dull' || 
     symptoms[i] === 'Sore' || symptoms[i] === 'Tender'|| symptoms[i] === 'Burning' ||
-     symptoms[i] === 'Stabbing' || symptoms[i] === 'Deep' || symptoms[i] === 'Superficial' || symptoms[i] === 'Bruising')
+     symptoms[i] === 'Stabbing' || symptoms[i] === 'Deep' || symptoms[i] === 'Superficial' || symptoms[i] === 'Bruising' || symptoms[i] === 'achy' || symptoms[i] === 'sharp' || symptoms[i] === 'dull' || 
+     symptoms[i] === 'sore' || symptoms[i] === 'tender'|| symptoms[i] === 'burning' ||
+      symptoms[i] === 'stabbing' || symptoms[i] === 'deep' || symptoms[i] === 'superficial' || symptoms[i] === 'bruising')
      {
      pain[0] = "pain"
    }
@@ -562,7 +564,9 @@ const getProblemConcatenated = (symptoms) => {
   for(i=0; i<symptoms.length; i++){
     if(symptoms[i] === 'Numbness' || symptoms[i] === 'Weakness' || symptoms[i] === 'Buckling' || 
    symptoms[i] === 'Catching' || symptoms[i] === 'Swelling'|| symptoms[i] === 'Grinding' ||
-    symptoms[i] === 'Tingling' ){
+    symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
+    symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
+     symptoms[i] === 'tingling' ){
      painless.push(` ${symptoms[i]},`);
      
    }
@@ -572,7 +576,7 @@ painless.splice(painless.length-1,0," and")
 }
 const painlessCopy = painless.join("")
 let concatenatedArray = [pain,painlessCopy]
-console.log(concatenatedArray)
+console.log("tttttttttttttttttttttttttttttttttt",concatenatedArray)
 return concatenatedArray ;
 }
 
@@ -742,6 +746,7 @@ exports.generateReport = async (req, res, next) => {
         visit on ${problem.dignosis.nextVisit}`, // Array
         workDIncludes: strWDIncludes ? strWDIncludes : '',
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
+        diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
         toThe: problem.dignosis.toThe,
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
