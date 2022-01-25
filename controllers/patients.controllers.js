@@ -44,6 +44,9 @@ exports.getPatient = async (req, res, next) => {
   try {
     const patient = await Patient.findById(req.user.data[1]);
 
+    console.log("teettttttttttt",patient.password);
+    console.log(patient)
+
     // we are returning because if record isnt present by id it will show two errors. by returning, it will only return the first one.
     //the catch statement will be executed if the format of the id is incorrect
     //if statement will be executed when the format is correct but id is not present into the database
@@ -286,7 +289,7 @@ exports.updatePatient = async (req, res) => {
   // const salt = bcrypt.genSaltSync(10);
   // const hash = bcrypt.hashSync(password, salt);
   // body.password = hash;
-  console.log("tesssssssssssssssssssssssst",req.body.password)
+
   // console.log("I am In Update Patient Route")
   console.log(req.body)
   try {
