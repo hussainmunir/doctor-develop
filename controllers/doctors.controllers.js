@@ -742,7 +742,7 @@ exports.generateReport = async (req, res, next) => {
         maritalStatus: patient.socialHistory.maritalStatus,
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} to the ${problem.dignosis.toThe} greater than ${problem.dignosis.greaterThan} until next
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} until next
         visit on ${problem.dignosis.nextVisit}`, // Array
         workDIncludes: strWDIncludes ? strWDIncludes : '',
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
