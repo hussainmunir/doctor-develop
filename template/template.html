@@ -54,7 +54,7 @@
             {{pronoun}}, states the symptoms have been present since {{onset}}, at {{intensity}} level intensity.
             {{pronoun}} {{injury}}.
             {{pronoun}} states symptoms are worse with {{aggrevatingFactors}} and get
-            better with {{alleviatingFactors}}. {{symtompsRadiate}}.{{pronoun}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
+            better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
             {{#each newMedications}}
             {{this}},
             {{/each}}
@@ -90,19 +90,19 @@
             </tr>
             {{/each}}
         </table> -->
-        <p><strong>Allergies:</strong> </p>
+        <p><strong>{{allergiesText}}</strong> </p>
         <ol>
             {{#each allergies}}
             <li>{{this.name}} {{this.reaction}}</li>
             {{/each}}
         </ol>
-        <p><strong>Medications:</strong> </p>
+        <p><strong>{{medicationsText}}</strong> </p>
         <ol>
             {{#each medications}}
             <li>{{this}}</li>
             {{/each}}
         </ol>
-        <p><strong>Past Medical History:</strong> </p>
+        <p><strong>{{pmhText}}</strong> </p>
         <ol>
             {{#each PMH}}
             <li>{{this}}</li>
@@ -155,7 +155,7 @@
         {{/if}} <br /> -->
 
 
-            <p1><strong>Skin Exam positive for: </strong>
+            <p1><strong>{{skinText}}</strong>
                 <ul>
                     {{#each skin}}
                     <li>{{this}}</li>
@@ -202,7 +202,7 @@
         <br />
         <strong>{{problemAreas}} Strength: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; width: 40%;">
-            <tr>
+            <tr style = {{styles}}>
                 <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Right Strength</th>
                 <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Name</th>
                 <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Left Strength</th>
@@ -250,7 +250,7 @@
             <li>
                 {{this.treatmentName}}{{this.treatmentDetail}}
             </li>
-            {{/each}}
+            {{/each}}   
         </ul>
         <p>The patient will follow up in {{followup}}. </p>
     </div>

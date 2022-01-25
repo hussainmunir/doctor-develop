@@ -46,6 +46,9 @@ const doctorSchema = new mongoose.Schema({
     dea: {
         type: String,
         required: [true, 'Please add your DEA']
+    },
+    companyName: {
+        type: String
     }
 
 

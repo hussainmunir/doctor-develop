@@ -66,6 +66,8 @@ const treatmentSchema = new mongoose.Schema({
    
 })
 
+
+
 const hpiProblemSchema = new mongoose.Schema({
     patientID: {
         type: String,
@@ -260,10 +262,23 @@ const hpiProblemSchema = new mongoose.Schema({
         },
         nextVisit: {
             type: String
-        },
+        }
     },
-
-
+    signature: {
+        publicId: {
+            type: String,
+            
+        },
+       eSignaturePhoto: {
+            type: String,
+        },
+        isSignature: {
+            type: Boolean,
+        }
+        
+    },
+    
+   
 
 
 });

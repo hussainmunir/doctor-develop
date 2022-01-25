@@ -1,4 +1,4 @@
-[
+
     {
     "patientID": "613730f173aede3850005d7b",
     "doctorId": "6152e43b028e483e485e0a30",
@@ -13,9 +13,7 @@
     "symptomsAtWorst": "intense",
     "isRadiate": "false",
     "radiateAt": "head",
-    "radiateDetails": "radiate details",
-
-    
+    "radiateDetails": "radiate details",  
     "radiationDistribution": ["left","right"],
     "aggravatingFactors": ["walking", "pivoting"],
     "alleviatingFactors": ["ice"],
@@ -24,12 +22,11 @@
     "otherTreatments": "none",
     "currentMedications":["panadol","disprin"],
     "painMedications": ["med1", "med2"],
-    "newMedications": ["newMed 1", "newMed 2"]
-}
-]
+    "newMedications": ["newMed 1", "newMed 2"],
 
-[
-    {
+
+
+    
         "dignosis": {
             "doctorId":"6165514dc124b020175aad83",
             "vitals":{
@@ -92,7 +89,7 @@
             "nextVisit": "dummy nextVisit"
     
         }
-    },
+    
 
 
-]
+    }

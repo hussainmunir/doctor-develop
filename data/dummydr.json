@@ -18,9 +18,12 @@
 {
     "name": "Dr Hamza",
     "email": "hamza@gmail.com",
-    "phone":"051-523-1234",
-    "emergencyContact":"051-985-4321",
+    "phone":"0515231234",
+    "emergencyContact":"0519854321",
     "password":"dummyPass",
-    "homeAddress":"this is where I live"
+    "homeAddress":"this is where I live",
+    "npi":"testing",
+    "dea":"testing",
+    "companyName":"test"
 }
 ]

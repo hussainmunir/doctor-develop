@@ -279,14 +279,15 @@ exports.getPatientLabs = async (req, res) => {
 exports.updatePatient = async (req, res) => {
 
   const body = req.body;
-  const password = body.password;
+  // const password = body.password;
 
   // there must be a password in body
   // we follow these 2 steps
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(password, salt);
-  body.password = hash;
-  console.log("I am In Update Patient Route")
+  // const salt = bcrypt.genSaltSync(10);
+  // const hash = bcrypt.hashSync(password, salt);
+  // body.password = hash;
+  console.log("tesssssssssssssssssssssssst",req.body.password)
+  // console.log("I am In Update Patient Route")
   console.log(req.body)
   try {
     const p = await Patient.findOne({ '_id': req.user.data[1] })

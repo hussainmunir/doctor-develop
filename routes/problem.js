@@ -4,7 +4,8 @@ const {
     getProblems,
     setProblems,
     getAllProblems,
-    getDocProblems
+    getDocProblems,
+    updatePatientSignature
 } = require('../controllers/problem.controller');
 
 const router = express.Router();
@@ -13,5 +14,6 @@ router.get('/', checkAuth, getProblems);
 router.post('/', checkAuth, setProblems);
 router.get('/all', getAllProblems)
 router.get('/docpatients', checkAuth, getDocProblems)
+router.post('/updateSignature', checkAuth,updatePatientSignature )
 
 module.exports = router;

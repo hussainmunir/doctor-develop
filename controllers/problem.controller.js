@@ -71,6 +71,57 @@ exports.getProblems = async (req, res, next) => {
 
 }
 
+exports.updatePatientSignature = async (req, res, next) => {
+    console.log("in update signature")
+    console.log(req.body)
+    console.log(req.files)
+    try {
+      const p = await Problem.findOne({ _id: req.body.problemId })
+      if (!p) {
+        return res.status(404).json({
+          "message": "Problem not found"
+        })
+      }
+      else {
+        
+        if (req.files) {
+          if (req.files.photo) { 
+              const urlId = await uploadImage(req.files.photo, next)
+    
+              var toBeAdded = {
+                IsSignature: true,
+                eSignaturePhoto:urlId.url,
+                publicId:urlId.public_id
+              }
+            
+          }
+           
+        }
+    }
+    const updateSignature = await Problem.findOneAndUpdate({ _id: req.body.problemId }, { $push: { signature: toBeAdded } }, { new: true, })
+    if (!updateSignature) {
+      return res.status(400).json({
+        success: false,
+        data: null
+      })
+    }
+    else {
+      return res.status(200).json({
+        success: true,
+        data: updateSignature
+      })
+    }
+  }
+
+
+
+catch (err) {
+  next(new ErrorResponse(err.message, 500))
+}
+}
+
+
+
 exports.setProblems = async (req, res, next) => {
     console.log("i am here")
     console.log(req.body)
@@ -97,6 +148,9 @@ exports.setProblems = async (req, res, next) => {
             "previousTreatment.isPreviousTreatment": req.body.isPreviousTreatment,
             "previousTreatment.previousTreatmentInclude": req.body.previousTreatmentInclude,
             "previousTreatment.otherTreatments": req.body.otherTreatments,
+            "signature.publicId":req.body.signature.publicId,
+            "signature.eSignaturePhoto":req.body.signature.eSignaturePhoto,
+            "signature.isSignature":req.body.signature.isSignature,
             currentMedications: req.body.currentMedications,
             createdAt: req.body.createdAt,
             isChecked: false,

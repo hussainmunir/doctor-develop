@@ -571,9 +571,9 @@ if(painless.length >= 1){
 painless.splice(painless.length-1,0," and")
 }
 const painlessCopy = painless.join("")
-let concatenstedArray = [pain,painlessCopy]
-console.log(concatenstedArray)
-return concatenstedArray ;
+let concatenatedArray = [pain,painlessCopy]
+console.log(concatenatedArray)
+return concatenatedArray ;
 }
 
 exports.generateReport = async (req, res, next) => {
@@ -591,7 +591,6 @@ exports.generateReport = async (req, res, next) => {
 
     //HELPER METHOD CALLS
     const result = getProblemConcatenated(problem.symptoms);
-    console.log("amir testing",result);
     const pAge = getAge(patient.dateOfBirth);
     const pSocial = getSocial(patient.socialHistory)
     // const smokeDrink = getSocial(patient.socialHistory)
@@ -701,13 +700,17 @@ exports.generateReport = async (req, res, next) => {
         pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past": "He has not received any treatment for this issue in the past",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
+        allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
         PMH: getMedicalHistory(patient.medicalConditions),
+        pmhText:patient.medicalConditions.length >= 1 ? "Past Medical History:" : '',
         PSH: patient.surgicalHistory,
         newMedications: newMedicationsName,//after med changes
         medicationHistory: newMedicationsName ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
         medications: medicationsName,
+        medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
         skin: problem.dignosis.skin,
+        skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
         problemAreas: problem_areas ? problem_areas : "none",
         rosGeneral: ros_general ? ros_general : "none",
         rosNeuro: ros_neuro ? ros_neuro : "none",
@@ -741,7 +744,8 @@ exports.generateReport = async (req, res, next) => {
         toThe: problem.dignosis.toThe,
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
-        nextVisit: problem.dignosis.nextVisit
+        nextVisit: problem.dignosis.nextVisit,
+        styles: problem.dignosis.strength ? ' ' : 'display:none',
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
