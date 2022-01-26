@@ -17,11 +17,11 @@ const specialTestSchema = new mongoose.Schema({
     test: [{
         testName: String,
         isLeftPass: {
-            type: Boolean,
+            type: String,
 
         },
         isRightPass: {
-            type: Boolean,
+            type: String,
 
         }
     }]
@@ -234,10 +234,8 @@ const hpiProblemSchema = new mongoose.Schema({
         strength: [strengthSchema],
         //i just added diagnosticStudies
      
-        rangeOfMotion: {
-            type: String,
-
-        },
+        rangeOfMotion: [String],
+        physicalExamThreeDModal: [String],
         medicalEquipment: {
             type: [String],
 

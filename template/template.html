@@ -54,7 +54,7 @@
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity.
             {{pronoun}} {{injury}}.
             {{pronoun}} states symptoms are worse with {{aggrevatingFactors}} and get
-            better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
+            better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pronoun}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
             {{#each newMedications}}
             {{this}},
             {{/each}}
@@ -90,7 +90,7 @@
             </tr>
             {{/each}}
         </table> -->
-        <p><strong>{{allergiesText}}</strong> </p>
+        <p style="margin-top: -40px;"><strong>{{allergiesText}}</strong> </p>
         <ol>
             {{#each allergies}}
             <li>{{this.name}} {{this.reaction}}</li>
@@ -142,6 +142,14 @@
             {{pronoun}} has {{generalExam.has}}. {{pronoun}} is able to follow instructions.
             {{pronoun}} is {{generalExam.andIs}}. <br /> <br />
 
+            <strong >Vitals</strong>
+            <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
+            <li style="list-style-type: none;">Wt:  {{vitals.weight}}</li>
+            <li style="list-style-type: none;">BMI:  {{vitals.BMI}}</li>
+            <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
+            <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
+            <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li>
+
             <!-- {{#if problemArray}}
         <p1><strong>Problems: </strong><br />
             <ul>
@@ -173,6 +181,11 @@
                     <li>{{this}}</li>
                     {{/each}}
                 </ul>
+                <ul style="margin-top:-20px; ">
+                    {{#each physicalExamThreeDModal}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
             </p1>
 
 
@@ -197,8 +210,12 @@
         <h1>No Affected Body Parts Found</h1>
         {{/if}}
         </p> -->
-        <p><strong>Range of motion: </strong>{{range}}</p>
-        <br />
+        <p><strong>Range of motion: </strong></p>
+        <ul>
+            {{#each range}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
         <br />
         <strong>{{problemAreas}} Strength: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; width: 40%;">

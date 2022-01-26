@@ -248,10 +248,10 @@ const getPassST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
     specialTest.test.forEach(s => {
-      if (s.isLeftPass) {
+      if (s.isLeftPass =="true") {
         newArr.push(`${s.testName} on the left`)
       }
-      if (s.isRightPass) {
+      if (s.isRightPass =="true") {
         newArr.push(`${s.testName} on the right`)
       }
     });
@@ -262,10 +262,10 @@ const getFailST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
     specialTest.test.forEach(s => {
-      if (!s.isLeftPass) {
+      if (s.isLeftPass =="false")  {
         newArr.push(`${s.testName} on the left`)
       }
-      if (!s.isRightPass) {
+      if (s.isRightPass =="false") {
         newArr.push(`${s.testName} on the right`)
       }
     });
@@ -291,9 +291,9 @@ const getSocial = (sH) => {
 const getRadiateStr = (condition, pr) => {
   console.log("condition : " + condition)
   if (condition) {
-    return `${pr} admits to the radiation of symptoms`
+    return `${pr} admits to the radiation of symptoms.`
   } else {
-    return `${pr} denies any radiating symptoms`
+    return `${pr} denies any radiating symptoms.`
   }
 }
 const getPreviousTreatments = (sPT, p) => {
@@ -369,53 +369,94 @@ const getFinger = (fingersArray) => {
   return fingers;
 }
 
-const getProblems = (symptoms) => {
-  var problems = ''
+// const getProblems = (symptoms) => {
+//   var problems = ''
 
-  if (symptoms.length > 1) {
-    for (w = 0; w <= symptoms.length - 1; w++) {
-      if (w >= symptoms.length - 1) {
-        if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull'
-          || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-          || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing'
-          || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial'
-          || symptoms[w] === 'Bruising') {
-          problems = problems + ` and ${symptoms[w]} pain`
-        }
-        else {
-          problems = problems + ` and ${symptoms[w]}`
-        }
-      }
-      else {
-        if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-          || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
-          problems = problems + `${symptoms[w]} pain, `
-        }
-        else {
-          problems = problems + `${symptoms[w]}, `
-        }
-      }
-    }
-  }
-  else {
-    if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
-      || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising') {
-      problems = problems + `${symptoms[0]} pain`
-    }
-    else {
-      problems = problems + `${symptoms[0]}`
-    }
-  }
+//   if (symptoms.length > 1) {
+//     for (w = 0; w <= symptoms.length - 1; w++) {
+//       if (w >= symptoms.length - 1) {
+//         if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull'
+//           || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//           || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing'
+//           || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial'
+//           || symptoms[w] === 'Bruising' || symptoms[w] === 'achy' || symptoms[w] === 'sharp' || symptoms[w] === 'dull'
+//           || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//           || symptoms[w] === 'burning' || symptoms[w] === 'stabbing'
+//           || symptoms[w] === 'deep' || symptoms[w] === 'superficial'
+//           || symptoms[w] === 'bruising') {
+//           problems = problems + ` and ${symptoms[w]} pain`
+//         }
+//         else {
+//           problems = problems + ` and ${symptoms[w]}`
+//         }
+//       }
+//       else {
+//         if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//           || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising' ||
+//           symptoms[w] === 'achy' || symptoms[w] === 'sharp' || symptoms[w] === 'dull' || symptoms[w] === 'sore' || symptoms[w] === 'tender'
+//           || symptoms[w] === 'burning' || symptoms[w] === 'stabbing' || symptoms[w] === 'deep' || symptoms[w] === 'superficial' || symptoms[w] === 'bruising') {
+//           problems = problems + `${symptoms[w]} pain, `
+//         }
+//         else {
+//           problems = problems + `${symptoms[w]}, `
+//         }
+//       }
+//     }
+//   }
+//   else {
+//     if (symptoms[w] === 'Achy' || symptoms[w] === 'Sharp' || symptoms[w] === 'Dull' || symptoms[w] === 'Sore' || symptoms[w] === 'Tender'
+//       || symptoms[w] === 'Burning' || symptoms[w] === 'Stabbing' || symptoms[w] === 'Deep' || symptoms[w] === 'Superficial' || symptoms[w] === 'Bruising' ||
+//       symptoms[w] === 'achy' || symptoms[w] === 'sharp' || symptoms[w] === 'dull' || symptoms[w] === 'sore' || symptoms[w] === 'tender'
+//       || symptoms[w] === 'burning' || symptoms[w] === 'stabbing' || symptoms[w] === 'deep' || symptoms[w] === 'superficial' || symptoms[w] === 'bruising') {
+//       problems = problems + `${symptoms[0]} pain`
+//     }
+//     else {
+//       problems = problems + `${symptoms[0]}`
+//     }
+//   }
 
-  if (problems == "undefined") {
-    return false
+//   if (problems == "undefined") {
+//     return false
+//   }
+//   else {
+//     return problems;
+//   }
+// }
+
+const getProblems= (symptoms) => {
+  var pain = [];
+  var painless = []
+ for(i=0; i<symptoms.length; i++){
+   if(symptoms[i] === 'Achy' || symptoms[i] === 'Sharp' || symptoms[i] === 'Dull' || 
+    symptoms[i] === 'Sore' || symptoms[i] === 'Tender'|| symptoms[i] === 'Burning' ||
+     symptoms[i] === 'Stabbing' || symptoms[i] === 'Deep' || symptoms[i] === 'Superficial' || symptoms[i] === 'Bruising' || symptoms[i] === 'achy' || symptoms[i] === 'sharp' || symptoms[i] === 'dull' || 
+     symptoms[i] === 'sore' || symptoms[i] === 'tender'|| symptoms[i] === 'burning' ||
+      symptoms[i] === 'stabbing' || symptoms[i] === 'deep' || symptoms[i] === 'superficial' || symptoms[i] === 'bruising')
+     {
+     pain.push(`${symptoms[i]} `)
+   }
   }
-  else {
-    return problems;
-  }
+  
+  for(i=0; i<symptoms.length; i++){
+    if(symptoms[i] === 'Numbness' || symptoms[i] === 'Weakness' || symptoms[i] === 'Buckling' || 
+   symptoms[i] === 'Catching' || symptoms[i] === 'Swelling'|| symptoms[i] === 'Grinding' ||
+    symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
+    symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
+     symptoms[i] === 'tingling' ){
+     painless.push(` ${symptoms[i]} `);
+     
+   }
 }
+if(painless.length >= 1 && pain.length >=1){
+painless.splice(painless.length+1,0," and ")
+}
+if(pain.length >= 1){
+  pain.splice(pain.length+1,0," pain")
+  }
 
-
+let concatenatedArray = [painless,pain]
+return concatenatedArray ;
+}
 
 const getMedicalHistory = (medicalConditions) => {
   if (medicalConditions) {
@@ -576,7 +617,6 @@ painless.splice(painless.length-1,0," and")
 }
 const painlessCopy = painless.join("")
 let concatenatedArray = [pain,painlessCopy]
-console.log("tttttttttttttttttttttttttttttttttt",concatenatedArray)
 return concatenatedArray ;
 }
 
@@ -674,7 +714,7 @@ exports.generateReport = async (req, res, next) => {
       orientation: 'potrait',
       border: '20mm'
     }
-
+    const injuryDetails=problem.injury.Details.toLowerCase();
     const document = {
 
       html: template,
@@ -695,13 +735,13 @@ exports.generateReport = async (req, res, next) => {
         pronoun,
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
-        injury: problem.injury.Details ? `"admits to ${problem.injury.Details}"` : "denies any injury",
+        injury: problem.injury.Details ? `"admits to ${injuryDetails}"` : "denies any injury",
         aggrevatingFactors: str_aggFactors,
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
         pastTreatments: problem.previousTreatment.previousTreatmentInclude,
-        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past": "He has not received any treatment for this issue in the past",
+        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past.": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
@@ -725,16 +765,17 @@ exports.generateReport = async (req, res, next) => {
         rosPsychiatric: ros_psychiatric ? ros_psychiatric : "none",
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
-        physicalExamText: problem.dignosis.physicalExam > 1? "The Patient has tenderness to palpation at:" : "",
+        physicalExamText: problem.dignosis.physicalExam.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
+        physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
         DD: str_DD ? str_DD : "none",
         treatmentPlan: problem.dignosis.treatmentPlan,
         medicalEquipment:problem.dignosis.medicalEquipment,
         range: problem.dignosis.rangeOfMotion,
         strength: problem.dignosis.strength,
         ST: STA,
-        positiveHeading: STA.length >= 1 ? "The patient has a negative: " : '',
+        positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
-        negativeHeading:negativeSTA.length >= 1 ? "The patient has a positive:" : "",
+        negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
         mMC: str_MMC ? str_MMC : "none",
         fMC: str_FMC ? str_FMC : "none",
         gPMC: str_GPMC ? str_GPMC : "none",
@@ -752,6 +793,7 @@ exports.generateReport = async (req, res, next) => {
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
         styles: problem.dignosis.strength ? ' ' : 'display:none',
+        vitals:problem.dignosis.vitals
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
