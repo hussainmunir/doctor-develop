@@ -765,7 +765,7 @@ exports.generateReport = async (req, res, next) => {
         rosPsychiatric: ros_psychiatric ? ros_psychiatric : "none",
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
-        physicalExamText: problem.dignosis.physicalExam.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
+        physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
         physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
         DD: str_DD ? str_DD : "none",
         treatmentPlan: problem.dignosis.treatmentPlan,
