@@ -218,30 +218,30 @@
             {{/each}}
         </ul>
         <br />
-        <strong>{{problemAreas}} Strength: </strong><br /><br />
-        <table style="text-align: left; border: 1px solid black; width: 40%;">
+        <strong>Strength: </strong><br /><br />
+        <table style="text-align: left; border: 1px solid black; width: 40%;border-collapse: collapse; line-height: 0.5;">
             <tr style = {{styles}}>
-                <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Right Strength</th>
-                <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Name</th>
-                <th style="border: 1px solid black; border-collapse: collapse; font-size: 14px;">Left Strength</th>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 100px;">Right</th>
+                <th style="border: 1px solid black; font-size: 14px;  min-width: 100px;">Name</th>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 100px;">Left</th>
             </tr>
             {{#each strength}}
             <tr>
-                <td style="border: 1px solid black; border-collapse: collapse; ">{{this.right}}/5</td>
-                <td style="border: 1px solid black; border-collapse: collapse;">{{this.strengthName}}</td>
-                <td style="border: 1px solid black; border-collapse: collapse;">{{this.left}}/5</td>
+                <td style="border: 1px solid black;">{{this.right}}/5</td>
+                <td style="border: 1px solid black;">{{this.strengthName}}</td>
+                <td style="border: 1px solid black;">{{this.left}}/5</td>
             </tr>
             {{/each}}
         </table>
         <!-- <p>The patient has tenderness to palpation at: </p><ul>{{#each physicalExam}} <li> {{this}} </li> {{/each}}</ul> -->
-        <p>{{negativeHeading}}</p>
+        <strong>{{negativeHeading}}</strong>
         
         <ul>
             {{#each negativeST}}
             <li>{{this}}</li>
             {{/each}}
         </ul>
-        <p>{{positiveHeading}}</p>
+        <strong>{{positiveHeading}}</strong>
         <ul>
             {{#each ST}}
             <li>{{this}}</li>
