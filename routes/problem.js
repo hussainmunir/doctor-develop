@@ -14,6 +14,6 @@ router.get('/', checkAuth, getProblems);
 router.post('/', checkAuth, setProblems);
 router.get('/all', getAllProblems)
 router.get('/docpatients', checkAuth, getDocProblems)
-router.post('/updateSignature', checkAuth,updatePatientSignature )
+router.post('/updateSignature',updatePatientSignature )
 
 module.exports = router;

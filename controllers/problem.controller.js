@@ -2,6 +2,8 @@ const Problem = require('../models/Problem');
 const Patient = require('../models/Patient');
 const ErrorResponse = require('../utils/errorResponse');
 const { getPatientNames } = require('../helpers/helpers')
+const { destroyImage, uploadImage, uploadPdf } = require('../helpers/helpers')
+const cloudinary = require("cloudinary");
 
 exports.getAllProblems = async (req, res, next) => {
     try {
@@ -73,8 +75,8 @@ exports.getProblems = async (req, res, next) => {
 
 exports.updatePatientSignature = async (req, res, next) => {
     console.log("in update signature")
-    console.log(req.body)
-    console.log(req.files)
+    console.log("test requeste",req.body)
+    console.log("test fileeeeeeeeeeeeeeee",req.files)
     try {
       const p = await Problem.findOne({ _id: req.body.problemId })
       if (!p) {
@@ -85,20 +87,21 @@ exports.updatePatientSignature = async (req, res, next) => {
       else {
         
         if (req.files) {
-          if (req.files.photo) { 
-              const urlId = await uploadImage(req.files.photo, next)
+          if (req.files.signaturePhoto) { 
+              const urlId = await uploadImage(req.files.signaturePhoto, next)
     
-              var toBeAdded = {
+              var toBeAdded = [{
                 IsSignature: true,
-                eSignaturePhoto:urlId.url,
-                publicId:urlId.public_id
+                eSignaturePhotoUrl:urlId.url,
+                public_id:urlId.public_id
               }
+              ]
             
           }
            
         }
     }
-    const updateSignature = await Problem.findOneAndUpdate({ _id: req.body.problemId }, { $push: { signature: toBeAdded } }, { new: true, })
+    const updateSignature = await Problem.findOneAndUpdate({ _id: req.body.problemId }, { signature: toBeAdded } , { new: true, })
     if (!updateSignature) {
       return res.status(400).json({
         success: false,
@@ -118,6 +121,8 @@ exports.updatePatientSignature = async (req, res, next) => {
 catch (err) {
   next(new ErrorResponse(err.message, 500))
 }
+
+
 }
 
 

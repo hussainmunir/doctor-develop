@@ -262,22 +262,24 @@ const hpiProblemSchema = new mongoose.Schema({
             type: String
         }
     },
-    signature: {
+    signature:[{
         publicId: {
             type: String,
-            
-        },
-       eSignaturePhoto: {
+        }},
+      { eSignaturePhoto: {
             type: String,
-        },
-        isSignature: {
+        }},
+        {isSignature: {
             type: Boolean,
-        }
+        }}
         
-    },
+    ],
+    signature: [{
+        eSignaturePhotoUrl: String,
+        public_id: String,
+        isSignature:Boolean,
+    }],
     
-   
-
 
 });
 

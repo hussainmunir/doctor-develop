@@ -96,25 +96,31 @@
             <li>{{this.name}} {{this.reaction}}</li>
             {{/each}}
         </ol>
-        <p><strong>{{medicationsText}}</strong> </p>
-        <ol>
+        <strong>{{medicationsText}}</strong> 
+        <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each medications}}
             <li>{{this}}</li>
             {{/each}}
         </ol>
-        <p><strong>{{pmhText}}</strong> </p>
-        <ol>
+        <strong>{{pmhText}}</strong> 
+        <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each PMH}}
             <li>{{this}}</li>
             {{/each}}
         </ol>
 
-        <p><strong>Past Surgical History:</strong></p>
+        <strong>Past Surgical History:</strong>
         <!-- <ul>
             {{#each PSH}}
             <img src={{this.url}} alt="">
             {{/each}}
         </ul> -->
+         <ul style="margin-top: 0px; padding-top: 0px;">
+            {{#each PSH}}
+            <li>{{this.name}} </li>
+            {{/each}}
+        </ul>
+    
 
         <p><strong>Family History:</strong><br>
             <strong>Mother's Conditions:</strong> {{mMC}}</br>
@@ -221,9 +227,9 @@
         <strong>Strength: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; width: 40%;border-collapse: collapse; line-height: 0.5;">
             <tr style = {{styles}}>
-                <th style="border: 1px solid black; font-size: 14px; min-width: 100px;">Right</th>
+                <th style="border: 1px solid black; font-size: 14px; width: 10px;">Right</th>
                 <th style="border: 1px solid black; font-size: 14px;  min-width: 100px;">Name</th>
-                <th style="border: 1px solid black; font-size: 14px; min-width: 100px;">Left</th>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 30px;">Left</th>
             </tr>
             {{#each strength}}
             <tr>
