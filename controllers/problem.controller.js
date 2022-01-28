@@ -90,12 +90,12 @@ exports.updatePatientSignature = async (req, res, next) => {
           if (req.files.signaturePhoto) { 
               const urlId = await uploadImage(req.files.signaturePhoto, next)
     
-              var toBeAdded = [{
+              var toBeAdded = {
                 IsSignature: true,
                 eSignaturePhotoUrl:urlId.url,
                 public_id:urlId.public_id
               }
-              ]
+              
             
           }
            

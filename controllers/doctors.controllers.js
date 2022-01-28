@@ -793,7 +793,9 @@ exports.generateReport = async (req, res, next) => {
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
         styles: problem.dignosis.strength ? ' ' : 'display:none',
-        vitals:problem.dignosis.vitals
+        vitals:problem.dignosis.vitals,
+        signatureUrl:problem.signature.eSignaturePhotoUrl,
+        imageStyle:problem.signature.eSignaturePhotoUrl ? "width:80px;height:80px; text-align:center" : "display:none"
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }

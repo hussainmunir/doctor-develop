@@ -274,11 +274,11 @@ const hpiProblemSchema = new mongoose.Schema({
         }}
         
     ],
-    signature: [{
+    signature: {
         eSignaturePhotoUrl: String,
         public_id: String,
         isSignature:Boolean,
-    }],
+    },
     
 
 });
