@@ -5,6 +5,13 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    designations:{
+        type: String,
+
+    },
+    companyName:{
+        type:String,
+    },
     email: {
         type: String,
         required: true,
@@ -47,11 +54,7 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add your DEA']
     },
-    companyName: {
-        type: String
-    }
-
-
+ 
 });
 
 module.exports = mongoose.model('Doctor', doctorSchema);

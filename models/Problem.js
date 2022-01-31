@@ -76,6 +76,12 @@ const hpiProblemSchema = new mongoose.Schema({
     patientName: {
         type: String,
     },
+    dignosedBy: {
+        type: String
+    },
+    companyName:{
+        type:String,
+    },
     doctorId: {
         type: String,
     },
@@ -277,6 +283,7 @@ const hpiProblemSchema = new mongoose.Schema({
     signature: {
         eSignaturePhotoUrl: String,
         public_id: String,
+        date: String,
         isSignature:Boolean,
     },
     

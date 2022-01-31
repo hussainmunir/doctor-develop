@@ -311,7 +311,7 @@ const getPreviousTreatments = (sPT, p) => {
 const getDDStr = (dd) => {
   let arr = [];
   dd.forEach(item => {
-    arr.push(item.desc);
+    arr.push(`${item.desc} (${item.code})`);
   });
   return arr;
 }
@@ -454,8 +454,19 @@ if(pain.length >= 1){
   pain.splice(pain.length+1,0," pain")
   }
 
-let concatenatedArray = [painless,pain]
-return concatenatedArray ;
+if(painless.length == 0){
+  let arr= [painless,pain];
+  let concatenatedArray = arr.join('')
+  // return concatenatedArray ;
+}
+let painStr = pain.toString();
+let removeCommaPain =painStr.replace(/,([^,]*)$/, '$1');
+let painlessStr = painless.toString();
+let removeCommaPainless =painlessStr.replace(/,([^,]*)$/, '$1');
+let concatenatedArray = [removeCommaPainless,removeCommaPain]
+let removeCommaConcatenatedArray = concatenatedArray.join('')
+console.log(removeCommaConcatenatedArray);
+return removeCommaConcatenatedArray ;
 }
 
 const getMedicalHistory = (medicalConditions) => {
@@ -620,6 +631,7 @@ let concatenatedArray = [pain,painlessCopy]
 return concatenatedArray ;
 }
 
+
 exports.generateReport = async (req, res, next) => {
   try {
     const problem = await Problem.findOne({ _id: req.params.pID }).lean();
@@ -632,8 +644,14 @@ exports.generateReport = async (req, res, next) => {
         data: "Something has gone wrong"
       })
     }
+    const getDoctorName = async (id) => {
+      const doctor = await Doctor.findOne({ _id: id }).lean()
+      return doctor
+     
+    }
 
     //HELPER METHOD CALLS
+    const doctorName = await getDoctorName(problem.doctorId)
     const result = getProblemConcatenated(problem.symptoms);
     const pAge = getAge(patient.dateOfBirth);
     const pSocial = getSocial(patient.socialHistory)
@@ -687,7 +705,6 @@ exports.generateReport = async (req, res, next) => {
     let str_MMC = getTreatments(patient.familyHistory.motherMConditions);
 
     let str_FMC = getTreatments(patient.familyHistory.fatherMConditions);
-
     let str_GPMC = getTreatments(patient.familyHistory.grandparentMConditions);
 
     let str_SMC = getTreatments(patient.familyHistory.siblingsMConditions);
@@ -781,9 +798,11 @@ exports.generateReport = async (req, res, next) => {
         gPMC: str_GPMC ? str_GPMC : "none",
         sMC: str_SMC ? str_SMC : "none",
         maritalStatus: patient.socialHistory.maritalStatus,
+        handDominance: patient.socialHistory.handDominance,
+        occupation:patient.socialHistory.occupation,
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} until next
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next
         visit on ${problem.dignosis.nextVisit}`, // Array
         workDIncludes: strWDIncludes ? strWDIncludes : '',
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
@@ -795,7 +814,10 @@ exports.generateReport = async (req, res, next) => {
         styles: problem.dignosis.strength ? ' ' : 'display:none',
         vitals:problem.dignosis.vitals,
         signatureUrl:problem.signature.eSignaturePhotoUrl,
-        imageStyle:problem.signature.eSignaturePhotoUrl ? "width:80px;height:80px; text-align:center" : "display:none"
+        signatureDate:problem.signature.date,
+        imageStyle:problem.signature.eSignaturePhotoUrl ? "width:80px;height:80px; text-align:center" : "display:none",
+        doctorName:doctorName.name,
+        designations:doctorName.designations
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
@@ -827,6 +849,19 @@ exports.getWaitingList = async (req, res, next) => {
 exports.getPreviousAppointments = async (req, res, next) => {
   try {
     const prev = await Problem.find({ 'isChecked': true, "doctorId": req.user.data[1] });
+    const getDoctorName = async (id) => {
+      const doctor = await Doctor.findOne({ _id: id }).lean()
+      return doctor
+     
+    }
+    
+    
+    var doctorName = await getDoctorName(req.user.data[1])
+    prev.forEach((element) => {
+      element.dignosedBy=`${doctorName.name}, ${doctorName.designations}`
+      element.companyName=doctorName.companyName
+      console.log("testing",doctorName)
+    });
     if (!prev) {
       res.status(200).json({
         data: "No patients in previously checked",
@@ -835,7 +870,7 @@ exports.getPreviousAppointments = async (req, res, next) => {
     res.status(200).json({
       count: prev.length,
       success: true,
-      data: prev
+      data: prev,
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))

@@ -93,7 +93,8 @@ exports.updatePatientSignature = async (req, res, next) => {
               var toBeAdded = {
                 IsSignature: true,
                 eSignaturePhotoUrl:urlId.url,
-                public_id:urlId.public_id
+                public_id:urlId.public_id,
+                date: new Date().toLocaleString()
               }
               
             
