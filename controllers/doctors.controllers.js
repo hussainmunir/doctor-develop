@@ -320,6 +320,7 @@ const getDDStr = (dd) => {
 }
 
 const getCurrMed = (med) => {
+  console.log("med",med)
   let meds = [];
   let str = "";
   med.forEach(item => {
@@ -694,7 +695,9 @@ exports.generateReport = async (req, res, next) => {
 
 
     let medicationsName = getCurrMed(patient.currentMedications);
+    console.log("problem.currentMedications",problem.currentMedications)
     let newMedicationsName = getCurrMed(problem.currentMedications);
+    console.log("cuurent medication",newMedicationsName)
 
 
 
@@ -763,7 +766,7 @@ exports.generateReport = async (req, res, next) => {
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
         pastTreatments: problem.previousTreatment.previousTreatmentInclude,
-        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past. Including": "has not received any treatment for this issue in the past.",
+        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
@@ -771,7 +774,7 @@ exports.generateReport = async (req, res, next) => {
         pmhText:patient.medicalConditions.length >= 1 ? "Past Medical History:" : '',
         PSH: patient.surgicalHistory,
         newMedications: newMedicationsName,//after med changes
-        medicationHistory: newMedicationsName ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
+        medicationHistory: newMedicationsName.length >= 1 ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
