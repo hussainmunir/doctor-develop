@@ -222,7 +222,7 @@ exports.diagnosis = async (req, res, next) => {
       { '_id': req.params.pID },
       { 'isChecked': true }
     )
-  console.log(prb);
+  
     res.status(200).json({
       success: true,
       data: prb
@@ -247,12 +247,13 @@ const getAge = (dob) => {
 const getPassST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
+    let bodypart =specialTest.bodyPart;
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="true") {
-        newArr.push(`${s.testName} on the left`)
+        newArr.push(`${s.testName} on the left ${bodypart}`)
       }
       if (s.isRightPass =="true") {
-        newArr.push(`${s.testName} on the right`)
+        newArr.push(`${s.testName} on the right ${bodypart}`)
       }
     });
   })
@@ -261,12 +262,14 @@ const getPassST = (st) => {
 const getFailST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
+    let bodypart =specialTest.bodyPart;
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="false")  {
-        newArr.push(`${s.testName} on the left`)
+        console.log("special test fail ",specialTest)
+        newArr.push(`${s.testName} on the left ${bodypart}`)
       }
       if (s.isRightPass =="false") {
-        newArr.push(`${s.testName} on the right`)
+        newArr.push(`${s.testName} on the right ${bodypart}`)
       }
     });
   });
@@ -465,7 +468,6 @@ let painlessStr = painless.toString();
 let removeCommaPainless =painlessStr.replace(/,([^,]*)$/, '$1');
 let concatenatedArray = [removeCommaPainless,removeCommaPain]
 let removeCommaConcatenatedArray = concatenatedArray.join('')
-console.log(removeCommaConcatenatedArray);
 return removeCommaConcatenatedArray ;
 }
 
@@ -624,10 +626,14 @@ const getProblemConcatenated = (symptoms) => {
    }
 }
 if(painless.length >= 1){
-painless.splice(painless.length-1,0," and")
+painless.splice(painless.length-1,0," and ")
 }
 const painlessCopy = painless.join("")
-let concatenatedArray = [pain,painlessCopy]
+let concatenatedArray = [...pain,[painlessCopy]]
+if(painlessCopy.length == 0){
+ let commaRemove= concatenatedArray.join("")
+ return commaRemove;
+}
 return concatenatedArray ;
 }
 
@@ -635,7 +641,6 @@ return concatenatedArray ;
 exports.generateReport = async (req, res, next) => {
   try {
     const problem = await Problem.findOne({ _id: req.params.pID }).lean();
-    console.log("test",problem)
     const patient = await Patient.findOne({ _id: problem.patientID }).lean();
    
     if (!problem || !patient || !problem.isChecked) {
@@ -758,7 +763,7 @@ exports.generateReport = async (req, res, next) => {
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
         pastTreatments: problem.previousTreatment.previousTreatmentInclude,
-        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past.": "has not received any treatment for this issue in the past.",
+        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past. Including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
@@ -785,6 +790,7 @@ exports.generateReport = async (req, res, next) => {
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
         physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
         DD: str_DD ? str_DD : "none",
+        DDarray:arr_DD,
         treatmentPlan: problem.dignosis.treatmentPlan,
         medicalEquipment:problem.dignosis.medicalEquipment,
         range: problem.dignosis.rangeOfMotion,
@@ -815,9 +821,11 @@ exports.generateReport = async (req, res, next) => {
         vitals:problem.dignosis.vitals,
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
-        imageStyle:problem.signature.eSignaturePhotoUrl ? "width:80px;height:80px; text-align:center" : "display:none",
+        imageStyle:problem.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
-        designations:doctorName.designations
+        designations:doctorName.designations,
+        RadiationDistribution:problem.dignosis.radiationDistribution,
+        RadiationDistributionTxt:problem.dignosis.radiationDistribution?"Distribution Of Radiation:":'',
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
@@ -860,7 +868,6 @@ exports.getPreviousAppointments = async (req, res, next) => {
     prev.forEach((element) => {
       element.dignosedBy=`${doctorName.name}, ${doctorName.designations}`
       element.companyName=doctorName.companyName
-      console.log("testing",doctorName)
     });
     if (!prev) {
       res.status(200).json({

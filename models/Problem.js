@@ -143,10 +143,7 @@ const hpiProblemSchema = new mongoose.Schema({
 
         }
     },
-    radiationDistribution: {
-        type: [String],
-        required: [true, 'Please add where is the radiation distribution in radiation 3d model']
-    },
+  
     aggravatingFactors: {
         type: [String],
         required: [true, 'Please enter aggravating factors']
@@ -206,6 +203,10 @@ const hpiProblemSchema = new mongoose.Schema({
                 type: String,
 
             },
+        },
+        radiationDistribution: {
+            type: [String],
+            required: [true, 'Please add where is the radiation distribution in radiation 3d model']
         },
         generalExam: {
             patientIs: [String],

@@ -129,11 +129,11 @@
             <strong>Siblings Conditions:</strong> {{sMC}}
         </p>
         <br><strong>Social History:</strong><br>
-            <strong>Occupation:</strong>{{occupation}}</br>
+            <strong>Occupation:</strong> {{occupation}}</br>
             <strong>Martial Status:</strong> {{maritalStatus}}</br>
             <strong>Smokes:</strong> {{smokes.doesSmoke}}</br>
             <strong>Drinks:</strong> {{drinks.doesDrink}}</br>
-            <strong>HandDominance:</strong> {{handDominance}} </br>
+            <strong>Hand Dominance:</strong> {{handDominance}} </br>
         </p>
         <p><strong>Review of Systems:</strong><br>
             <strong>General:</strong> {{rosGeneral}}</br>
@@ -250,15 +250,20 @@
             {{/each}}
         </ul> 
     </div>
+  <strong>{{RadiationDistributionTxt}}</strong>
+  <ul >
+    {{#each RadiationDistribution}}
+    <li>{{this}}</li>
+    {{/each}}
+</ul>
 
     <div class="green">
         <strong>{{diagnosticSudiesText}}</strong>
         {{#each diagnosticSudies}}
         <p>{{this.labResult}}</p>
         {{/each}}
-        <strong>Assessment:</strong>
-        <p>{{name}} is a {{age}} year old {{gender}} with: {{DD}}</p>
-        <ol>{{#each DD}} <li>{{this.desc}}</li> {{/each}}</ol>
+        <strong>Assessment:</strong> {{name}} is a {{age}} year old {{gender}} with: 
+        <ol>{{#each DDarray}} <li>{{this}}</li> {{/each}}</ol>
         <p><strong>Plan: </strong>{{name}} presents signs and symptoms consistent with: {{DD}} <br> {{#each DD}}
             {{this.desc}},
             {{/each}}</p>
