@@ -43,6 +43,18 @@ const strengthSchema = new mongoose.Schema({
 
     }
 })
+const reflexesSchema = new mongoose.Schema({
+    reflexName: {
+        type: String
+
+    },
+    left: {
+        type: String,
+    },
+    right: {
+        type: String,
+    }
+})
 const diagnosticSchema = new mongoose.Schema({
     labName: {
         type: String
@@ -239,6 +251,7 @@ const hpiProblemSchema = new mongoose.Schema({
         specialTests: [specialTestSchema],
         diagnosticStudies: [diagnosticSchema],
         strength: [strengthSchema],
+        reflexes: [reflexesSchema],
         //i just added diagnosticStudies
      
         rangeOfMotion: [String],

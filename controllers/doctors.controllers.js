@@ -73,6 +73,25 @@ exports.getAllDoctors = async (req, res, next) => {
   }
 }
 
+exports.getAllCompanies = async (req, res, next) => {
+  try {
+    const doctors = await Doctor.find();
+
+   const companyName= doctors.map((doctor) => doctor.companyName)
+   uniqueArray = companyName.filter(function(item, pos) {
+    return companyName.indexOf(item) == pos;
+})
+
+    if (!doctors) { next(new ErrorResponse('Doctors not found', 404)) }
+    res.status(200).json({
+      success: true, data: uniqueArray
+    });
+
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
 
 /**
 * !@dec Update  doctor
@@ -204,7 +223,6 @@ exports.searchCode = async (req, res, next) => {
 }
 
 exports.diagnosis = async (req, res, next) => {
-  console.log('I am Diagnosis')
   try {
     const prb = await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -265,7 +283,7 @@ const getFailST = (st) => {
     let bodypart =specialTest.bodyPart;
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="false")  {
-        console.log("special test fail ",specialTest)
+
         newArr.push(`${s.testName} on the left ${bodypart}`)
       }
       if (s.isRightPass =="false") {
@@ -292,7 +310,6 @@ const getSocial = (sH) => {
 
 
 const getRadiateStr = (condition, pr) => {
-  console.log("condition : " + condition)
   if (condition) {
     return `${pr} admits to the radiation of symptoms.`
   } else {
@@ -320,7 +337,6 @@ const getDDStr = (dd) => {
 }
 
 const getCurrMed = (med) => {
-  console.log("med",med)
   let meds = [];
   let str = "";
   med.forEach(item => {
@@ -514,7 +530,9 @@ const getTreatments = (fullBodyCoordinates) => {
     return false
   }
   else {
-    return bodyCoordinates;
+    const lower =bodyCoordinates.toLowerCase();
+ 
+    return lower;
   }
 }
 
@@ -527,7 +545,6 @@ const getGeneralExam = (generalExam) => {
     "has": generalExam.has[0].toLowerCase(),
     "andIs": generalExam.andIs[0].toLowerCase()
   }
-  console.log(generalExam.patientIs[0][0])
   if (generalExam.patientIs[0][0].toUpperCase() === 'A' || generalExam.patientIs[0][0].toUpperCase() === 'E' || generalExam.patientIs[0][0].toUpperCase() === 'I'
     || generalExam.patientIs[0][0].toUpperCase() === 'O' || generalExam.patientIs[0][0].toUpperCase() === 'U') {
     finalGeneralExam.patientIs = `an ${getTreatments(generalExam.patientIs)}`
@@ -622,15 +639,18 @@ const getProblemConcatenated = (symptoms) => {
     symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
     symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
      symptoms[i] === 'tingling' ){
-     painless.push(` ${symptoms[i]},`);
+     painless.push(` ${symptoms[i]}`);
      
    }
 }
 if(painless.length >= 1){
 painless.splice(painless.length-1,0," and ")
 }
-const painlessCopy = painless.join("")
-let concatenatedArray = [...pain,[painlessCopy]]
+
+
+const  painlessString= painless.toString();
+const painlessCopy = painlessString.replace(/,([^,]*)$/, '$1');
+let concatenatedArray = [...pain,painlessCopy]
 if(painlessCopy.length == 0){
  let commaRemove= concatenatedArray.join("")
  return commaRemove;
@@ -695,9 +715,7 @@ exports.generateReport = async (req, res, next) => {
 
 
     let medicationsName = getCurrMed(patient.currentMedications);
-    console.log("problem.currentMedications",problem.currentMedications)
     let newMedicationsName = getCurrMed(problem.currentMedications);
-    console.log("cuurent medication",newMedicationsName)
 
 
 
@@ -724,6 +742,7 @@ exports.generateReport = async (req, res, next) => {
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
 
     let problem_areas = getTreatments(problem.fullBodyCoordinates)
+   
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let ros_general = getTreatments(patient.reviewSystem.general)
     let ros_neuro = getTreatments(patient.reviewSystem.neurologic)
@@ -758,6 +777,7 @@ exports.generateReport = async (req, res, next) => {
         problems: getProblems(problem.symptoms),
         problem_concatenated: problem_concatenated,
         pronoun,
+        toHasortoHer:pronoun == "He"? "to his" : "to her",
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
         injury: problem.injury.Details ? `"admits to ${injuryDetails}"` : "denies any injury",
@@ -798,6 +818,7 @@ exports.generateReport = async (req, res, next) => {
         medicalEquipment:problem.dignosis.medicalEquipment,
         range: problem.dignosis.rangeOfMotion,
         strength: problem.dignosis.strength,
+        Reflexes: problem.dignosis.reflexes,
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
@@ -828,7 +849,7 @@ exports.generateReport = async (req, res, next) => {
         doctorName:doctorName.name,
         designations:doctorName.designations,
         RadiationDistribution:problem.dignosis.radiationDistribution,
-        RadiationDistributionTxt:problem.dignosis.radiationDistribution?"Distribution Of Radiation:":'',
+        RadiationDistributionTxt:problem.dignosis.radiationDistribution.length >=1 ?"Distribution Of Radiation:":'',
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
@@ -841,6 +862,15 @@ exports.generateReport = async (req, res, next) => {
 exports.getWaitingList = async (req, res, next) => {
   try {
     const waiting = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] });
+  
+    var patients;
+   for(i=0; i<waiting.length; i++){
+    const patient = await Patient.findOne({ _id: waiting[i].patientID}).lean();
+    waiting[i].currentPatientMedication=patient.currentMedications;
+   
+   }
+  
+   console.log("currentPatientMedication",waiting[0].currentPatientMedication)
     if (!waiting) {
       res.status(200).json({
         data: "No patients in waiting",

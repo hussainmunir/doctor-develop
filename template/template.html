@@ -50,13 +50,13 @@
         <strong>History Of Presenting Illness:</strong><br>
         <p>
             {{name}} is a very pleasant {{age}} year old {{gender}} who presents with the complaint of
-            {{problems}} at {{problemAreas}}.
+            {{problems}} {{toHasortoHer}} {{problemAreas}}.
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity.
             {{pronoun}} {{injury}}.
             {{pronoun}} states symptoms are worse with {{aggrevatingFactors}} and get
             better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pronoun}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
             {{#each newMedications}}
-            {{this}},
+            {{this}}
             {{/each}}
             <br><br>
             <!--  <strong>{{name}} has received treatment for this issue in the past including:</strong>
@@ -233,6 +233,22 @@
                 <td style="border: 1px solid black;">{{this.right}}/5</td>
                 <td style="border: 1px solid black; text-align:center">{{this.strengthName}}</td>
                 <td style="border: 1px solid black;">{{this.left}}/5</td>
+            </tr>
+            {{/each}}
+        </table>
+        <br>
+        <strong>Reflexes: </strong><br /><br />
+        <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+            <tr>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>
+                <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Left</th>
+            </tr>
+            {{#each Reflexes}}
+            <tr>
+                <td style="border: 1px solid black;">{{this.right}}</td>
+                <td style="border: 1px solid black; text-align:center">{{this.reflexName}}</td>
+                <td style="border: 1px solid black;">{{this.left}}</td>
             </tr>
             {{/each}}
         </table>

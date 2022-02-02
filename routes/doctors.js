@@ -11,6 +11,7 @@ const { getDoctorById,
     generateReport,
     getAllDoctors,
     getWaitingList,
+    getAllCompanies,
     getPreviousAppointments
 } = require('../controllers/doctors.controllers');
 
@@ -20,6 +21,8 @@ const router = express.Router();
 router.get('/getDr', checkAuth, getDoctor);
 router.post('/register', registerDoctor);
 router.post('/login', loginDoctor);
+router.get('/doctors',getAllDoctors)
+router.get('/companyNames',getAllCompanies)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
 router.get('/', checkAuth, getAllDoctors)
 router.get('/getDr/:id', checkAuth, getDoctorById);
