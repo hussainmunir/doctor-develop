@@ -850,7 +850,7 @@ exports.generateReport = async (req, res, next) => {
         doctorName:doctorName.name,
         designations:doctorName.designations,
         RadiationDistribution:problem.dignosis.radiationDistribution,
-        RadiationDistributionTxt:problem.dignosis.radiationDistribution ? "Distribution Of Radiation:":'',
+        RadiationDistributionTxt:problem.dignosis.radiationDistribution.length >=1 ? "Distribution Of Radiation:":'',
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
