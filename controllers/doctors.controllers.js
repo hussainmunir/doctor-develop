@@ -819,6 +819,7 @@ exports.generateReport = async (req, res, next) => {
         range: problem.dignosis.rangeOfMotion,
         strength: problem.dignosis.strength,
         Reflexes: problem.dignosis.reflexes,
+        ReflexesStyles:problem.dignosis.reflexes?"":"display: none;",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
@@ -849,7 +850,7 @@ exports.generateReport = async (req, res, next) => {
         doctorName:doctorName.name,
         designations:doctorName.designations,
         RadiationDistribution:problem.dignosis.radiationDistribution,
-        RadiationDistributionTxt:problem.dignosis.radiationDistribution  ? "Distribution Of Radiation:":'',
+        RadiationDistributionTxt:problem.dignosis.radiationDistribution ? "Distribution Of Radiation:":'',
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
@@ -861,22 +862,23 @@ exports.generateReport = async (req, res, next) => {
 
 exports.getWaitingList = async (req, res, next) => {
   try {
-    const waiting = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] });
+    const waiting = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
   
-    var patients;
    for(i=0; i<waiting.length; i++){
     const patient = await Patient.findOne({ _id: waiting[i].patientID}).lean();
-    waiting[i].currentPatientMedication=patient.currentMedications;
    
-   }
+    waiting.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
   
-   console.log("currentPatientMedication",waiting[0].currentPatientMedication)
+   }
+
     if (!waiting) {
       res.status(200).json({
         data: "No patients in waiting",
 
       })
     }
+   
     res.status(200).json({
       count: waiting.length,
       success: true,

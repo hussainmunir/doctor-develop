@@ -179,21 +179,15 @@
                 </ul>
             </p1>
             <p1><strong>{{physicalExamText}}</strong>
-                <ul style="margin-bottom:0; ">
                     {{#each handFootLandMarks}}
                     <li>{{this}}</li>
                     {{/each}}
-                </ul>
-                <ul style="margin-top:0; ">
                     {{#each generalBodyParts}}
                     <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-                <ul >
+                    {{/each}}  
                     {{#each physicalExamThreeDModal}}
                     <li>{{this}}</li>
                     {{/each}}
-                </ul>
             </p1>
         </p>
 
@@ -239,7 +233,7 @@
         <br>
         <strong>Reflexes: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-            <tr>
+            <tr style={{ReflexesStyles}}>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>
                 <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Left</th>
