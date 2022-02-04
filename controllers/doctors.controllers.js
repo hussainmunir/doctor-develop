@@ -91,6 +91,19 @@ exports.getAllCompanies = async (req, res, next) => {
     next(new ErrorResponse(err.message, 500))
   }
 }
+exports.companiesAllDoctors = async (req, res, next) => {
+  try {
+    const doctor = await Doctor.find({ 'companyName': req.params.companyName });
+
+    if (!doctor) { next(new ErrorResponse('Doctor not found', 404)) }
+    res.status(200).json({
+      success: true, data: doctor
+    });
+
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
 
 
 /**

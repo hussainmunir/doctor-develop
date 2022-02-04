@@ -12,7 +12,8 @@ const { getDoctorById,
     getAllDoctors,
     getWaitingList,
     getAllCompanies,
-    getPreviousAppointments
+    getPreviousAppointments,
+    companiesAllDoctors
 } = require('../controllers/doctors.controllers');
 
 
@@ -23,6 +24,7 @@ router.post('/register', registerDoctor);
 router.post('/login', loginDoctor);
 router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
+router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
 router.get('/', checkAuth, getAllDoctors)
 router.get('/getDr/:id', checkAuth, getDoctorById);
