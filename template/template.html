@@ -46,7 +46,7 @@
     <!-- <h3>Medications Prescribed: {medications}</h3> <br /><br /> -->
 
     <div class="blue">
-        <p><strong>Chief Complaint:</strong> {{problemAreas}} {{problem_concatenated}}</p>
+        <p><strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}</p>
         <strong>History Of Presenting Illness:</strong><br>
         <p>
             {{name}} is a very pleasant {{age}} year old {{gender}} who presents with the complaint of
@@ -54,7 +54,7 @@
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity.
             {{pronoun}} {{injury}}.
             {{pronoun}} states symptoms are worse with {{aggrevatingFactors}} and get
-            better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pronoun}} {{pastTreatmentText}} {{#each pastTreatments}}{{this}} {{/each}}{{pronoun}} {{medicationHistory}}
+            better with {{alleviatingFactors}}. {{symtompsRadiate}} {{pronoun}} {{pastTreatmentText}} {{#each pastTreatments}} {{this}}{{/each}}. {{pronoun}} {{medicationHistory}}
             {{#each newMedications}}
             {{this}}
             {{/each}}
@@ -215,9 +215,10 @@
             {{/each}}
         </ul>
         <br />
+       <div style = "display: {{styles}}">
         <strong>Strength: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-            <tr style = {{styles}}>
+            <tr>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>
                 <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Left</th>
@@ -230,10 +231,12 @@
             </tr>
             {{/each}}
         </table>
+       </div>
         <br>
+       <div  style="display: {{ReflexesStyles}}">
         <strong>Reflexes: </strong><br /><br />
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
-            <tr style={{ReflexesStyles}}>
+            <tr>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>
                 <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Left</th>
@@ -246,6 +249,7 @@
             </tr>
             {{/each}}
         </table>
+       </div>
         <!-- <p>The patient has tenderness to palpation at: </p><ul>{{#each physicalExam}} <li> {{this}} </li> {{/each}}</ul> -->
         <strong>{{positiveHeading}}</strong>
         <ul>

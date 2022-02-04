@@ -453,7 +453,7 @@ const getProblems= (symptoms) => {
      symptoms[i] === 'sore' || symptoms[i] === 'tender'|| symptoms[i] === 'burning' ||
       symptoms[i] === 'stabbing' || symptoms[i] === 'deep' || symptoms[i] === 'superficial' || symptoms[i] === 'bruising')
      {
-     pain.push(`${symptoms[i]} `)
+     pain.push(` ${symptoms[i]}`)
    }
   }
   
@@ -463,7 +463,7 @@ const getProblems= (symptoms) => {
     symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
     symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
      symptoms[i] === 'tingling' ){
-     painless.push(` ${symptoms[i]} `);
+     painless.push(` ${symptoms[i]}`);
      
    }
 }
@@ -658,6 +658,13 @@ if(painlessCopy.length == 0){
 return concatenatedArray ;
 }
 
+const appendAndBeforTheLastValue = (arr) => {
+  console.log("AAAAA",arr)
+  if(arr.length>1){
+    arr.splice(arr.length-1,0," and")
+    return arr;
+  }
+}
 
 exports.generateReport = async (req, res, next) => {
   try {
@@ -678,6 +685,7 @@ exports.generateReport = async (req, res, next) => {
 
     //HELPER METHOD CALLS
     const doctorName = await getDoctorName(problem.doctorId)
+    const pastTreatments=appendAndBeforTheLastValue(problem.previousTreatment.previousTreatmentInclude)
     const result = getProblemConcatenated(problem.symptoms);
     const pAge = getAge(patient.dateOfBirth);
     const pSocial = getSocial(patient.socialHistory)
@@ -742,7 +750,7 @@ exports.generateReport = async (req, res, next) => {
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
 
     let problem_areas = getTreatments(problem.fullBodyCoordinates)
-   
+    const problem_areasToUpperCase = problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1);
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let ros_general = getTreatments(patient.reviewSystem.general)
     let ros_neuro = getTreatments(patient.reviewSystem.neurologic)
@@ -752,7 +760,7 @@ exports.generateReport = async (req, res, next) => {
     let ros_endocrine = getTreatments(patient.reviewSystem.endocrine)
     let ros_psychiatric = getTreatments(patient.reviewSystem.psychiatric)
     let general_exam = getGeneralExam(problem.dignosis.generalExam)
-
+    console.log(problem.dignosis.reflexes.length)
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -785,7 +793,7 @@ exports.generateReport = async (req, res, next) => {
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
-        pastTreatments: problem.previousTreatment.previousTreatmentInclude,
+        pastTreatments,
         pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
@@ -801,6 +809,7 @@ exports.generateReport = async (req, res, next) => {
         skin: problem.dignosis.skin,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
         problemAreas: problem_areas ? problem_areas : "none",
+        problem_areasToUpperCase,
         rosGeneral: ros_general ? ros_general : "none",
         rosNeuro: ros_neuro ? ros_neuro : "none",
         rosSkin: ros_skin ? ros_skin : "none",
@@ -819,7 +828,7 @@ exports.generateReport = async (req, res, next) => {
         range: problem.dignosis.rangeOfMotion,
         strength: problem.dignosis.strength,
         Reflexes: problem.dignosis.reflexes,
-        ReflexesStyles:problem.dignosis.reflexes?"":"display: none;",
+        ReflexesStyles:problem.dignosis.reflexes.length == 0 ?"none" : "",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
@@ -842,7 +851,7 @@ exports.generateReport = async (req, res, next) => {
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
-        styles: problem.dignosis.strength ? ' ' : 'display:none',
+        styles: problem.dignosis.strength.length == 0 ? 'none' : ' ',
         vitals:problem.dignosis.vitals,
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
