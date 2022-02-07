@@ -175,6 +175,10 @@ const hpiProblemSchema = new mongoose.Schema({
         otherTreatments: {
             type: String,
             required: false,
+        },
+        physicalTherapy:{
+            whenBegin:String,
+            numberOfSession:String
         }
 
     },
@@ -280,7 +284,8 @@ const hpiProblemSchema = new mongoose.Schema({
         },
         nextVisit: {
             type: String
-        }
+        },
+        date: String,
     },
     signature:[{
         publicId: {

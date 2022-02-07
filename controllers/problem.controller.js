@@ -89,12 +89,11 @@ exports.updatePatientSignature = async (req, res, next) => {
         if (req.files) {
           if (req.files.signaturePhoto) { 
               const urlId = await uploadImage(req.files.signaturePhoto, next)
-    
               var toBeAdded = {
                 IsSignature: true,
                 eSignaturePhotoUrl:urlId.url,
                 public_id:urlId.public_id,
-                date: new Date().toLocaleString()
+                date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
               }
               
             
@@ -129,9 +128,8 @@ catch (err) {
 
 
 exports.setProblems = async (req, res, next) => {
-    console.log("i am here")
     console.log(req.body)
-    console.log("teste" , req.body.isRaditate);
+   
     try {
         const problem = new Problem({
             patientID: req.user.data[1],
@@ -154,6 +152,7 @@ exports.setProblems = async (req, res, next) => {
             "previousTreatment.isPreviousTreatment": req.body.isPreviousTreatment,
             "previousTreatment.previousTreatmentInclude": req.body.previousTreatmentInclude,
             "previousTreatment.otherTreatments": req.body.otherTreatments,
+            "previousTreatment.physicalTherapy": req.body.physicalTherapy,
             "signature.publicId":"public id",
             "signature.eSignaturePhoto":"",
             "signature.isSignature":"false",

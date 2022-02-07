@@ -236,6 +236,10 @@ exports.searchCode = async (req, res, next) => {
 }
 
 exports.diagnosis = async (req, res, next) => {
+
+  console.log("red.body",req.body);
+  req.body.dignosis.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  console.log("req.body.dignosis.date",req.body.dignosis.date)
   try {
     const prb = await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -788,7 +792,7 @@ exports.generateReport = async (req, res, next) => {
         fN: patient.fname,
         DOB: moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         MRN: patient.insurance.membershipId,
-        date: moment().format('MMMM Do, YYYY'),
+        date: moment(problem.dignosis.date).format('MMMM Do, YYYY'),
         followup: problem.dignosis.suggestedFollowup,
         diagnosis: problem.dignosis.assessment,
         treatments: getTreatments(problem.dignosis.treatmentPlan),
@@ -801,7 +805,7 @@ exports.generateReport = async (req, res, next) => {
         toHasortoHer:pronoun == "He"? "to his" : "to her",
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
-        injury: problem.injury.Details ? `"admits to ${injuryDetails}"` : "denies any injury",
+        injury: problem.injury.Details ? `admits to injury: " ${injuryDetails}"` : "denies any injury",
         aggrevatingFactors: str_aggFactors,
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
