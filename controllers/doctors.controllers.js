@@ -333,13 +333,23 @@ const getRadiateStr = (condition, pr) => {
     return `${pr} denies any radiating symptoms.`
   }
 }
-const getPreviousTreatments = (sPT, p) => {
-  let str = ""
-  if (sPT.isPreviousTreatment || (sPT.previousTreatmentInclude != "None")) {
-    str = `${p.fname} has received treatment for this issue in the past including ${sPT.previousTreatmentInclude.map(t => `${t} `)} `
-    return str
+const getPreviousTreatments = (sPT) => {
+  console.log("amir khan=>",sPT)
+  let str = "Brace and physical therapy which started on {whenBegin} and had {numberOfSession} sessions completed."
+  if (sPT.isPreviousTreatment) {
+   
+   if(sPT.isPreviousTreatment && sPT.physicalTherapy.whenBegin != "" && sPT.physicalTherapy.numberOfSession && sPT.previousTreatmentInclude.length > 1){
+     str=`has received previous treatment include ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
+     return str;
+    }else{
+      sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
+      const removeComma = sPT.previousTreatmentInclude.join(" ");
+      str=`has received previous treatment include ${removeComma}`
+      return str;
+    }
+ 
   } else {
-    str = `${p.fname} has not received treatment for this issue in the past.`
+    str = `has not received treatment for this issue in the past.`
     return str
   }
 
@@ -362,6 +372,21 @@ const getCurrMed = (med) => {
   });
 
   return meds;
+}
+const getStrength = (array) => {
+  var spain =[]
+  var strength=[]
+  for(i=0; i<array.length;i++){
+    if(array[i].strengthName.trim() ==="Cervical Spine Flexion" || array[i].strengthName.trim() ==="Cervical Spine Extension" || array[i].strengthName.trim() ==="Thoracic/Lumbar Flexion" ||array[i].strengthName.trim() ==="Thoracic/Lumbar Extension"){
+  spain.push(array[i])
+  
+  }else{
+   strength.push(array[i])
+  }
+ 
+ var wrapper=[spain,strength]; 
+}
+return wrapper;
 }
 const getPhysicalExam = (physicalExam) => {
   var handFootArray = []
@@ -675,13 +700,13 @@ if(painlessCopy.length == 0){
 return concatenatedArray ;
 }
 
-const appendAndBeforTheLastValue = (arr) => {
-  console.log("AAAAA",arr)
-  if(arr.length>1){
-    arr.splice(arr.length-1,0," and")
-    return arr;
-  }
-}
+// const appendAndBeforTheLastValue = (arr) => {
+//   console.log("AAAAA",arr)
+//   if(arr.length>1){
+//     arr.splice(arr.length-1,0," and")
+//     return arr;
+//   }
+// }
 
 exports.generateReport = async (req, res, next) => {
   try {
@@ -702,14 +727,14 @@ exports.generateReport = async (req, res, next) => {
 
     //HELPER METHOD CALLS
     const doctorName = await getDoctorName(problem.doctorId)
-    const pastTreatments=appendAndBeforTheLastValue(problem.previousTreatment.previousTreatmentInclude)
+    // const pastTreatments=appendAndBeforTheLastValue(problem.previousTreatment.previousTreatmentInclude)
     const result = getProblemConcatenated(problem.symptoms);
     const pAge = getAge(patient.dateOfBirth);
     const pSocial = getSocial(patient.socialHistory)
     // const smokeDrink = getSocial(patient.socialHistory)
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
-    const pTreatString = getPreviousTreatments(problem.previousTreatment, patient);
+    const pTreatString = getPreviousTreatments(problem.previousTreatment);
     let pronoun;
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
@@ -762,12 +787,13 @@ exports.generateReport = async (req, res, next) => {
 
     let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
-
+    let strength= getStrength(problem.dignosis.strength);
+    console.log("testing",strength)
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
 
     let problem_areas = getTreatments(problem.fullBodyCoordinates)
-    const problem_areasToUpperCase = problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1);
+    const problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let ros_general = getTreatments(patient.reviewSystem.general)
     let ros_neuro = getTreatments(patient.reviewSystem.neurologic)
@@ -810,8 +836,8 @@ exports.generateReport = async (req, res, next) => {
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
-        pastTreatments,
-        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
+        // pastTreatments,
+        // pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
@@ -843,7 +869,9 @@ exports.generateReport = async (req, res, next) => {
         treatmentPlan: problem.dignosis.treatmentPlan,
         medicalEquipment:problem.dignosis.medicalEquipment,
         range: problem.dignosis.rangeOfMotion,
-        strength: problem.dignosis.strength,
+        rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
+        strength:strength?strength[1]:[],
+        spain:strength?strength[0]:[],
         Reflexes: problem.dignosis.reflexes,
         ReflexesStyles:problem.dignosis.reflexes.length == 0 ?"none" : "",
         ST: STA,

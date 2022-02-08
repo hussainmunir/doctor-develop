@@ -44,41 +44,59 @@ exports.getAppts = async (req, res) => {
 
 }
 
-exports.setAppts = async(req, res) => {
-    console.log("in appointment controller")
-    const body = req.body;
+// exports.setAppts = async(req, res) => {
+//     console.log("in appointment controller")
+//     const body = req.body;
     
-    try{
-        const doctor= await Doctor.findOne({ _id : req.body.doctorID})
-        const patient = await Patient.findOne({_id : req.user.data[1]})
+//     try{
+//         const doctor= await Doctor.findOne({ _id : req.body.doctorID})
+//         const patient = await Patient.findOne({_id : req.user.data[1]})
 
-        body.patientID = req.user.data[1];
-        body.doctorName = doctor.name;
-        body.patientName = `${patient.fname} ${patient.lname}`
-        const appt = new Appointments(body);
-         try {
-        const check = await Appointments.findOne({ 'doctorID': appt.doctorID, 'date': appt.date });
-        if (check) {
-            res.status(500).json({
-                success: false,
-                mesage: "Appointment already exists ! Please select another date"
-            })
-        } else {
-            const result = await appt.save()
-            res.status(200).json({
-                success: true,
-                message: 'Appointment added successfully'
-            });
-        }
+//         body.patientID = req.user.data[1];
+//         body.doctorName = doctor.name;
+//         body.patientName = `${patient.fname} ${patient.lname}`
+//         const appt = new Appointments(body);
+//          try {
+//         const check = await Appointments.findOne({ 'doctorID': appt.doctorID, 'date': appt.date });
+//         if (check) {
+//             res.status(500).json({
+//                 success: false,
+//                 mesage: "Appointment already exists ! Please select another date"
+//             })
+//         } else {
+//             const result = await appt.save()
+//             res.status(200).json({
+//                 success: true,
+//                 message: 'Appointment added successfully'
+//             });
+//         }
 
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: err.message })
+//     }
+//     }
+//     catch(e){
+//        return  res.status(500).json({
+//             success: false,
+//             mesage: "this doctor does not exist"
+//         })
+//     }
+// }
+
+
+exports.setAppts = async (req, res, next) => {
+    
+  
+   
+    try {
+        const {date,doctorID,patientID,doctorName,patientName,companyName,time}=req.body
+        const appointment = new Appointments({date,time,doctorID,patientID,doctorName, patientName,companyName});
+        const result = await appointment.save();
+        return res.status(200).json({
+            success: true,
+            message: 'set appointments successfully',
+        });
     } catch (err) {
-        res.status(500).json({ success: false, message: err.message })
-    }
-    }
-    catch(e){
-       return  res.status(500).json({
-            success: false,
-            mesage: "this doctor does not exist"
-        })
+        return res.status(500).json({ success: false, message: err.message })
     }
 }

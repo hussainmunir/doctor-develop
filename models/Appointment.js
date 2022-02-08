@@ -10,10 +10,8 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add doctor id']
     },
-    date: {
-        type: Date,
-        required: [true, 'Please enter the appointment date']
-    },
+    date:String,
+    time:String,
     doctorName:{
         type:String,
         required:[true , "doctor name missing"]
@@ -21,7 +19,8 @@ const appointmentSchema = new mongoose.Schema({
     patientName:{
         type:String,
         required:[true , "patient name missing"]
-    }
+    },
+    companyName:String
 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);
