@@ -900,6 +900,7 @@ exports.generateReport = async (req, res, next) => {
         vitals:problem.dignosis.vitals,
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
+        doctorNameStyle:problem.signature.eSignaturePhotoUrl?" ":"none",
         imageStyle:problem.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
         designations:doctorName.designations,
