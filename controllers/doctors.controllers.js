@@ -335,17 +335,18 @@ const getRadiateStr = (condition, pr) => {
 }
 const getPreviousTreatments = (sPT) => {
   console.log("amir khan=>",sPT)
-  let str = "Brace and physical therapy which started on {whenBegin} and had {numberOfSession} sessions completed."
+  let str = ""
   if (sPT.isPreviousTreatment) {
    
-   if(sPT.isPreviousTreatment && sPT.physicalTherapy.whenBegin != "" && sPT.physicalTherapy.numberOfSession && sPT.previousTreatmentInclude.length > 1){
-     str=`has received previous treatment include ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
-     return str;
+   if( sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length >= 1){
+     console.log("amir khan")
+    return str=`has received previous treatment include ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
+    
     }else{
       sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
       const removeComma = sPT.previousTreatmentInclude.join(" ");
-      str=`has received previous treatment include ${removeComma}`
-      return str;
+     return str=`has received previous treatment include ${removeComma}`
+      
     }
  
   } else {
@@ -727,7 +728,6 @@ exports.generateReport = async (req, res, next) => {
 
     //HELPER METHOD CALLS
     const doctorName = await getDoctorName(problem.doctorId)
-    // const pastTreatments=appendAndBeforTheLastValue(problem.previousTreatment.previousTreatmentInclude)
     const result = getProblemConcatenated(problem.symptoms);
     const pAge = getAge(patient.dateOfBirth);
     const pSocial = getSocial(patient.socialHistory)
@@ -788,7 +788,6 @@ exports.generateReport = async (req, res, next) => {
     let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
     let strength= getStrength(problem.dignosis.strength);
-    console.log("testing",strength)
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
 
@@ -836,8 +835,7 @@ exports.generateReport = async (req, res, next) => {
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
-        // pastTreatments,
-        // pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
+        pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
