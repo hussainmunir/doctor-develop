@@ -354,7 +354,7 @@ const getPreviousTreatments = (sPT) => {
     }
  
   } else {
-    str = `has not received treatment for this issue in the past.`
+    str = `has not received treatment for this issue in the past`
     return str
   }
 
