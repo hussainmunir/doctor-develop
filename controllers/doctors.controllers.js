@@ -342,7 +342,11 @@ const getPreviousTreatments = (sPT) => {
      console.log("amir khan")
     return str=`has received previous treatment include ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
     
-    }else{
+    }
+    if(sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length == 0){
+      return str=`has received previous treatment include physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
+    }
+    if(sPT.physicalTherapy.whenBegin == ""  && sPT.previousTreatmentInclude.length >= 1){
       sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
       const removeComma = sPT.previousTreatmentInclude.join(" ");
      return str=`has received previous treatment include ${removeComma}`
@@ -870,6 +874,8 @@ exports.generateReport = async (req, res, next) => {
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength?strength[1]:[],
         spain:strength?strength[0]:[],
+        spainStyle:strength[0].length ==0 ? "none":"",
+        strengthStyle:strength[1].length ==0 ? "none":"",
         Reflexes: problem.dignosis.reflexes,
         ReflexesStyles:problem.dignosis.reflexes.length == 0 ?"none" : "",
         ST: STA,
@@ -894,7 +900,6 @@ exports.generateReport = async (req, res, next) => {
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
-        styles: problem.dignosis.strength.length == 0 ? 'none' : ' ',
         vitals:problem.dignosis.vitals,
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
