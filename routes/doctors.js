@@ -13,7 +13,9 @@ const { getDoctorById,
     getWaitingList,
     getAllCompanies,
     getPreviousAppointments,
-    companiesAllDoctors
+    companiesAllDoctors,
+    postOperation,
+    putDoctorFollowUp
 } = require('../controllers/doctors.controllers');
 
 
@@ -21,6 +23,7 @@ const router = express.Router();
 
 router.get('/getDr', checkAuth, getDoctor);
 router.post('/register', registerDoctor);
+router.post('/operation', postOperation);
 router.post('/login', loginDoctor);
 router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
@@ -31,6 +34,7 @@ router.get('/getDr/:id', checkAuth, getDoctorById);
 router.get('/report/:pID', generateReport);
 router.get('/search', checkAuth, searchCode);
 router.put('/updateDr', checkAuth, updateDoctor);
+router.put('/updateFollowUp/:followUpID',putDoctorFollowUp)
 router.delete('/deleteDr', checkAuth, deleteDoctor);
 router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments)

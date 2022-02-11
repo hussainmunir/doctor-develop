@@ -4,6 +4,7 @@ const Pharma = require('../models/Pharmacies');
 const OtherMedConditions = require('../models/OtherMedicalConditions');
 const Test = require('../models/Test');
 const Problem = require('../models/Problem');
+const FollowUp = require('../models/FollowUp.js');
 const ErrorResponse = require('../utils/errorResponse');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -277,7 +278,6 @@ exports.getPatientLabs = async (req, res) => {
     })
   }
 }
-
 exports.updatePatient = async (req, res) => {
 
   const body = req.body;
@@ -955,3 +955,22 @@ exports.getPreviousTreatments = async (req, res, next) => {
     next(new ErrorResponse(err.message, 500))
   }
 }
+
+exports.postPatientFollowUp = async (req, res, next) => {
+  try {
+    console.log(req.body)
+      const followUp = new FollowUp({patientInWaitingRoom: req.body.patientInWaitingRoom,
+        followUpVisit:req.body.followUpVisit});
+
+      await followUp.save();
+
+      res.send({
+        success: true,
+        message: 'FollowUp created successful'
+      });
+    
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+

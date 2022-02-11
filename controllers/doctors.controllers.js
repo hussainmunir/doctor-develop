@@ -1,8 +1,10 @@
 const Doctor = require('../models/Doctor')
+const Operation = require('../models/Operation')
 const ICD = require('../models/ICDcodes')
 const Problem = require('../models/Problem')
 const Patient = require('../models/Patient')
 const SpecialTests = require('../models/SpecialTests')
+const FollowUp = require('../models/FollowUp.js');
 const ErrorResponse = require('../utils/errorResponse')
 const path = require('path');
 const fs = require('fs');
@@ -334,22 +336,21 @@ const getRadiateStr = (condition, pr) => {
   }
 }
 const getPreviousTreatments = (sPT) => {
-  console.log("amir khan=>",sPT)
   let str = ""
   if (sPT.isPreviousTreatment) {
    
    if( sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length >= 1){
-     console.log("amir khan")
-    return str=`has received previous treatment include ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
+    
+    return str=`has received previous treatment including ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and has completed ${sPT.physicalTherapy.numberOfSession} sessions`
     
     }
     if(sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length == 0){
-      return str=`has received previous treatment include physical therapy which started on ${sPT.physicalTherapy.whenBegin} and had ${sPT.physicalTherapy.numberOfSession} sessions completed`
+      return str=`has received previous treatment including physical therapy which started on ${sPT.physicalTherapy.whenBegin} and has completed ${sPT.physicalTherapy.numberOfSession} sessions`
     }
     if(sPT.physicalTherapy.whenBegin == ""  && sPT.previousTreatmentInclude.length >= 1){
       sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
       const removeComma = sPT.previousTreatmentInclude.join(" ");
-     return str=`has received previous treatment include ${removeComma}`
+     return str=`has received previous treatment including ${removeComma}`
       
     }
  
@@ -944,6 +945,49 @@ exports.getWaitingList = async (req, res, next) => {
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
+  }
+}
+
+
+exports.postOperation = async (req, res, next) => {
+  try {
+      const operation = new Operation(req.body);
+
+      await operation.save();
+
+      res.send({
+        success: true,
+        message: 'Operation created successful'
+      });
+    
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.putDoctorFollowUp = async (req, res, next) => {
+
+  console.log("red.body",req.body);
+
+  try {
+    const followUp = await FollowUp.findOneAndUpdate(
+      { '_id': req.params.followUpID },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      });
+
+    if (!followUp) {
+      return next(new ErrorResponse('follow up note does not exist', 400))
+    }
+    res.status(200).json({
+      success: true,
+      message:"follow up note update successfully "
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
   }
 }
 

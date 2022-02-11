@@ -256,8 +256,6 @@ const hpiProblemSchema = new mongoose.Schema({
         diagnosticStudies: [diagnosticSchema],
         strength: [strengthSchema],
         reflexes: [reflexesSchema],
-        //i just added diagnosticStudies
-     
         rangeOfMotion: [String],
         physicalExamThreeDModal: [String],
         medicalEquipment: {

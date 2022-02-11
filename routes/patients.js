@@ -24,7 +24,9 @@ const { getPatient,
     getPharmacy,
     getOtherMeds,
     getPatientById,
-    getPreviousTreatments } = require('../controllers/patients.controllers');
+    getPreviousTreatments,
+    postPatientFollowUp
+ } = require('../controllers/patients.controllers');
 
 
 const router = express.Router();
@@ -36,7 +38,7 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser)
 router.post('/getPatientLabs', checkAuth, getPatientLabs);
-
+router.post('/patientfollowup', postPatientFollowUp)
 
 router.post('/test', testUser);
 
