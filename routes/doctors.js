@@ -15,7 +15,9 @@ const { getDoctorById,
     getPreviousAppointments,
     companiesAllDoctors,
     postOperation,
-    putDoctorFollowUp
+    putDoctorFollowUp,
+    generateFollowUp,
+    generateOpNote
 } = require('../controllers/doctors.controllers');
 
 
@@ -29,6 +31,8 @@ router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
 router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
+router.get('/followUp/:FollowId', checkAuth, generateFollowUp);
+router.get('/operationNote/:opId', checkAuth, generateOpNote);
 router.get('/', checkAuth, getAllDoctors)
 router.get('/getDr/:id', checkAuth, getDoctorById);
 router.get('/report/:pID', generateReport);

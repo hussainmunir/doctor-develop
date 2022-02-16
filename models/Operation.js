@@ -47,8 +47,18 @@ const diagnosticSchema = new mongoose.Schema({
         type: String,
     }
 })
-
+const surgicalHistorySchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    code: {
+        type: String
+    },
+    recommendByDoctor:Boolean
+})
 const operationSchema = new mongoose.Schema({
+    patientId:String,
+    dactorId:String,
     patientAdmits: [String],
     isPain: Boolean,
     companyName:String,
@@ -67,6 +77,8 @@ const operationSchema = new mongoose.Schema({
     diagnosticStudies: [diagnosticSchema],
     cPTCode:String,
     treatmentPlan:[treatmentSchema],
+    surgicalHistory: [surgicalHistorySchema],
+    
 });
 
 

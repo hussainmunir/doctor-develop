@@ -101,6 +101,8 @@ const treatmentSchema = new mongoose.Schema({
 // })
 
 const followUpSchema = new mongoose.Schema({
+    patientId:String,
+        doctorId:String,
     patientInWaitingRoom:{
         symptoms: String,
         painScale: String,
@@ -110,7 +112,8 @@ const followUpSchema = new mongoose.Schema({
         injectionHelpDetail:String,
         improveWithInjection:Boolean,
         improveDetail:String,
-        fallsOrTrauma:Boolean
+        fallsOrTrauma:Boolean,
+        fallsTraumaDetail:String
     },
     followUpVisit:{
         physicalExamThreeDModal: [String],

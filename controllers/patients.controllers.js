@@ -959,7 +959,11 @@ exports.getPreviousTreatments = async (req, res, next) => {
 exports.postPatientFollowUp = async (req, res, next) => {
   try {
     console.log(req.body)
-      const followUp = new FollowUp({patientInWaitingRoom: req.body.patientInWaitingRoom,
+    
+      const followUp = new FollowUp({
+        patientId:req.body.patientId,
+        doctorId:req.body.patientId,
+        patientInWaitingRoom: req.body.patientInWaitingRoom,
         followUpVisit:req.body.followUpVisit});
 
       await followUp.save();

@@ -4,7 +4,7 @@ const ICD = require('../models/ICDcodes')
 const Problem = require('../models/Problem')
 const Patient = require('../models/Patient')
 const SpecialTests = require('../models/SpecialTests')
-const FollowUp = require('../models/FollowUp.js');
+const FollowUpModal = require('../models/FollowUp.js');
 const ErrorResponse = require('../utils/errorResponse')
 const path = require('path');
 const fs = require('fs');
@@ -747,18 +747,7 @@ exports.generateReport = async (req, res, next) => {
     const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate, pronoun);
     const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
     const template = fs.readFileSync('./template/template.html', 'utf-8');
-    //--- let symptoms_lower = problem.symptoms.map((item) => {
-    //   console.log("logging item")
-    //   console.log("item : ", item)
-    //   if (item) {
-    //     item.toLowerCase()
-    //   }
-    //   else {
-    //     item
-    //   }
-
-    //--- });
-
+   
     let str_aggFactors = getTreatments(problem.aggravatingFactors);
     if (str_aggFactors) {
       str_aggFactors = str_aggFactors.toLowerCase();
@@ -1018,5 +1007,66 @@ exports.getPreviousAppointments = async (req, res, next) => {
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
+  }
+}
+exports.generateFollowUp = async (req, res, next) => {
+  try {
+    const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
+    const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
+   console.log("patient",patient)
+    if (!followUp || !patient ) {
+      return res.status(400).json({
+        success: false,
+        data: "Something has gone wrong"
+      })
+    }
+    const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
+    const options = {
+      format: 'A4',
+      orientation: 'potrait',
+      border: '20mm'
+    }
+    const document = {
+
+      html: followUpNote,
+      data: {
+        patient,
+        dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY')
+   
+      },
+      path: `${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`
+    }
+    pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`))
+  } catch (err) {
+    return next(new ErrorResponse(err.message + "in generateFollow up function", 500))
+  }
+}
+
+
+exports.generateOpNote = async (req, res, next) => {
+  console.log("amir khab")
+  try {
+    const operation = await Operation.findOne({ _id: req.params.opId }).lean();
+    console.log("Note",operation)
+    const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
+    // res.status(200).json({data:Note})
+    console.log("Note",operation)
+    const options = {
+      format: 'A4',
+      orientation: 'potrait',
+      border: '20mm'
+    }
+    const document = {
+
+      html: operationNote,
+      data: {
+        ln:operation,
+   
+      },
+      path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
+    }
+    pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`))
+  } catch (err) {
+    return next(new ErrorResponse(err.message + "in generate operation note function", 500))
   }
 }
