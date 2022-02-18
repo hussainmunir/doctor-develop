@@ -25,7 +25,8 @@ const { getPatient,
     getOtherMeds,
     getPatientById,
     getPreviousTreatments,
-    postPatientFollowUp
+    postPatientFollowUp,
+    getProblemList
  } = require('../controllers/patients.controllers');
 
 
@@ -67,6 +68,7 @@ router.get('/getPharmacies', checkAuth, getPharmacies);
 router.get('/getInsuranceInfo', checkAuth, getInsuranceInfo);
 router.get('/getInsuranceInfo', checkAuth, getInsuranceInfo);
 router.get('/search', checkAuth, getOtherMeds);
-router.get('/prev', checkAuth, getPreviousTreatments)
+router.get('/prev', checkAuth, getPreviousTreatments);
+router.get('/getProblemList/:patientId',checkAuth, getProblemList)
 
 module.exports = router;

@@ -101,8 +101,11 @@ const treatmentSchema = new mongoose.Schema({
 // })
 
 const followUpSchema = new mongoose.Schema({
-    patientId:String,
-        doctorId:String,
+    patientId: String,
+    doctorId: String,
+    problemId: String,
+    isChecked: Boolean,
+
     patientInWaitingRoom:{
         symptoms: String,
         painScale: String,

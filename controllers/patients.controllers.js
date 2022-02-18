@@ -22,18 +22,41 @@ cloudinary.config({
 
 
 // @dec Get all patient
-// @route GET /api/v1/patients
+// @route GET /api/v1/patients/getPatients
 // @access Public (no need to get autheticated)
 exports.getPatients = async (req, res, next) => {
   try {
     const patients = await Patient.find();
-
+    if (!patients) {
+      return next(new ErrorResponse(`No patients in the database`, 404));
+    }
     res.status(200).json({
       success: true, count: patients.length, data: patients
     });
 
   } catch (err) {
 
+  }
+
+}
+// @dec Get all Problem of the current log in patients
+// @route GET /api/v1/patients/getProblemList/:patientId
+// @access Public (no need to get autheticated)
+exports.getProblemList = async (req, res, next) => {
+  console.log("id",req.params.patientId)
+  try {
+    const problems = await Problem.find({patientID: req.params.patientId,isChecked: true });
+    if (problems == null) {
+      res.status(200).json({
+        success: true, data: "This patient have no problem in The database"
+      });
+    }
+    res.status(200).json({
+      success: true, data: problems
+    });
+
+  } catch (err) {
+    next(new ErrorResposne(err.message, 500));
   }
 
 }
@@ -963,8 +986,11 @@ exports.postPatientFollowUp = async (req, res, next) => {
       const followUp = new FollowUp({
         patientId:req.body.patientId,
         doctorId:req.body.patientId,
+        problemId:req.body.problemId,
         patientInWaitingRoom: req.body.patientInWaitingRoom,
-        followUpVisit:req.body.followUpVisit});
+        followUpVisit:req.body.followUpVisit,
+        isChecked: false
+      });
 
       await followUp.save();
 

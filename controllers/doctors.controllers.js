@@ -954,12 +954,10 @@ exports.postOperation = async (req, res, next) => {
   }
 }
 
+//doctor update follow up note 
 exports.putDoctorFollowUp = async (req, res, next) => {
-
-  console.log("red.body",req.body);
-
   try {
-    const followUp = await FollowUp.findOneAndUpdate(
+    const followUp = await FollowUpModal.findOneAndUpdate(
       { '_id': req.params.followUpID },
       req.body,
       {
@@ -970,6 +968,10 @@ exports.putDoctorFollowUp = async (req, res, next) => {
     if (!followUp) {
       return next(new ErrorResponse('follow up note does not exist', 400))
     }
+    await FollowUpModal.findOneAndUpdate(
+      { '_id': req.params.followUpID },
+      { 'isChecked': true }
+    )
     res.status(200).json({
       success: true,
       message:"follow up note update successfully "
@@ -1009,11 +1011,22 @@ exports.getPreviousAppointments = async (req, res, next) => {
     next(new ErrorResponse(err.message, 500))
   }
 }
+
 exports.generateFollowUp = async (req, res, next) => {
+  
   try {
     const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
     const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
-   console.log("patient",patient)
+    const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
+    let strength= getStrength(followUp.followUpVisit.strength);
+    let physicalExam = getPhysicalExam(problem.dignosis.physicalExam);
+    const STA = getPassST(problem.dignosis.specialTests);
+    let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
+    let str_DD = getTreatments(arr_DD);
+    let medicationsName = getCurrMed(patient.currentMedications);
+    let problem_areas = getTreatments(problem.fullBodyCoordinates);
+    let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
+    let problem_concatenated = getProblemConcatenated(problem.symptoms)
     if (!followUp || !patient ) {
       return res.status(400).json({
         success: false,
@@ -1024,29 +1037,60 @@ exports.generateFollowUp = async (req, res, next) => {
     const options = {
       format: 'A4',
       orientation: 'potrait',
-      border: '20mm'
+      border: '20mm',
     }
     const document = {
 
       html: followUpNote,
       data: {
         patient,
-        dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY')
-   
+        dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
+        Age:getAge(patient.dateOfBirth),
+        gender:patient.gender,
+        pronoun:patient.gender == "male"? "He" : "she",
+        hisORHer:patient.gender == "male"?"his" :"her",
+        patientInWaitingRoom:followUp.patientInWaitingRoom,
+        injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp == true?" improvement":" no improvement",
+        improveDetail:followUp.patientInWaitingRoom.improveDetail,
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including (free text box content).":"no trauma.",
+        strength:strength[1],
+        skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        followUpVisit:followUp.followUpVisit,
+        generalBodyParts: physicalExam[0],
+        handFootLandMarks: physicalExam[1],
+        physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
+        physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
+        vitals:problem.dignosis.vitals,
+        ST: STA,
+        positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
+        RadiationDistribution:problem.dignosis.radiationDistribution,
+        RadiationDistributionTxt:problem.dignosis.radiationDistribution.length >=1 ? "Distribution Of Radiation:":'',
+        diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
+        diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
+        DD: str_DD ? str_DD : "none",
+        DDarray:arr_DD,
+        allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
+        medications: medicationsName,
+        medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
+        rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
+        problem_areasToUpperCase,
+        problem_concatenated,
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`
     }
     pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`))
   } catch (err) {
-    return next(new ErrorResponse(err.message + "in generateFollow up function", 500))
+    return next(new ErrorResponse(err.message + " follow up Id is incorrect in generateFollow up function", 500))
   }
 }
 
 
 exports.generateOpNote = async (req, res, next) => {
-  console.log("amir khab")
   try {
     const operation = await Operation.findOne({ _id: req.params.opId }).lean();
+    const patient = await Patient.findOne({ _id: operation.patientId }).lean();
+    const problem = await Problem.findOne({ _id: operation.problemId }).lean();
     console.log("Note",operation)
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
@@ -1060,13 +1104,13 @@ exports.generateOpNote = async (req, res, next) => {
 
       html: operationNote,
       data: {
-        ln:operation,
+        patient,
    
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
     pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`))
   } catch (err) {
-    return next(new ErrorResponse(err.message + "in generate operation note function", 500))
+    return next(new ErrorResponse(err.message + " in generate operation note function", 500))
   }
 }
