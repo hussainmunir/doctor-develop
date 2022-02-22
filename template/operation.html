@@ -5,28 +5,34 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+         h1{text-decoration: underline;}
+        h2{margin: 2px; font-size: 16px;}
+        p{margin-top: 2px;}
+    </style>
 </head>
 <body>
     <h1>Operation Note</h1>
     <h1>{{patient.fname}},{{patient.lname}}</h1>
-   <h2>DOB: (Date of Birth)</h2>
-   <h2>MRN: (Medical Record Number)</h2>
+    <h2>DOB:{{dateOfBirth}}</h2>
+    <h2>MRN: (Medical Record Number)</h2>
    <h2>Date of Encounter: (Date)</h2>
    <h2>Return: (Follow up appointment selected by doctor in treatment plan)</h2>
    <h2>Diagnosis: (Surgery Perfomed)</h2>
-   <h2>Work Duty:</h2>
-   <h2>Chief Complaint:</h2>
+   <h2>Work Duty:{{workDType}}</h2>
+   <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
+   <br><br>
    <h2>History of Presenting Illness</h2>
-        <p>(Name) presents today for first post-op visit up. Since surgery, the patient
+        <p>{{patient.fname}} {{patient.lname}}  presents today for first post-op visit up. Since surgery, the patient
             (Fevers/chills/nausea/vomiting/chest pain/shortness of breath/calf/falls/trauma).
-            (He/She) states (his/her) pain is (controlled/not controlled) (without medication/with
+            {{pronoun}} states {{hisORHer}} pain is (controlled/not controlled) (without medication/with
             medication including (free text box)). Pain is graded at (Pain Scale) level intensity. (He/She)
             (Is ambulating without any assistive devices/is ambulating with (Assistive Device)/is not
             ambulatory)
         </p> 
 
-<p><strong>Examination:</strong> (Name) is an awake, alert and oriented (male/female/individual) that
-    appears (his/her/their) stated age. They have a pleasant demeanor. They are able to follow
+<p><strong>Examination:</strong>{{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
+    appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
     commands appropriately. They are in no acu</p>
 
     <h2>Vitals:</h2>

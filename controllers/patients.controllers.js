@@ -5,6 +5,7 @@ const OtherMedConditions = require('../models/OtherMedicalConditions');
 const Test = require('../models/Test');
 const Problem = require('../models/Problem');
 const FollowUp = require('../models/FollowUp.js');
+const Operation = require('../models/Operation')
 const ErrorResponse = require('../utils/errorResponse');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -379,7 +380,9 @@ exports.registerUser = async (req, res, next) => {
     else {
       let surgObj = {
         "name": JSON.parse(req.body.surgicalHistName)[0],
-        "code": JSON.parse(req.body.surgicalHistCode)[0]
+        "code": JSON.parse(req.body.surgicalHistCode)[0],
+        "problemId": JSON.parse(req.body.problemId)[0],
+        "recommendByDoctor": req.body.recommendByDoctor[0],
       }
       surgHistArr.push(surgObj);
     }
@@ -1004,3 +1007,50 @@ exports.postPatientFollowUp = async (req, res, next) => {
   }
 }
 
+exports.postOperation = async (req, res, next) => {
+  try {
+    console.log("req body",req.body)
+      const operation = new Operation(req.body);
+
+      await operation.save();
+
+      res.send({
+        success: true,
+        message: 'Operation created successful'
+      });
+    
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.getOperationWaitingList = async (req, res, next) => {
+  try {
+    const patient = await Patient.find({_id:req.params.patientId}).lean();
+  
+     console.log("=========>",patient[0].surgicalHistory[2].recommendByDoctor);
+     var list = [];
+
+    if (!patient) {
+      res.status(200).json({
+        data: "No patients in waiting",
+
+      })
+    }
+    console.log("=========>",patient[0].surgicalHistory[2].recommendByDoctor);
+    let SurgicalArray = patient[0].surgicalHistory;
+
+    if(SurgicalArray){
+      const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
+      list=recomendedByDoctor;
+    }
+   
+    res.status(200).json({
+      // count: waiting.length,
+      success: true,
+      data: list
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}

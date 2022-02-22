@@ -5,6 +5,7 @@ const Problem = require('../models/Problem')
 const Patient = require('../models/Patient')
 const SpecialTests = require('../models/SpecialTests')
 const FollowUpModal = require('../models/FollowUp.js');
+const CptCodes = require('../models/CptCodes.js');
 const ErrorResponse = require('../utils/errorResponse')
 const path = require('path');
 const fs = require('fs');
@@ -254,6 +255,11 @@ exports.diagnosis = async (req, res, next) => {
     if (!prb) {
       return next(new ErrorResponse('problem does not exist', 400))
     }
+
+    if(prb.dignosis.surgeryRecommendedByDoctor.name !== "") {
+      console.log("amir")
+      const patient = await Patient.findOneAndUpdate( { '_id': req.params.pID })
+    } 
 
     await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -937,17 +943,58 @@ exports.getWaitingList = async (req, res, next) => {
   }
 }
 
-
-exports.postOperation = async (req, res, next) => {
+exports.combineWaitingList = async (req, res, next) => {
+  console.log(req.user.data[1])
   try {
-      const operation = new Operation(req.body);
+    const problem = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
+    const operation = await Operation.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
+    const followUpModal = await FollowUpModal.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
+  
+  
 
-      await operation.save();
+    if (!problem && !operation && !followUpModal) {
+      res.status(200).json({
+        data: "No thing in waiting list",
 
-      res.send({
-        success: true,
-        message: 'Operation created successful'
-      });
+      })
+    }
+   
+    res.status(200).json({
+      success: true,
+      data: {problem,operation,followUpModal}
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.putOperation = async (req, res, next) => {
+  try {
+
+      const operation = await Operation.findOneAndUpdate(
+        { '_id': req.params.operationId },
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        });
+        if (!operation) {
+          return next(new ErrorResponse('follow up note does not exist', 400))
+        }
+        const patient = await Patient.find({_id:req.body.patientId}).lean();
+       
+        if(patient){
+          console.log(patient[0].surgicalHistory)
+        }
+        await Operation.findOneAndUpdate(
+          { '_id': req.params.operationId },
+          { 'isChecked': true }
+        )
+        res.status(200).json({
+          success: true,
+          message:"Operation note update successfully "
+        })
+    
     
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
@@ -1091,10 +1138,13 @@ exports.generateOpNote = async (req, res, next) => {
     const operation = await Operation.findOne({ _id: req.params.opId }).lean();
     const patient = await Patient.findOne({ _id: operation.patientId }).lean();
     const problem = await Problem.findOne({ _id: operation.problemId }).lean();
-    console.log("Note",operation)
+
+    let problem_areas = getTreatments(problem.fullBodyCoordinates);
+    let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
+    let problem_concatenated = getProblemConcatenated(problem.symptoms) 
+
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
-    console.log("Note",operation)
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -1105,7 +1155,13 @@ exports.generateOpNote = async (req, res, next) => {
       html: operationNote,
       data: {
         patient,
-   
+        dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        problem_areasToUpperCase,
+        problem_concatenated,
+        gender:patient.gender,
+        pronoun:patient.gender == "male"? "He" : "she",
+        hisORHer:patient.gender == "male"?"his" :"her",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
@@ -1114,3 +1170,48 @@ exports.generateOpNote = async (req, res, next) => {
     return next(new ErrorResponse(err.message + " in generate operation note function", 500))
   }
 }
+
+      
+    
+    exports.getCptCode = async (req, res, next) => {
+      
+      try {
+        // let searchedName = req.params.code;
+        // const result = await CptCodes.find({ "Code": { $regex: searchedName, $options: '$i' } });
+        const result = await CptCodes.find();
+        if (result === null) {
+          res.status(200).json({
+            success: true,
+            data: "No surgery with this code exist"
+          })
+        } else {
+          res.status(200).json({
+            success: true,
+            data: result
+          });
+    
+        }
+      } catch (err) {
+        next(new ErrorResponse(err.message, 500))
+      }
+    }
+
+
+    exports.postCptCode = async (req, res, next) => {
+      try {
+        const cptCode = new CptCodes({
+          Code:req.body.Code,
+          SurgeryName:req.body.SurgeryName
+        })
+    
+        const result = await cptCode.save();
+      console.log("result",result)
+        res.status(200).json({
+          success: true,
+          data: result
+        });
+    
+      } catch (err) {
+        next(new ErrorResponse(err.message, 500))
+      }
+    }

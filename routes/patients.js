@@ -26,7 +26,9 @@ const { getPatient,
     getPatientById,
     getPreviousTreatments,
     postPatientFollowUp,
-    getProblemList
+    getProblemList,
+    postOperation,
+    getOperationWaitingList
  } = require('../controllers/patients.controllers');
 
 
@@ -39,7 +41,8 @@ const router = express.Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser)
 router.post('/getPatientLabs', checkAuth, getPatientLabs);
-router.post('/patientfollowup', postPatientFollowUp)
+router.post('/patientfollowup', postPatientFollowUp);
+router.post('/operation', postOperation)
 
 router.post('/test', testUser);
 
@@ -70,5 +73,5 @@ router.get('/getInsuranceInfo', checkAuth, getInsuranceInfo);
 router.get('/search', checkAuth, getOtherMeds);
 router.get('/prev', checkAuth, getPreviousTreatments);
 router.get('/getProblemList/:patientId',checkAuth, getProblemList)
-
+router.get('/getOperationWaitingList/:patientId',checkAuth, getOperationWaitingList)
 module.exports = router;

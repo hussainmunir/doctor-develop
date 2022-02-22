@@ -54,7 +54,11 @@ const surgicalHistorySchema = new mongoose.Schema({
     code: {
         type: String
     },
-    recommendByDoctor:Boolean
+    problemId:String,
+    recommendByDoctor:{
+        type:Boolean,
+    },
+    surgicalId:String,
 })
 const operationSchema = new mongoose.Schema({
     patientId: String,
@@ -80,7 +84,10 @@ const operationSchema = new mongoose.Schema({
     cPTCode:String,
     treatmentPlan:[treatmentSchema],
     surgicalHistory: [surgicalHistorySchema],
-    
+    isChecked:{ 
+        type:Boolean,
+        default:false
+    }
 });
 
 

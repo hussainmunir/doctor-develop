@@ -63,7 +63,13 @@ const surgicalHistorySchema = new mongoose.Schema({
     code: {
         type: String
     },
-    recommendByDoctor:Boolean
+    problemId:{
+        type:String,
+        default:""},
+    recommendByDoctor:{
+        type:Boolean,
+        default:false,
+    }
 })
 
 const emergencyContactSchema = new mongoose.Schema({

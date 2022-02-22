@@ -14,10 +14,13 @@ const { getDoctorById,
     getAllCompanies,
     getPreviousAppointments,
     companiesAllDoctors,
-    postOperation,
+    putOperation,
     putDoctorFollowUp,
     generateFollowUp,
-    generateOpNote
+    generateOpNote,
+    getCptCode,
+    postCptCode,
+    combineWaitingList
 } = require('../controllers/doctors.controllers');
 
 
@@ -25,7 +28,7 @@ const router = express.Router();
 
 router.get('/getDr', checkAuth, getDoctor);
 router.post('/register', registerDoctor);
-router.post('/operation', postOperation);
+router.put('/operation/:operationId', putOperation);
 router.post('/login', loginDoctor);
 router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
@@ -41,8 +44,10 @@ router.put('/updateDr', checkAuth, updateDoctor);
 router.put('/updateFollowUp/:followUpID',putDoctorFollowUp)
 router.delete('/deleteDr', checkAuth, deleteDoctor);
 router.get('/getWaiting', checkAuth, getWaitingList);
-router.get('/prev', checkAuth, getPreviousAppointments)
-
+router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
+router.get('/prev', checkAuth, getPreviousAppointments);
+router.get('/getcptCode',getCptCode);
+router.post('/postcptCode',postCptCode);
 
 
 module.exports = router;

@@ -78,7 +78,18 @@ const treatmentSchema = new mongoose.Schema({
    
 })
 
-
+const surgicalSchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    code: {
+        type: String
+    },
+    problemId:String,
+    recommendByDoctor:{
+        type:Boolean,
+    }
+})
 
 const hpiProblemSchema = new mongoose.Schema({
     patientID: {
@@ -252,6 +263,7 @@ const hpiProblemSchema = new mongoose.Schema({
             type: [treatmentSchema],
 
         },
+        surgeryRecommendedByDoctor: [surgicalSchema],
         specialTests: [specialTestSchema],
         diagnosticStudies: [diagnosticSchema],
         strength: [strengthSchema],

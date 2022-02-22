@@ -111,10 +111,8 @@ const followUpSchema = new mongoose.Schema({
         painScale: String,
         treatmentPlanFollow:[String],
         companyName:String,
-        didInjectionHelp:Boolean,
+        didInjectionHelp:String,
         injectionHelpDetail:String,
-        improveWithInjection:Boolean,
-        improveDetail:String,
         fallsOrTrauma:Boolean,
         fallsTraumaDetail:String
     },
