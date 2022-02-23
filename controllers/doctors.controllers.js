@@ -239,10 +239,7 @@ exports.searchCode = async (req, res, next) => {
 }
 
 exports.diagnosis = async (req, res, next) => {
-
-  console.log("red.body",req.body);
   req.body.dignosis.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
-  console.log("req.body.dignosis.date",req.body.dignosis.date)
   try {
     const prb = await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -257,8 +254,15 @@ exports.diagnosis = async (req, res, next) => {
     }
 
     if(prb.dignosis.surgeryRecommendedByDoctor.name !== "") {
-      console.log("amir")
-      const patient = await Patient.findOneAndUpdate( { '_id': req.params.pID })
+      const patient = await Patient.find( { '_id': prb.patientID }).lean()
+      const updatePatient = patient
+        
+      const result = updatePatient[0].surgicalHistory.concat(patient[0].surgicalHistory,prb.dignosis.surgeryRecommendedByDoctor);
+ console.log("result",result)
+      console.log("problem surgery ",prb.dignosis.surgeryRecommendedByDoctor)
+      console.log("patient  surgicalHistory",patient[0].surgicalHistory)
+      
+      const update = await Patient.findOneAndUpdate({ '_id': prb.patientID },{"surgicalHistory":result});
     } 
 
     await Problem.findOneAndUpdate(

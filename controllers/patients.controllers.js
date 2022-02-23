@@ -1009,8 +1009,22 @@ exports.postPatientFollowUp = async (req, res, next) => {
 
 exports.postOperation = async (req, res, next) => {
   try {
-    console.log("req body",req.body)
+    //update  change the recoomended by  doctor to true;
+    const surgicalId = req.body.surgicalHistory[0].surgicalId;
+    console.log("surgicalId",surgicalId)
       const operation = new Operation(req.body);
+      const patient = await Patient.find( { '_id': req.body.patientId }).lean()
+
+      const updatePatient = patient
+     
+    const amir =  updatePatient[0].surgicalHistory.find((surgical,index) =>{
+       surgical._id == surgicalId
+       
+      })
+  
+     
+ const update = await Patient.findOneAndUpdate({ '_id': prb.patientID },{"surgicalHistory":result});
+     
 
       await operation.save();
 
@@ -1028,7 +1042,7 @@ exports.getOperationWaitingList = async (req, res, next) => {
   try {
     const patient = await Patient.find({_id:req.params.patientId}).lean();
   
-     console.log("=========>",patient[0].surgicalHistory[2].recommendByDoctor);
+    
      var list = [];
 
     if (!patient) {
@@ -1037,10 +1051,11 @@ exports.getOperationWaitingList = async (req, res, next) => {
 
       })
     }
-    console.log("=========>",patient[0].surgicalHistory[2].recommendByDoctor);
+  
     let SurgicalArray = patient[0].surgicalHistory;
-
+console.log("SurgicalArray",SurgicalArray)
     if(SurgicalArray){
+      
       const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
       list=recomendedByDoctor;
     }
