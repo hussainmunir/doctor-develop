@@ -257,7 +257,7 @@ exports.diagnosis = async (req, res, next) => {
       const patient = await Patient.find( { '_id': prb.patientID }).lean()
       const updatePatient = patient
         
-      const result = updatePatient[0].surgicalHistory.concat(patient[0].surgicalHistory,prb.dignosis.surgeryRecommendedByDoctor);
+      const result = updatePatient[0].surgicalHistory.concat(prb.dignosis.surgeryRecommendedByDoctor);
  console.log("result",result)
       console.log("problem surgery ",prb.dignosis.surgeryRecommendedByDoctor)
       console.log("patient  surgicalHistory",patient[0].surgicalHistory)

@@ -1011,21 +1011,24 @@ exports.postOperation = async (req, res, next) => {
   try {
     //update  change the recoomended by  doctor to true;
     const surgicalId = req.body.surgicalHistory[0].surgicalId;
-    console.log("surgicalId",surgicalId)
       const operation = new Operation(req.body);
       const patient = await Patient.find( { '_id': req.body.patientId }).lean()
+    const amir =  patient[0].surgicalHistory.find((surgical,index) => {
+     return surgical._id == surgicalId
+      
+    })
+   const surgicalIndex = patient[0].surgicalHistory.indexOf(amir)
 
-      const updatePatient = patient
-     
-    const amir =  updatePatient[0].surgicalHistory.find((surgical,index) =>{
-       surgical._id == surgicalId
-       
-      })
+    patient[0].surgicalHistory[surgicalIndex] =req.body.surgicalHistory[0];
+
+    const result = patient[0].surgicalHistory;
   
+    console.log("result",result)
+    // {"surgicalHistory":patient[0].surgicalHistory}
+  
+ const update = await Patient.findOneAndUpdate({ '_id': patient[0]._id },{"surgicalHistory": result});
+ 
      
- const update = await Patient.findOneAndUpdate({ '_id': prb.patientID },{"surgicalHistory":result});
-     
-
       await operation.save();
 
       res.send({

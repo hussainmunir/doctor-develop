@@ -88,7 +88,8 @@ const surgicalSchema = new mongoose.Schema({
     problemId:String,
     recommendByDoctor:{
         type:Boolean,
-    }
+    },
+    surgicalId:String,
 })
 
 
