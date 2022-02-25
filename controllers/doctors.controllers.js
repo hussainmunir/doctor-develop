@@ -954,7 +954,7 @@ exports.combineWaitingList = async (req, res, next) => {
     const operation = await Operation.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
     const followUpModal = await FollowUpModal.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
   
-  
+  console.log("followUpModal",followUpModal)
 
     if (!problem && !operation && !followUpModal) {
       res.status(200).json({
@@ -962,10 +962,37 @@ exports.combineWaitingList = async (req, res, next) => {
 
       })
     }
-   
+    var followUpArray = [];
+   for(i=0; i<followUpModal.length; i++){
+     let obj = {}
+     obj.waitingListType="followUp";
+     obj.problem={};
+     obj.followUp=followUpModal[i];
+     obj.postOp={};
+     followUpArray.push(obj)
+   }
+   var problemArray = [];
+   for(i=0; i<problem.length; i++){
+     let obj = {}
+     obj.waitingListType="problem";
+     obj.followUp={};
+     obj.problem=problem[i];
+     obj.postOp={};
+     problemArray.push(obj)
+   }
+   var operationArray = [];
+   for(i=0; i<operation.length; i++){
+     let obj = {}
+     obj.waitingListType="operation";
+     obj.problem={};
+     obj.followUp={};
+     obj.postOp=operation[i];
+     operationArray.push(obj)
+   }
+   const waitingList = followUpArray.concat(problemArray,operationArray)
     res.status(200).json({
       success: true,
-      data: {problem,operation,followUpModal}
+      data: {waitingList}
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
