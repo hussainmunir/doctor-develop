@@ -992,7 +992,7 @@ exports.combineWaitingList = async (req, res, next) => {
    const waitingList = followUpArray.concat(problemArray,operationArray)
     res.status(200).json({
       success: true,
-      data: {waitingList}
+      data: waitingList
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
