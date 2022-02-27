@@ -105,6 +105,7 @@ const followUpSchema = new mongoose.Schema({
     doctorId: String,
     problemId: String,
     isChecked: Boolean,
+    patientName:String,
 
     patientInWaitingRoom:{
         symptoms: String,

@@ -61,6 +61,7 @@ const surgicalHistorySchema = new mongoose.Schema({
     surgicalId:String,
 })
 const operationSchema = new mongoose.Schema({
+    patientName:String,
     patientId: String,
     doctorId: String,
     problemId: String,

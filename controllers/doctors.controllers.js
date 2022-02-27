@@ -948,13 +948,32 @@ exports.getWaitingList = async (req, res, next) => {
 }
 
 exports.combineWaitingList = async (req, res, next) => {
-  console.log(req.user.data[1])
   try {
     const problem = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
     const operation = await Operation.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
     const followUpModal = await FollowUpModal.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
   
-  console.log("followUpModal",followUpModal)
+   for(i=0; i<problem.length; i++){
+    const patient = await Patient.findOne({ _id: problem[i].patientID}).lean();
+   
+    problem.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+
+   }
+   
+   for(i=0; i<operation.length; i++){
+    const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
+   
+    operation.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   for(i=0; i<followUpModal.length; i++){
+    const patient = await Patient.findOne({ _id: followUpModal[i].patientId}).lean();
+   
+    followUpModal.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   
 
     if (!problem && !operation && !followUpModal) {
       res.status(200).json({

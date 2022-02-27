@@ -988,8 +988,9 @@ exports.postPatientFollowUp = async (req, res, next) => {
     
       const followUp = new FollowUp({
         patientId:req.body.patientId,
-        doctorId:req.body.patientId,
+        doctorId:req.body.doctorId,
         problemId:req.body.problemId,
+        patientName:req.body.patientName,
         patientInWaitingRoom: req.body.patientInWaitingRoom,
         followUpVisit:req.body.followUpVisit,
         isChecked: false
