@@ -66,39 +66,29 @@ const treatmentSchema = new mongoose.Schema({
    
 })
 
+const ddschema = new mongoose.Schema({
+    code: {
+        type: String,
 
-// const patientFollowUpSchema = new mongoose.Schema({
-//     symptoms: String,
-//     painScale: String,
-//     treatmentPlanFollow:[String],
-//     companyName:String,
-//     didInjectionHelp:Boolean,
-//     injectionHelpDetail:String,
-//     improveWithInjection:Boolean,
-//     improveDetail:String,
-//     fallsOrTrauma:Boolean
-// }
-//     );
+    },
+    desc: {
+        type: String,
 
-// const doctorFollowUpSchema = new mongoose.Schema({
-//     physicalExamThreeDModal: [String],
-//     rangeOfMotion: [String],
-//     physicalExam: [
-//         {
-//             name: String,
-//             jointname: String,
-//             values: [String]
-//         }
-//     ],
-//     strength: [strengthSchema],
-//     specialTests: [specialTestSchema],
-//     reflexes: [reflexesSchema],
-//     diagnosticStudies: [diagnosticSchema],
-//     treatmentPlan: {
-//         type: [treatmentSchema],
-
-//     },
-// })
+    }
+})
+const surgicalSchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    code: {
+        type: String
+    },
+    problemId:String,
+    recommendByDoctor:{
+        type:Boolean,
+    },
+    surgicalId:String,
+})
 
 const followUpSchema = new mongoose.Schema({
     patientId: String,
@@ -114,8 +104,10 @@ const followUpSchema = new mongoose.Schema({
         companyName:String,
         didInjectionHelp:String,
         injectionHelpDetail:String,
+        fullBodyCoordinates: [String],
         fallsOrTrauma:Boolean,
-        fallsTraumaDetail:String
+        fallsTraumaDetail:String,
+        differentialDignosis: [ddschema],
     },
     followUpVisit:{
         physicalExamThreeDModal: [String],
@@ -131,10 +123,17 @@ const followUpSchema = new mongoose.Schema({
         specialTests: [specialTestSchema],
         reflexes: [reflexesSchema],
         diagnosticStudies: [diagnosticSchema],
+        surgeryRecommendedByDoctor: [surgicalSchema],
         treatmentPlan: {
             type: [treatmentSchema],
     
-        }
+        },
+        signature: {
+            eSignaturePhotoUrl: String,
+            public_id: String,
+            date: String,
+            isSignature:Boolean,
+        },
     }
 });
 

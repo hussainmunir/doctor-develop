@@ -1011,6 +1011,7 @@ exports.postPatientFollowUp = async (req, res, next) => {
 exports.postOperation = async (req, res, next) => {
   try {
     //update  change the recoomended by  doctor to true;
+    console.log(" req.body.surgicalHistory[0]", req.body)
     const surgicalId = req.body.surgicalHistory[0].surgicalId;
       const operation = new Operation(req.body);
       const patient = await Patient.find( { '_id': req.body.patientId }).lean()
@@ -1043,7 +1044,7 @@ exports.postOperation = async (req, res, next) => {
 }
 
 exports.getOperationWaitingList = async (req, res, next) => {
-  try {
+    try {
     const patient = await Patient.find({_id:req.params.patientId}).lean();
   
     

@@ -20,7 +20,10 @@ const { getDoctorById,
     generateOpNote,
     getCptCode,
     postCptCode,
-    combineWaitingList
+    combineWaitingList,
+    followUpSignature,
+    operationSignature,
+    combinePreviousVisite
 } = require('../controllers/doctors.controllers');
 
 
@@ -46,8 +49,10 @@ router.delete('/deleteDr', checkAuth, deleteDoctor);
 router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments);
+router.get('/combinePreviousVisite', checkAuth, combinePreviousVisite);
 router.get('/getcptCode',getCptCode);
 router.post('/postcptCode',postCptCode);
-
+router.post('/followUpSignature',followUpSignature );
+router.post('/operationSignature',operationSignature );
 
 module.exports = router;

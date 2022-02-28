@@ -88,7 +88,13 @@ const operationSchema = new mongoose.Schema({
     isChecked:{ 
         type:Boolean,
         default:false
-    }
+    },
+    signature: {
+        eSignaturePhotoUrl: String,
+        public_id: String,
+        date: String,
+        isSignature:Boolean,
+    },
 });
 
 

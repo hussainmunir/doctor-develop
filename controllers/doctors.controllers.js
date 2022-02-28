@@ -7,6 +7,7 @@ const SpecialTests = require('../models/SpecialTests')
 const FollowUpModal = require('../models/FollowUp.js');
 const CptCodes = require('../models/CptCodes.js');
 const ErrorResponse = require('../utils/errorResponse')
+const { destroyImage, uploadImage, uploadPdf } = require('../helpers/helpers')
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
@@ -258,7 +259,7 @@ exports.diagnosis = async (req, res, next) => {
       const updatePatient = patient
         
       const result = updatePatient[0].surgicalHistory.concat(prb.dignosis.surgeryRecommendedByDoctor);
- console.log("result",result)
+
       console.log("problem surgery ",prb.dignosis.surgeryRecommendedByDoctor)
       console.log("patient  surgicalHistory",patient[0].surgicalHistory)
       
@@ -1031,6 +1032,9 @@ exports.putOperation = async (req, res, next) => {
         if (!operation) {
           return next(new ErrorResponse('follow up note does not exist', 400))
         }
+
+       
+
         const patient = await Patient.find({_id:req.body.patientId}).lean();
        
         if(patient){
@@ -1065,6 +1069,20 @@ exports.putDoctorFollowUp = async (req, res, next) => {
     if (!followUp) {
       return next(new ErrorResponse('follow up note does not exist', 400))
     }
+
+     console.log("followUp",followUp)
+    if(followUp.followUpVisit.surgeryRecommendedByDoctor.name !== "") {
+      const patient = await Patient.find( { '_id': followUp.patientId }).lean()
+      const updatePatient = patient
+        
+      const result = updatePatient[0].surgicalHistory.concat(followUp.followUpVisit.surgeryRecommendedByDoctor);
+      
+      console.log("problem surgery ",followUp.followUpVisit.surgeryRecommendedByDoctor)
+      console.log("patient  surgicalHistory",patient[0].surgicalHistory)
+      
+      const update = await Patient.findOneAndUpdate({ '_id': followUp.patientId },{"surgicalHistory":result});
+    } 
+console.log("followUp.patientID",followUp.patientId)
     await FollowUpModal.findOneAndUpdate(
       { '_id': req.params.followUpID },
       { 'isChecked': true }
@@ -1109,12 +1127,50 @@ exports.getPreviousAppointments = async (req, res, next) => {
   }
 }
 
+exports.combinePreviousVisite = async (req, res, next) => {
+  try {
+    
+    const prev = await Problem.find({ 'isChecked': true, "doctorId": req.user.data[1] });
+    const followUp = await FollowUpModal.find({ 'isChecked': true, "doctorId": req.user.data[1] });Operation
+    const operation = await Operation.find({ 'isChecked': true, "doctorId": req.user.data[1] });
+
+    console.log("prev",prev)
+    console.log("followUp",followUp)
+    console.log("operation",operation)
+    const getDoctorName = async (id) => {
+      const doctor = await Doctor.findOne({ _id: id }).lean()
+      return doctor
+     
+    }
+    
+    
+    var doctorName = await getDoctorName(req.user.data[1])
+    prev.forEach((element) => {
+      element.dignosedBy=`${doctorName.name}, ${doctorName.designations}`
+      element.companyName=doctorName.companyName
+    });
+    if (!prev) {
+      res.status(200).json({
+        data: "No patients in previously checked",
+      })
+    }
+    res.status(200).json({
+      count: prev.length,
+      success: true,
+      data: prev,
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
 exports.generateFollowUp = async (req, res, next) => {
   
   try {
     const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
     const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
     const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
+    console.log("problem",problem)
     let strength= getStrength(followUp.followUpVisit.strength);
     let physicalExam = getPhysicalExam(problem.dignosis.physicalExam);
     const STA = getPassST(problem.dignosis.specialTests);
@@ -1124,6 +1180,8 @@ exports.generateFollowUp = async (req, res, next) => {
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
+    let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
+    let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
     if (!followUp || !patient ) {
       return res.status(400).json({
         success: false,
@@ -1188,11 +1246,12 @@ exports.generateOpNote = async (req, res, next) => {
     const operation = await Operation.findOne({ _id: req.params.opId }).lean();
     const patient = await Patient.findOne({ _id: operation.patientId }).lean();
     const problem = await Problem.findOne({ _id: operation.problemId }).lean();
-
+    console.log("problem",problem)
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms) 
-
+    let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
+    let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     const options = {
@@ -1265,3 +1324,100 @@ exports.generateOpNote = async (req, res, next) => {
         next(new ErrorResponse(err.message, 500))
       }
     }
+
+    exports.followUpSignature = async (req, res, next) => {
+      try {
+        const p = await FollowUpModal.findOne({ _id: req.body.problemId })
+        if (!p) {
+          return res.status(404).json({
+            "message": "Problem not found"
+          })
+        }
+        else {
+          
+          if (req.files) {
+            if (req.files.signaturePhoto) { 
+                const urlId = await uploadImage(req.files.signaturePhoto, next)
+                var toBeAdded = {
+                  IsSignature: true,
+                  eSignaturePhotoUrl:urlId.url,
+                  public_id:urlId.public_id,
+                  date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+                }
+                
+              
+            }
+             
+          }
+      }
+      const updateSignature = await FollowUpModal.findOneAndUpdate({ _id: req.body.followUpId }, { signature: toBeAdded } , { new: true, })
+      if (!updateSignature) {
+        return res.status(400).json({
+          success: false,
+          data: null
+        })
+      }
+      else {
+        return res.status(200).json({
+          success: true,
+          data: updateSignature
+        })
+      }
+    }
+  
+  
+  
+  catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+  
+  
+  }
+  exports.operationSignature = async (req, res, next) => {
+    try {
+      const p = await Operation.findOne({ _id: req.body.problemId })
+      if (!p) {
+        return res.status(404).json({
+          "message": "Problem not found"
+        })
+      }
+      else {
+        
+        if (req.files) {
+          if (req.files.signaturePhoto) { 
+              const urlId = await uploadImage(req.files.signaturePhoto, next)
+              var toBeAdded = {
+                IsSignature: true,
+                eSignaturePhotoUrl:urlId.url,
+                public_id:urlId.public_id,
+                date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+              }
+              
+            
+          }
+           
+        }
+    }
+    const updateSignature = await Operation.findOneAndUpdate({ _id: req.body.followUpId }, { signature: toBeAdded } , { new: true, })
+    if (!updateSignature) {
+      return res.status(400).json({
+        success: false,
+        data: null
+      })
+    }
+    else {
+      return res.status(200).json({
+        success: true,
+        data: updateSignature
+      })
+    }
+  }
+
+
+
+catch (err) {
+  next(new ErrorResponse(err.message, 500))
+}
+
+
+}

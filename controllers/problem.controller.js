@@ -74,9 +74,6 @@ exports.getProblems = async (req, res, next) => {
 }
 
 exports.updatePatientSignature = async (req, res, next) => {
-    console.log("in update signature")
-    console.log("test requeste",req.body)
-    console.log("test fileeeeeeeeeeeeeeee",req.files)
     try {
       const p = await Problem.findOne({ _id: req.body.problemId })
       if (!p) {
