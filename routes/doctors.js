@@ -49,7 +49,7 @@ router.delete('/deleteDr', checkAuth, deleteDoctor);
 router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments);
-router.get('/combinePreviousVisite', checkAuth, combinePreviousVisite);
+router.get('/combinePreviousVisit', checkAuth, combinePreviousVisite);
 router.get('/getcptCode',getCptCode);
 router.post('/postcptCode',postCptCode);
 router.post('/followUpSignature',followUpSignature );

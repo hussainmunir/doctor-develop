@@ -128,13 +128,16 @@ const followUpSchema = new mongoose.Schema({
             type: [treatmentSchema],
     
         },
-        signature: {
-            eSignaturePhotoUrl: String,
-            public_id: String,
-            date: String,
-            isSignature:Boolean,
-        },
-    }
+        medicalEquipment: [String],
+        suggestedFollowup: String,
+       
+    },
+    signature: {
+        eSignaturePhotoUrl: String,
+        public_id: String,
+        date: String,
+        isSignature:Boolean,
+    },
 });
 
 

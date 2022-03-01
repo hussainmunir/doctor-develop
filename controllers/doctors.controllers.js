@@ -1032,7 +1032,12 @@ exports.putOperation = async (req, res, next) => {
         if (!operation) {
           return next(new ErrorResponse('follow up note does not exist', 400))
         }
-
+        if(operation.surgeryRecommendedByDoctor.name !== "") {
+          const patient = await Patient.find( { '_id': operation.patientId }).lean()
+          const updatePatient = patient
+          const result = updatePatient[0].surgicalHistory.concat(operation.surgeryRecommendedByDoctor);
+          const update = await Patient.findOneAndUpdate({ '_id': operation.patientId },{"surgicalHistory":result});
+        } 
        
 
         const patient = await Patient.find({_id:req.body.patientId}).lean();
@@ -1069,17 +1074,10 @@ exports.putDoctorFollowUp = async (req, res, next) => {
     if (!followUp) {
       return next(new ErrorResponse('follow up note does not exist', 400))
     }
-
-     console.log("followUp",followUp)
     if(followUp.followUpVisit.surgeryRecommendedByDoctor.name !== "") {
       const patient = await Patient.find( { '_id': followUp.patientId }).lean()
       const updatePatient = patient
-        
       const result = updatePatient[0].surgicalHistory.concat(followUp.followUpVisit.surgeryRecommendedByDoctor);
-      
-      console.log("problem surgery ",followUp.followUpVisit.surgeryRecommendedByDoctor)
-      console.log("patient  surgicalHistory",patient[0].surgicalHistory)
-      
       const update = await Patient.findOneAndUpdate({ '_id': followUp.patientId },{"surgicalHistory":result});
     } 
 console.log("followUp.patientID",followUp.patientId)
@@ -1326,8 +1324,11 @@ exports.generateOpNote = async (req, res, next) => {
     }
 
     exports.followUpSignature = async (req, res, next) => {
+      console.log("red",req.body)
+      console.log("files",req.files)
       try {
         const p = await FollowUpModal.findOne({ _id: req.body.problemId })
+        console.log("p",p)
         if (!p) {
           return res.status(404).json({
             "message": "Problem not found"
@@ -1338,6 +1339,7 @@ exports.generateOpNote = async (req, res, next) => {
           if (req.files) {
             if (req.files.signaturePhoto) { 
                 const urlId = await uploadImage(req.files.signaturePhoto, next)
+                console.log("urlId",urlId)
                 var toBeAdded = {
                   IsSignature: true,
                   eSignaturePhotoUrl:urlId.url,
@@ -1350,7 +1352,7 @@ exports.generateOpNote = async (req, res, next) => {
              
           }
       }
-      const updateSignature = await FollowUpModal.findOneAndUpdate({ _id: req.body.followUpId }, { signature: toBeAdded } , { new: true, })
+      const updateSignature = await FollowUpModal.findOneAndUpdate({ _id: req.body.problemId }, { signature: toBeAdded } , { new: true, })
       if (!updateSignature) {
         return res.status(400).json({
           success: false,
@@ -1398,7 +1400,7 @@ exports.generateOpNote = async (req, res, next) => {
            
         }
     }
-    const updateSignature = await Operation.findOneAndUpdate({ _id: req.body.followUpId }, { signature: toBeAdded } , { new: true, })
+    const updateSignature = await Operation.findOneAndUpdate({ _id: req.body.problemId }, { signature: toBeAdded } , { new: true, })
     if (!updateSignature) {
       return res.status(400).json({
         success: false,

@@ -35,6 +35,18 @@ const treatmentSchema = new mongoose.Schema({
     },
    
 })
+
+const ddschema = new mongoose.Schema({
+    code: {
+        type: String,
+
+    },
+    desc: {
+        type: String,
+
+    }
+})
+
 const diagnosticSchema = new mongoose.Schema({
     labName: {
         type: String
@@ -60,6 +72,21 @@ const surgicalHistorySchema = new mongoose.Schema({
     },
     surgicalId:String,
 })
+
+const surgicalSchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    code: {
+        type: String
+    },
+    problemId:String,
+    recommendByDoctor:{
+        type:Boolean,
+    },
+    surgicalId:String,
+})
+
 const operationSchema = new mongoose.Schema({
     patientName:String,
     patientId: String,
@@ -78,13 +105,16 @@ const operationSchema = new mongoose.Schema({
     surgicalSiteExam:[String],
     rangeOfMotion: [String],
     muscularStrengthTesting: [muscularStrength],
-    spineUpper:[String],
-    spineLower:[String],
     reflexes: [reflexesSchema],
     diagnosticStudies: [diagnosticSchema],
-    cPTCode:String,
+    cPTCode:[surgicalSchema],
+    surgeryRecommendedByDoctor: [surgicalSchema],
     treatmentPlan:[treatmentSchema],
+    medicalEquipment: [String],
+    suggestedFollowup: String,
     surgicalHistory: [surgicalHistorySchema],
+    differentialDignosis: [ddschema],
+    fullBodyCoordinates: [String],
     isChecked:{ 
         type:Boolean,
         default:false

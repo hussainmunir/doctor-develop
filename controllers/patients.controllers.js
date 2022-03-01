@@ -1058,13 +1058,25 @@ exports.getOperationWaitingList = async (req, res, next) => {
     }
   
     let SurgicalArray = patient[0].surgicalHistory;
-console.log("SurgicalArray",SurgicalArray)
     if(SurgicalArray){
       
       const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
       list=recomendedByDoctor;
     }
    
+
+    const problem = await Problem.find({_id:list[0].problemId}).lean();
+   
+    const differentialDignosis = problem[0].dignosis.differentialDignosis;
+    const fullBodyCoordinates = problem[0].fullBodyCoordinates
+
+  const newList = list.map((item) => {
+    item.differentialDignosis = differentialDignosis
+    item.fullBodyCoordinates = fullBodyCoordinates
+  })
+
+  console.log("newList",newList)
+
     res.status(200).json({
       // count: waiting.length,
       success: true,
