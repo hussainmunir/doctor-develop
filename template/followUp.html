@@ -15,18 +15,18 @@
     <h1>{{patient.fname}},{{patient.lname}}</h1>
     <h2>DOB:{{dateOfBirth}}</h2>
     <h2>Date Of Encounter:{{Age}}</h2>
-    <h2>Return:{{gender}}</h2>
+    <h2>Return:{{suggestedFollowUp}}</h2>
     <strong>Diagnosis:</strong> {{DD}}</br>
     <h2>Work Duty:{{workDType}}</h2>
 
 
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
     <h1>History Of Presenting Illness</h1>
-    <h3>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient (has been/has not
-        been) compliant with treatment plan including (Previous Treatment Plan). {{pronoun}} states
+    <h3>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient {{hasBeen}} compliant
+         with treatment plan including {{#each ptreatmentPlane}}{{this.treatmentName}}  {{/each}}. {{pronoun}} states
         that since last visit, symptoms are {{patientInWaitingRoom.symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
         level intensity.The patient reports {{injectionDetail}} in symptoms since receiving injection at last visit, and states that it was helpful
-        {{improveDetail}}. The patient admits to {{fallsOrTrauma}}
+        {{improveDetail}}. The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}.
         </h3>
 
     <h1><strong>{{allergiesText}}</strong> </h1>
@@ -41,7 +41,7 @@
             <li>{{this}}</li>
             {{/each}}
         </ol>
-    <h1>Physical Examination: ({{patient.fname}},{{patient.lname}})</h1>
+    <h1>Physical Examination: {{patient.fname}},{{patient.lname}}</h1>
     <h3> is an awake, alert and oriented {{patient.gender}} that
         appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
         commands appropriately. They are in no acute distress.
@@ -121,8 +121,8 @@
     {{/each}}
     <h2>Assessment: {{fname}} {{lname}} is a {{Age}} year old {{sex}} with:</h2>
     <ol>{{#each DDarray}} <li>{{this}}</li> {{/each}}</ol>
-    <h2>Plan:</h2> <p>(Name) presents with signs and symptoms consistent with (Diagnosis #1), (Diagnosis
-    #2), Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
+    <h2>Plan:</h2> <p>{{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{DD}} Diagnosis,
+         diagnostic studies, and treatment plans were reviewed with the patient at
     today’s visit. Treatment plan includes (Treatment Plan buttons selected by doctor). The
     patient will follow up (in one week/in two weeks/in 3 weeks/in one month/in 6 weeks/ as
     needed/other). (The patient was provided with (DME item). The patient is happy with the

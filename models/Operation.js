@@ -98,6 +98,7 @@ const operationSchema = new mongoose.Schema({
     companyName:String,
     painScale:String,
     painCondition:String,
+    painDetail:String,
     patientAmbulating:{
         ambulating:Boolean,
         assistiveDevice:[String]

@@ -1129,10 +1129,9 @@ exports.combinePreviousVisite = async (req, res, next) => {
   try {
     
     const prev = await Problem.find({ 'isChecked': true, "doctorId": req.user.data[1] });
-    const followUp = await FollowUpModal.find({ 'isChecked': true, "doctorId": req.user.data[1] });Operation
+    const followUp = await FollowUpModal.find({ 'isChecked': true, "doctorId": req.user.data[1] });
     const operation = await Operation.find({ 'isChecked': true, "doctorId": req.user.data[1] });
 
-    console.log("prev",prev)
     console.log("followUp",followUp)
     console.log("operation",operation)
     const getDoctorName = async (id) => {
@@ -1152,10 +1151,39 @@ exports.combinePreviousVisite = async (req, res, next) => {
         data: "No patients in previously checked",
       })
     }
+    var followUpArray = [];
+    for(i=0; i<prev.length; i++){
+      let obj = {}
+      obj.waitingListType="followUp";
+      obj.problem={};
+      obj.followUp=prev[i];
+      obj.postOp={};
+      followUpArray.push(obj)
+    }
+    var problemArray = [];
+    for(i=0; i<followUp.length; i++){
+      let obj = {}
+      obj.waitingListType="problem";
+      obj.followUp={};
+      obj.problem=followUp[i];
+      obj.postOp={};
+      problemArray.push(obj)
+    }
+    var operationArray = [];
+    for(i=0; i<operation.length; i++){
+      let obj = {}
+      obj.waitingListType="operation";
+      obj.problem={};
+      obj.followUp={};
+      obj.postOp=operation[i];
+      operationArray.push(obj)
+    }
+    const waitingList = followUpArray.concat(problemArray,operationArray)
+    const count = prev.length+followUp.length+operation.length;
     res.status(200).json({
-      count: prev.length,
+      count:count ,
       success: true,
-      data: prev,
+      data: waitingList,
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
@@ -1168,11 +1196,11 @@ exports.generateFollowUp = async (req, res, next) => {
     const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
     const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
     const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
-    console.log("problem",problem)
+
     let strength= getStrength(followUp.followUpVisit.strength);
-    let physicalExam = getPhysicalExam(problem.dignosis.physicalExam);
-    const STA = getPassST(problem.dignosis.specialTests);
-    let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
+    let physicalExam = getPhysicalExam(followUp.followUpVisit.physicalExam);
+    const STA = getPassST(followUp.followUpVisit.specialTests);
+    let arr_DD = getDDStr(followUp.patientInWaitingRoom.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
     let medicationsName = getCurrMed(patient.currentMedications);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
@@ -1205,7 +1233,7 @@ exports.generateFollowUp = async (req, res, next) => {
         patientInWaitingRoom:followUp.patientInWaitingRoom,
         injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp == true?" improvement":" no improvement",
         improveDetail:followUp.patientInWaitingRoom.improveDetail,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including (free text box content).":"no trauma.",
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including ":"no trauma.",
         strength:strength[1],
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
@@ -1227,6 +1255,10 @@ exports.generateFollowUp = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
+        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup,
+        hasBeen:followUp.followUpVisit.treatmentPlan.length >= 1 ? "has been" : "has not been",
+        ptreatmentPlane:followUp.followUpVisit.treatmentPlan,
+        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail,
         problem_areasToUpperCase,
         problem_concatenated,
       },
@@ -1245,13 +1277,19 @@ exports.generateOpNote = async (req, res, next) => {
     const patient = await Patient.findOne({ _id: operation.patientId }).lean();
     const problem = await Problem.findOne({ _id: operation.problemId }).lean();
     console.log("problem",problem)
+    let strength= getStrength(problem.dignosis.strength);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms) 
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    let arr_DD = getDDStr(operation.differentialDignosis);
+    let str_DD = getTreatments(arr_DD);
+    const STA = getPassST(problem.dignosis.specialTests);
+    const negativeSTA = getFailST(problem.dignosis.specialTests);
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
+    
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -1261,7 +1299,9 @@ exports.generateOpNote = async (req, res, next) => {
 
       html: operationNote,
       data: {
+        operation,
         patient,
+        Age:getAge(patient.dateOfBirth),
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         problem_areasToUpperCase,
@@ -1269,6 +1309,17 @@ exports.generateOpNote = async (req, res, next) => {
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
+        MRN: patient.insurance.membershipId,
+        suggestedFollowUp:operation.suggestedFollowup,
+        DD: str_DD ? str_DD : "none",
+        vitals:problem.dignosis.vitals,
+        skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
+        rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
+        strength:strength[1],
+        ST: STA,
+        positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
+        negativeST: negativeSTA,
+        negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
