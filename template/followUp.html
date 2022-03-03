@@ -12,40 +12,40 @@
 </head>
 <body>
     <h1 style="text-align: center;">Follow Up Note</h1>
-    <h1>{{patient.fname}},{{patient.lname}}</h1>
-    <h2>DOB:{{dateOfBirth}}</h2>
-    <h2>Date Of Encounter:{{Age}}</h2>
-    <h2>Return:{{suggestedFollowUp}}</h2>
+    <strong>{{patient.fname}},{{patient.lname}}</strong><br>
+    <strong>DOB:</strong> {{dateOfBirth}}<br>
+    <strong>Date Of Encounter:</strong> {{date}}<br>
+    <strong>Return:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> {{DD}}</br>
-    <h2>Work Duty:{{workDType}}</h2>
+    <strong>Work Duty:</strong> {{workDType}}<br>
 
 
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
-    <h1>History Of Presenting Illness</h1>
-    <h3>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient {{hasBeen}} compliant
+    <h2>History Of Presenting Illness</h2>
+    <p>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient {{hasBeen}} compliant
          with treatment plan including {{#each ptreatmentPlane}}{{this.treatmentName}}  {{/each}}. {{pronoun}} states
         that since last visit, symptoms are {{patientInWaitingRoom.symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
         level intensity.The patient reports {{injectionDetail}} in symptoms since receiving injection at last visit, and states that it was helpful
         {{improveDetail}}. The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}.
-        </h3>
+        </p>
 
-    <h1><strong>{{allergiesText}}</strong> </h1>
+    <h2><strong>{{allergiesText}}</strong> </h2>
         <ol>
             {{#each patient.allergies}}
             <li>{{this.name}} {{this.reaction}}</li>
             {{/each}}
         </ol>
-        <h1>{{medicationsText}}</h1> 
+        <h2>{{medicationsText}}</h2> 
         <ol>
             {{#each medications}}
             <li>{{this}}</li>
             {{/each}}
         </ol>
-    <h1>Physical Examination: {{patient.fname}},{{patient.lname}}</h1>
-    <h3> is an awake, alert and oriented {{patient.gender}} that
+    <h2>Physical Examination: </h2>
+    <p>{{patient.fname}},{{patient.lname}} is an awake, alert and oriented {{patient.gender}} that
         appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
         commands appropriately. They are in no acute distress.
-    </h3>
+    </p>
 
     <strong >Vitals:</strong>
     <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
@@ -54,9 +54,9 @@
     <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
     <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li>
-    <h2>Skin:{{skin}}</h2>
-    <h1>{{physicalExamText}}</h1>
-    <h3> {{#each handFootLandMarks}}
+    <strong>Skin:</strong> {{skin}} 
+    <h2>{{physicalExamText}}</h2>
+    <p> {{#each handFootLandMarks}}
     <li>{{this}}</li>
     {{/each}}
     {{#each generalBodyParts}}
@@ -64,7 +64,7 @@
     {{/each}}  
     {{#each physicalExamThreeDModal}}
     <li>{{this}}</li>
-    {{/each}}</h3>
+    {{/each}}</p>
     <h2>{{rangeOFMotion}}</h2>
     
     <ul>
@@ -123,10 +123,15 @@
     <ol>{{#each DDarray}} <li>{{this}}</li> {{/each}}</ol>
     <h2>Plan:</h2> <p>{{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{DD}} Diagnosis,
          diagnostic studies, and treatment plans were reviewed with the patient at
-    today’s visit. Treatment plan includes (Treatment Plan buttons selected by doctor). The
-    patient will follow up (in one week/in two weeks/in 3 weeks/in one month/in 6 weeks/ as
-    needed/other). (The patient was provided with (DME item). The patient is happy with the
+    today’s visit. Treatment plan includes  {{#each treatmentPlane}}{{this.treatmentName}}  {{/each}}. The
+    patient will follow up {{suggestedFollowUp}}. The patient was provided with {{medicalEquipment}}. The patient is happy with the
     plan moving forward.</p>
+
+    <div >
+        <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
+         <img src={{signatureUrl}} alt="" style={{imageStyle}}><br>
+         <strong>{{signatureDate}}</strong>
+     </div>
     
 </body>
 </html>

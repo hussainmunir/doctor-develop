@@ -1021,7 +1021,7 @@ exports.combineWaitingList = async (req, res, next) => {
 
 exports.putOperation = async (req, res, next) => {
   try {
-
+    req.body.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
       const operation = await Operation.findOneAndUpdate(
         { '_id': req.params.operationId },
         req.body,
@@ -1063,6 +1063,7 @@ exports.putOperation = async (req, res, next) => {
 //doctor update follow up note 
 exports.putDoctorFollowUp = async (req, res, next) => {
   try {
+    req.body.patientInWaitingRoom.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
     const followUp = await FollowUpModal.findOneAndUpdate(
       { '_id': req.params.followUpID },
       req.body,
@@ -1193,6 +1194,11 @@ exports.combinePreviousVisite = async (req, res, next) => {
 exports.generateFollowUp = async (req, res, next) => {
   
   try {
+    const getDoctorName = async (id) => {
+      const doctor = await Doctor.findOne({ _id: id }).lean()
+      return doctor
+     
+    }
     const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
     const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
     const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
@@ -1208,6 +1214,7 @@ exports.generateFollowUp = async (req, res, next) => {
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    const doctorName = await getDoctorName(problem.doctorId)
     if (!followUp || !patient ) {
       return res.status(400).json({
         success: false,
@@ -1226,6 +1233,7 @@ exports.generateFollowUp = async (req, res, next) => {
       data: {
         patient,
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
+        date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),
         Age:getAge(patient.dateOfBirth),
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
@@ -1258,9 +1266,17 @@ exports.generateFollowUp = async (req, res, next) => {
         suggestedFollowUp:followUp.followUpVisit.suggestedFollowup,
         hasBeen:followUp.followUpVisit.treatmentPlan.length >= 1 ? "has been" : "has not been",
         ptreatmentPlane:followUp.followUpVisit.treatmentPlan,
+        treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail,
+        medicalEquipment:followUp.followUpVisit.medicalEquipment,
         problem_areasToUpperCase,
         problem_concatenated,
+        // signatureUrl:followUp.signature.eSignaturePhotoUrl,
+        // signatureDate:followUp.signature.date,
+        // doctorNameStyle:followUp.signature.eSignaturePhotoUrl?" ":"none",
+        // imageStyle:followUp.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
+        // doctorName:doctorName.name,
+        // designations:doctorName.designations,
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`
     }
@@ -1273,10 +1289,15 @@ exports.generateFollowUp = async (req, res, next) => {
 
 exports.generateOpNote = async (req, res, next) => {
   try {
+    const getDoctorName = async (id) => {
+      const doctor = await Doctor.findOne({ _id: id }).lean()
+      return doctor
+     
+    }
     const operation = await Operation.findOne({ _id: req.params.opId }).lean();
     const patient = await Patient.findOne({ _id: operation.patientId }).lean();
     const problem = await Problem.findOne({ _id: operation.problemId }).lean();
-    console.log("problem",problem)
+  
     let strength= getStrength(problem.dignosis.strength);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -1287,6 +1308,8 @@ exports.generateOpNote = async (req, res, next) => {
     let str_DD = getTreatments(arr_DD);
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
+    const doctorName = await getDoctorName(problem.doctorId)
+    
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     
@@ -1303,6 +1326,7 @@ exports.generateOpNote = async (req, res, next) => {
         patient,
         Age:getAge(patient.dateOfBirth),
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
+        date: moment(operation.date).format('MMMM Do, YYYY'),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         problem_areasToUpperCase,
         problem_concatenated,
@@ -1320,6 +1344,13 @@ exports.generateOpNote = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
+        medicalEquipment:operation.medicalEquipment,
+        // signatureUrl:operation.signature.eSignaturePhotoUrl,
+        // signatureDate:operation.signature.date,
+        // doctorNameStyle:operation.signature.eSignaturePhotoUrl?" ":"none",
+        // imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
+        // doctorName:doctorName.name,
+        // designations:doctorName.designations,
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
@@ -1428,6 +1459,7 @@ exports.generateOpNote = async (req, res, next) => {
   }
   exports.operationSignature = async (req, res, next) => {
     try {
+      console.log(req.body)
       const p = await Operation.findOne({ _id: req.body.problemId })
       if (!p) {
         return res.status(404).json({

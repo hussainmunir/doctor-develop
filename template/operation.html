@@ -13,13 +13,13 @@
 </head>
 <body>
     <h1>Operation Note</h1>
-    <h1>{{patient.fname}},{{patient.lname}}</h1>
-    <h2>DOB:{{dateOfBirth}}</h2>
-    <h2>MRN:{{MRN}}</h2>
-   <h2>Date of Encounter: (Date)</h2>
-   <h2>Return: {{suggestedFollowUp}}</h2>
-   <h2>Diagnosis: {{DD}}</h2>
-   <h2>Work Duty:{{workDType}}</h2>
+    <strong>{{patient.fname}},{{patient.lname}}</strong>
+    <strong>DOB:</strong> {{dateOfBirth}}<br>
+    <strong>MRN:</strong> {{MRN}}<br>
+    <strong>Date of Encounter:</strong> {{date}}<br>
+    <strong>Return:</strong> {{suggestedFollowUp}}<br>
+    <strong>Diagnosis:</strong> {{DD}}<br>
+    <strong>Work Duty:</strong> {{workDType}}<br>
    <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
    <br><br>
    <h2>History of Presenting Illness</h2>
@@ -31,7 +31,7 @@
             ambulatory)
         </p> 
 
-<p><strong>Examination:</strong>{{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
+<p><strong>Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
     appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
     commands appropriately. They are in no acu</p>
 
@@ -100,11 +100,11 @@
     <h2>Diagnostic Studies:</h2>
     <h2>Assessment: {{patient.fname}} {{patient.lname}} is a {{Age}} year old {{patient.gender}} S/P:</h2>
     <h2>1.) (Surgery Perfomed)</h2>
-    <p>Plan: {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with (Diagnosis #1), (Diagnosis
-        #2), Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
+    <p>Plan: {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with {{DD}}
+         Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
         today’s visit. Treatment plan includes (Treatment Plan buttons selected by doctor). The
         patient will follow up (in one week/in two weeks/in 3 weeks/in one month/in 6 weeks/ as
-        needed/other). (The patient was provided with (DME item). The patient is happy with the
+        needed/other). The patient was provided with {{medicalEquipment}}. The patient is happy with the
         plan moving forward.</p>
  
 </body>

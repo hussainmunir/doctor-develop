@@ -88,6 +88,7 @@ const surgicalSchema = new mongoose.Schema({
 })
 
 const operationSchema = new mongoose.Schema({
+    date: String,
     patientName:String,
     patientId: String,
     doctorId: String,

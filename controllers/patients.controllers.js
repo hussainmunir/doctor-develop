@@ -985,7 +985,7 @@ exports.getPreviousTreatments = async (req, res, next) => {
 exports.postPatientFollowUp = async (req, res, next) => {
   try {
     console.log(req.body)
-    
+  
       const followUp = new FollowUp({
         patientId:req.body.patientId,
         doctorId:req.body.doctorId,
@@ -1011,6 +1011,7 @@ exports.postPatientFollowUp = async (req, res, next) => {
 exports.postOperation = async (req, res, next) => {
   try {
     //update  change the recoomended by  doctor to true;
+   
     console.log(" req.body.surgicalHistory[0]", req.body)
     const surgicalId = req.body.surgicalHistory[0].surgicalId;
       const operation = new Operation(req.body);
