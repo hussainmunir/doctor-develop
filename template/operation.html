@@ -13,7 +13,7 @@
 </head>
 <body>
     <h1>Operation Note</h1>
-    <strong>{{patient.fname}},{{patient.lname}}</strong>
+    <strong>{{patient.fname}},{{patient.lname}}</strong><br>
     <strong>DOB:</strong> {{dateOfBirth}}<br>
     <strong>MRN:</strong> {{MRN}}<br>
     <strong>Date of Encounter:</strong> {{date}}<br>
@@ -24,8 +24,10 @@
    <br><br>
    <h2>History of Presenting Illness</h2>
         <p>{{patient.fname}} {{patient.lname}}  presents today for first post-op visit up. Since surgery, the patient
-            (Fevers/chills/nausea/vomiting/chest pain/shortness of breath/calf/falls/trauma).
-            {{pronoun}} states {{hisORHer}} pain is (controlled/not controlled) (without medication/with
+            {{#each operation.patientAdmits}}
+            {{this}}
+            {{/each}} .
+            {{pronoun}} states {{hisORHer}} pain is  {{isPain}} (without medication/with
             medication including (free text box)). Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
             (Is ambulating without any assistive devices/is ambulating with (Assistive Device)/is not
             ambulatory)

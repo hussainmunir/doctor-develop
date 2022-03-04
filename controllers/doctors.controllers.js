@@ -1133,8 +1133,6 @@ exports.combinePreviousVisite = async (req, res, next) => {
     const followUp = await FollowUpModal.find({ 'isChecked': true, "doctorId": req.user.data[1] });
     const operation = await Operation.find({ 'isChecked': true, "doctorId": req.user.data[1] });
 
-    console.log("followUp",followUp)
-    console.log("operation",operation)
     const getDoctorName = async (id) => {
       const doctor = await Doctor.findOne({ _id: id }).lean()
       return doctor
@@ -1155,18 +1153,18 @@ exports.combinePreviousVisite = async (req, res, next) => {
     var followUpArray = [];
     for(i=0; i<prev.length; i++){
       let obj = {}
-      obj.waitingListType="followUp";
-      obj.problem={};
-      obj.followUp=prev[i];
+      obj.waitingListType="problem";
+      obj.followUp={};
+      obj.problem=prev[i];
       obj.postOp={};
       followUpArray.push(obj)
     }
     var problemArray = [];
     for(i=0; i<followUp.length; i++){
       let obj = {}
-      obj.waitingListType="problem";
-      obj.followUp={};
-      obj.problem=followUp[i];
+      obj.waitingListType="followUp";
+      obj.problem={};
+      obj.followUp=followUp[i];
       obj.postOp={};
       problemArray.push(obj)
     }
@@ -1194,19 +1192,29 @@ exports.combinePreviousVisite = async (req, res, next) => {
 exports.generateFollowUp = async (req, res, next) => {
   
   try {
+    
+    const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
+    const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
+    const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
+
+    console.log("follow up id",req.params.FollowId)
+    console.log(followUp.patientId,"teess",followUp.problemId)
+
+     if (!followUp || !patient ) {
+      return res.status(400).json({
+        success: false,
+        data: "Something has gone wrong"
+      })
+    }
     const getDoctorName = async (id) => {
       const doctor = await Doctor.findOne({ _id: id }).lean()
       return doctor
      
     }
-    const followUp = await FollowUpModal.findOne({ _id: req.params.FollowId }).lean();
-    const patient = await Patient.findOne({ _id: followUp.patientId }).lean();
-    const problem = await Problem.findOne({ _id: followUp.problemId }).lean();
-
     let strength= getStrength(followUp.followUpVisit.strength);
     let physicalExam = getPhysicalExam(followUp.followUpVisit.physicalExam);
     const STA = getPassST(followUp.followUpVisit.specialTests);
-    let arr_DD = getDDStr(followUp.patientInWaitingRoom.differentialDignosis);
+    let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
     let medicationsName = getCurrMed(patient.currentMedications);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
@@ -1215,12 +1223,7 @@ exports.generateFollowUp = async (req, res, next) => {
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
     const doctorName = await getDoctorName(problem.doctorId)
-    if (!followUp || !patient ) {
-      return res.status(400).json({
-        success: false,
-        data: "Something has gone wrong"
-      })
-    }
+   
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
       format: 'A4',
@@ -1271,12 +1274,12 @@ exports.generateFollowUp = async (req, res, next) => {
         medicalEquipment:followUp.followUpVisit.medicalEquipment,
         problem_areasToUpperCase,
         problem_concatenated,
-        // signatureUrl:followUp.signature.eSignaturePhotoUrl,
-        // signatureDate:followUp.signature.date,
-        // doctorNameStyle:followUp.signature.eSignaturePhotoUrl?" ":"none",
-        // imageStyle:followUp.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
-        // doctorName:doctorName.name,
-        // designations:doctorName.designations,
+        signatureUrl:followUp.signature.eSignaturePhotoUrl,
+        signatureDate:followUp.signature.date,
+        doctorNameStyle:followUp.signature.eSignaturePhotoUrl?" ":"none",
+        imageStyle:followUp.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
+        doctorName:doctorName.name,
+        designations:doctorName.designations,
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${followUp._id}.pdf`
     }
@@ -1289,15 +1292,16 @@ exports.generateFollowUp = async (req, res, next) => {
 
 exports.generateOpNote = async (req, res, next) => {
   try {
+    
+    const operation = await Operation.findOne({ _id: req.params.opId }).lean();
+    const patient = await Patient.findOne({ _id: operation.patientId }).lean();
+    const problem = await Problem.findOne({ _id: operation.problemId }).lean();
+  
     const getDoctorName = async (id) => {
       const doctor = await Doctor.findOne({ _id: id }).lean()
       return doctor
      
     }
-    const operation = await Operation.findOne({ _id: req.params.opId }).lean();
-    const patient = await Patient.findOne({ _id: operation.patientId }).lean();
-    const problem = await Problem.findOne({ _id: operation.problemId }).lean();
-  
     let strength= getStrength(problem.dignosis.strength);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -1309,7 +1313,9 @@ exports.generateOpNote = async (req, res, next) => {
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
     const doctorName = await getDoctorName(problem.doctorId)
+
     
+
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     
@@ -1345,12 +1351,14 @@ exports.generateOpNote = async (req, res, next) => {
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
         medicalEquipment:operation.medicalEquipment,
-        // signatureUrl:operation.signature.eSignaturePhotoUrl,
-        // signatureDate:operation.signature.date,
-        // doctorNameStyle:operation.signature.eSignaturePhotoUrl?" ":"none",
-        // imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
-        // doctorName:doctorName.name,
-        // designations:doctorName.designations,
+        isPain:operation.isPain? "controlled" : "not controlled",
+        patientAmbulating:operation.patientAmbulating.ambulating,
+        signatureUrl:operation.signature.eSignaturePhotoUrl,
+        signatureDate:operation.signature.date,
+        doctorNameStyle:operation.signature.eSignaturePhotoUrl?" ":"none",
+        imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
+        doctorName:doctorName.name,
+        designations:doctorName.designations,
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }

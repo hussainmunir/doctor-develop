@@ -131,6 +131,7 @@ const followUpSchema = new mongoose.Schema({
         },
         medicalEquipment: [String],
         suggestedFollowup: String,
+      
        
     },
     signature: {
@@ -139,6 +140,7 @@ const followUpSchema = new mongoose.Schema({
         date: String,
         isSignature:Boolean,
     },
+  
 });
 
 

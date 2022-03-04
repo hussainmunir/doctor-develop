@@ -96,6 +96,7 @@ const operationSchema = new mongoose.Schema({
     isChecked: Boolean,
     patientAdmits: [String],
     isPain: Boolean,
+    medicationRequired:Boolean,
     companyName:String,
     painScale:String,
     painCondition:String,

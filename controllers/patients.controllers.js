@@ -993,7 +993,11 @@ exports.postPatientFollowUp = async (req, res, next) => {
         patientName:req.body.patientName,
         patientInWaitingRoom: req.body.patientInWaitingRoom,
         followUpVisit:req.body.followUpVisit,
-        isChecked: false
+        isChecked: false,
+        "signature.public_id":"public id",
+        "signature.eSignaturePhotoUrl":"",
+        "signature.isSignature":"false",
+        "signature.date":""
       });
 
       await followUp.save();
@@ -1014,6 +1018,7 @@ exports.postOperation = async (req, res, next) => {
    
     console.log(" req.body.surgicalHistory[0]", req.body)
     const surgicalId = req.body.surgicalHistory[0].surgicalId;
+    req.body.signature=  {public_id:"test id",eSignaturePhotoUrl:"",isSignature:"false",date:""}
       const operation = new Operation(req.body);
       const patient = await Patient.find( { '_id': req.body.patientId }).lean()
     const amir =  patient[0].surgicalHistory.find((surgical,index) => {
