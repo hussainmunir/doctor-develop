@@ -27,10 +27,9 @@
             {{#each operation.patientAdmits}}
             {{this}}
             {{/each}} .
-            {{pronoun}} states {{hisORHer}} pain is  {{isPain}} (without medication/with
-            medication including (free text box)). Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
-            (Is ambulating without any assistive devices/is ambulating with (Assistive Device)/is not
-            ambulatory)
+            {{pronoun}} states {{hisORHer}} pain is  {{isPain}} 
+            {{medicationtxt}} {{#each treatmentPlane}}{{this.treatmentName}}  {{/each}}. Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
+          <span style="display: {{ambulatingStyle}};"> {{patientAmbulating}} {{assistiveDevice}}</span> {{isNotAmbulating}}
         </p> 
 
 <p><strong>Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
@@ -104,9 +103,8 @@
     <h2>1.) (Surgery Perfomed)</h2>
     <p>Plan: {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with {{DD}}
          Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
-        today’s visit. Treatment plan includes (Treatment Plan buttons selected by doctor). The
-        patient will follow up (in one week/in two weeks/in 3 weeks/in one month/in 6 weeks/ as
-        needed/other). The patient was provided with {{medicalEquipment}}. The patient is happy with the
+        today’s visit. Treatment plan includes {{#each treatmentPlane}}{{this.treatmentName}}  {{/each}}. The
+        patient will follow up {{suggestedFollowUp}}. The patient was provided with {{medicalEquipment}}. The patient is happy with the
         plan moving forward.</p>
  
 </body>

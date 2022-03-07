@@ -1359,6 +1359,12 @@ exports.generateOpNote = async (req, res, next) => {
         imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
         designations:doctorName.designations,
+        treatmentPlane:operation.treatmentPlan,
+        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? "is ambulating with" : "Is ambulating without any assistive devices",
+        assistiveDevice:operation.patientAmbulating.assistiveDevice,
+        ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
+        isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
+        medicationtxt:operation.treatmentPlan.length >=1 ? "with medication including" : "without medication",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
