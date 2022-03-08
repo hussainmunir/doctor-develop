@@ -141,7 +141,7 @@ const followUpSchema = new mongoose.Schema({
         isSignature:Boolean,
     },
   
-});
+},{ timestamps: true });
 
 
 

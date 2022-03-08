@@ -629,6 +629,20 @@ const getProbAreasChiefCom = (areas) => {
   return str;
 }
 
+const getSurgicalHistory = (surgery) => {
+  console.log("surgery",surgery)
+   let doctroRecSergury = []
+   
+   for(i=0; i < surgery.length; i++) {
+    if(surgery[i].recommendByDoctor == false) {
+      console.log("amir")
+      doctroRecSergury.push(surgery[i])
+    }
+   }
+   return doctroRecSergury;
+
+}
+
 // const getProblemConcatenated = (symptoms) => {
 //   var problems = ''
 
@@ -717,6 +731,7 @@ if(painlessCopy.length == 0){
 return concatenatedArray ;
 }
 
+
 // const appendAndBeforTheLastValue = (arr) => {
 //   console.log("AAAAA",arr)
 //   if(arr.length>1){
@@ -768,7 +783,8 @@ exports.generateReport = async (req, res, next) => {
       str_allFactors = str_allFactors.toLowerCase();
     }
 
-
+    
+  
     let medicationsName = getCurrMed(patient.currentMedications);
     let newMedicationsName = getCurrMed(problem.currentMedications);
 
@@ -807,6 +823,8 @@ exports.generateReport = async (req, res, next) => {
     let ros_endocrine = getTreatments(patient.reviewSystem.endocrine)
     let ros_psychiatric = getTreatments(patient.reviewSystem.psychiatric)
     let general_exam = getGeneralExam(problem.dignosis.generalExam)
+    let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
+   
     console.log(problem.dignosis.reflexes.length)
     const options = {
       format: 'A4',
@@ -846,7 +864,7 @@ exports.generateReport = async (req, res, next) => {
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
         PMH: getMedicalHistory(patient.medicalConditions),
         pmhText:patient.medicalConditions.length >= 1 ? "Past Medical History:" : '',
-        PSH: patient.surgicalHistory,
+        PSH: recommendedBydoctorSurgery,
         newMedications: newMedicationsName,//after med changes
         medicationHistory: newMedicationsName.length >= 1 ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
         medications: medicationsName,
