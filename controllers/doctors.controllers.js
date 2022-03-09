@@ -358,8 +358,10 @@ const getPreviousTreatments = (sPT) => {
     if(sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length == 0){
       return str=`has received previous treatment including physical therapy which started on ${sPT.physicalTherapy.whenBegin} and has completed ${sPT.physicalTherapy.numberOfSession} sessions`
     }
-    if(sPT.physicalTherapy.whenBegin == ""  && sPT.previousTreatmentInclude.length >= 1){
-      sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
+    if(sPT.physicalTherapy.whenBegin == ""){
+      if(sPT.previousTreatmentInclude.length > 1){
+        sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
+      }
       const removeComma = sPT.previousTreatmentInclude.join(" ");
      return str=`has received previous treatment including ${removeComma}`
       
@@ -630,17 +632,25 @@ const getProbAreasChiefCom = (areas) => {
 }
 
 const getSurgicalHistory = (surgery) => {
-  console.log("surgery",surgery)
    let doctroRecSergury = []
    
    for(i=0; i < surgery.length; i++) {
     if(surgery[i].recommendByDoctor == false) {
-      console.log("amir")
       doctroRecSergury.push(surgery[i])
     }
    }
    return doctroRecSergury;
 
+}
+
+const getFollowUp = (surgery) => {
+  let followUp= "";
+  for(i=0; i<surgery.length; i++) {
+    if (surgery[i].treatmentName == "surgery" || surgery[i].treatmentName == "Surgery"){
+      followUp = "after surgery"
+    }
+  }
+  return followUp;
 }
 
 // const getProblemConcatenated = (symptoms) => {
@@ -824,7 +834,8 @@ exports.generateReport = async (req, res, next) => {
     let ros_psychiatric = getTreatments(patient.reviewSystem.psychiatric)
     let general_exam = getGeneralExam(problem.dignosis.generalExam)
     let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
-   
+    let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
+    console.log("testing",followUpText)
     console.log(problem.dignosis.reflexes.length)
     const options = {
       format: 'A4',
@@ -841,7 +852,7 @@ exports.generateReport = async (req, res, next) => {
         DOB: moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         MRN: patient.insurance.membershipId,
         date: moment(problem.dignosis.date).format('MMMM Do, YYYY'),
-        followup: problem.dignosis.suggestedFollowup,
+        followup:followUpText? followUpText : problem.dignosis.suggestedFollowup,
         diagnosis: problem.dignosis.assessment,
         treatments: getTreatments(problem.dignosis.treatmentPlan),
         name: `${patient.fname} ${patient.lname}`,
@@ -919,7 +930,12 @@ exports.generateReport = async (req, res, next) => {
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
-        vitals:problem.dignosis.vitals,
+        BMI:problem.dignosis.vitals.BMI?`BMI:  ${problem.dignosis.vitals.BMI}`:"",
+        height:problem.dignosis.vitals.height?`Ht:  ${problem.dignosis.vitals.height}`:"",
+        weight:problem.dignosis.vitals.weight?`Wt:  ${problem.dignosis.vitals.weight}`:"",
+        BP:problem.dignosis.vitals.BP?`BP:  ${problem.dignosis.vitals.BP}`:"",
+        heartrate:problem.dignosis.vitals.heartrate?`Pulse:  ${problem.dignosis.vitals.heartrate}`:"",
+        respiratory:problem.dignosis.vitals.respiratory?`RR:  ${problem.dignosis.vitals.respiratory}`:"",
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
         doctorNameStyle:problem.signature.eSignaturePhotoUrl?" ":"none",
