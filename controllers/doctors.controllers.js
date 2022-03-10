@@ -653,6 +653,31 @@ const getFollowUp = (surgery) => {
   return followUp;
 }
 
+const getSkin = (skinArray,fullBodyCoordinates) => {
+  console.log("skinArray",skinArray)
+  console.log("fullBodyCoordinates",fullBodyCoordinates)
+  let skin = [] ;
+
+  for(i=0; i < skinArray.length; i++){
+    let tempString = []
+           tempString.push(`${skinArray[`${i}`]} to the `)
+    for(k=0; k < fullBodyCoordinates.length; k++) {
+      tempString.push(`${fullBodyCoordinates[`${k}`]}  `)
+      
+     
+    }
+  console.log("tempString",tempString.length)
+  if(tempString.length > 1){
+  tempString.splice(tempString.length-1,0,"and ")
+  let str =  tempString.toString()
+  var result = str.replace(/,/g,'') 
+  }
+    skin.push(result)
+  }
+  return skin;
+
+}
+
 // const getProblemConcatenated = (symptoms) => {
 //   var problems = ''
 
@@ -835,8 +860,9 @@ exports.generateReport = async (req, res, next) => {
     let general_exam = getGeneralExam(problem.dignosis.generalExam)
     let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
     let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
-    console.log("testing",followUpText)
-    console.log(problem.dignosis.reflexes.length)
+    let skinFullBodyCoordinate = getSkin (problem.dignosis.skin,problem.fullBodyCoordinates)
+    console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
+   
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -859,6 +885,7 @@ exports.generateReport = async (req, res, next) => {
         age: pAge,
         gender: patient.gender,
         problems: getProblems(problem.symptoms),
+        symptomsDuration:problem.symptomsDuration,
         problem_concatenated: problem_concatenated,
         pronoun,
         toHasortoHer:pronoun == "He"? "to his" : "to her",
@@ -881,7 +908,7 @@ exports.generateReport = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
-        skin: problem.dignosis.skin,
+        skin: skinFullBodyCoordinate,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
         problemAreas: problem_areas ? problem_areas : "none",
         problem_areasToUpperCase,

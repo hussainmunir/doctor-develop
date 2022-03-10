@@ -98,7 +98,7 @@ const followUpSchema = new mongoose.Schema({
     patientName:String,
 
     patientInWaitingRoom:{
-        date: String,
+        createdAt: String,
         symptoms: String,
         painScale: String,
         treatmentPlanFollow:[String],
@@ -129,6 +129,7 @@ const followUpSchema = new mongoose.Schema({
             type: [treatmentSchema],
     
         },
+        updatedAt:String,
         medicalEquipment: [String],
         suggestedFollowup: String,
       

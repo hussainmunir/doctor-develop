@@ -1071,17 +1071,31 @@ exports.getOperationWaitingList = async (req, res, next) => {
     }
    
 
+var amir = [];
+    for(i=0; i<list.length; i++) {
+      const problem = await Problem.find({_id:list[i].problemId}).lean();
+      amir.push(problem[0])
+      
+      
+    }
+    
     const problem = await Problem.find({_id:list[0].problemId}).lean();
    
-    const differentialDignosis = problem[0].dignosis.differentialDignosis;
-    const fullBodyCoordinates = problem[0].fullBodyCoordinates
+    // const differentialDignosis = problem[0].dignosis.differentialDignosis;
+    // const fullBodyCoordinates = problem[0].fullBodyCoordinates
 
-  const newList = list.map((item) => {
-    item.differentialDignosis = differentialDignosis
-    item.fullBodyCoordinates = fullBodyCoordinates
-  })
+  // const newList = list.map((item) => {
+  //   item.differentialDignosis = differentialDignosis
+  //   item.fullBodyCoordinates = fullBodyCoordinates
+  // })
 
-  console.log("newList",newList)
+ 
+    list.map((item,i) => {
+      console.log("amir in map")
+      item.differentialDignosis =amir[i].dignosis.differentialDignosis
+      item.fullBodyCoordinates = amir[i].fullBodyCoordinates
+    })
+  
 
     res.status(200).json({
       // count: waiting.length,
