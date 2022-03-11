@@ -993,6 +993,7 @@ exports.postPatientFollowUp = async (req, res, next) => {
         patientName:req.body.patientName,
         patientInWaitingRoom: req.body.patientInWaitingRoom,
         followUpVisit:req.body.followUpVisit,
+        createdAt: req.body.createdAt,
         isChecked: false,
         "signature.public_id":"public id",
         "signature.eSignaturePhotoUrl":"",
@@ -1021,11 +1022,11 @@ exports.postOperation = async (req, res, next) => {
     req.body.signature=  {public_id:"test id",eSignaturePhotoUrl:"",isSignature:"false",date:""}
       const operation = new Operation(req.body);
       const patient = await Patient.find( { '_id': req.body.patientId }).lean()
-    const amir =  patient[0].surgicalHistory.find((surgical,index) => {
+    const surgical_Index =  patient[0].surgicalHistory.find((surgical,index) => {
      return surgical._id == surgicalId
       
     })
-   const surgicalIndex = patient[0].surgicalHistory.indexOf(amir)
+   const surgicalIndex = patient[0].surgicalHistory.indexOf(surgical_Index)
 
     patient[0].surgicalHistory[surgicalIndex] =req.body.surgicalHistory[0];
 
@@ -1071,29 +1072,19 @@ exports.getOperationWaitingList = async (req, res, next) => {
     }
    
 
-var amir = [];
+var test = [];
     for(i=0; i<list.length; i++) {
       const problem = await Problem.find({_id:list[i].problemId}).lean();
-      amir.push(problem[0])
+      test.push(problem[0])
       
       
     }
     
     const problem = await Problem.find({_id:list[0].problemId}).lean();
    
-    // const differentialDignosis = problem[0].dignosis.differentialDignosis;
-    // const fullBodyCoordinates = problem[0].fullBodyCoordinates
-
-  // const newList = list.map((item) => {
-  //   item.differentialDignosis = differentialDignosis
-  //   item.fullBodyCoordinates = fullBodyCoordinates
-  // })
-
- 
     list.map((item,i) => {
-      console.log("amir in map")
-      item.differentialDignosis =amir[i].dignosis.differentialDignosis
-      item.fullBodyCoordinates = amir[i].fullBodyCoordinates
+      item.differentialDignosis =test[i].dignosis.differentialDignosis
+      item.fullBodyCoordinates = test[i].fullBodyCoordinates
     })
   
 

@@ -50,7 +50,7 @@ router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments);
 router.get('/combinePreviousVisit', checkAuth, combinePreviousVisite);
-router.get('/getcptCode',getCptCode);
+router.get('/getcptCode',checkAuth,getCptCode);
 router.post('/postcptCode',postCptCode);
 router.post('/followUpSignature',followUpSignature );
 router.post('/operationSignature',operationSignature );

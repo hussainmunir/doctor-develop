@@ -88,7 +88,6 @@ const surgicalSchema = new mongoose.Schema({
 })
 
 const operationSchema = new mongoose.Schema({
-    createdAt: String,
     patientName:String,
     patientId: String,
     doctorId: String,
@@ -118,7 +117,6 @@ const operationSchema = new mongoose.Schema({
     surgicalHistory: [surgicalHistorySchema],
     differentialDignosis: [ddschema],
     fullBodyCoordinates: [String],
-    updatedAt:String,
     isChecked:{ 
         type:Boolean,
         default:false
@@ -130,7 +128,9 @@ const operationSchema = new mongoose.Schema({
         date: String,
         isSignature:Boolean,
     },
-},{ timestamps: true });
+    updatedAt:String,
+    createdAt: String,
+});
 
 
 

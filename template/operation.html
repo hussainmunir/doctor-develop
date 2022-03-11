@@ -12,12 +12,12 @@
     </style>
 </head>
 <body>
-    <strong>{{patient.fname}},{{patient.lname}}</strong><br><br>
-    <strong>DOB:</strong> {{dateOfBirth}}<br><br>
-    <strong>MRN:</strong> {{MRN}}<br><br>
+    <strong>{{patient.fname}},{{patient.lname}}</strong><br>
+    <strong>DOB:</strong> {{dateOfBirth}}<br>
+    <strong>MRN:</strong> {{MRN}}<br>
     <strong>Date of Encounter:</strong> {{date}}<br><br>
-    <strong>Return:</strong> {{suggestedFollowUp}}<br><br>
-    <strong>Diagnosis:</strong> {{DD}}<br><br>
+    <strong>Return:</strong> {{suggestedFollowUp}}<br>
+    <strong>Diagnosis:</strong> {{DD}}<br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
    <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
    <br><br>
@@ -42,8 +42,7 @@
     <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
     <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li>
-    <h2>Skin:{{skin}} Incision is</h2>
-    <p>(Clean/Dry/Intact/Erythema/Edema/Ecchymosis/Drainage/Dehiscense/Hematoma)</p>
+    <strong>Skin:</strong> Incision is {{skin}} 
     <h2>The patient has tenderness to palpation at:</h2>
     <h2>{{rangeOFMotion}}</h2>
     

@@ -1194,6 +1194,7 @@ exports.combinePreviousVisite = async (req, res, next) => {
     const followUp = await FollowUpModal.find({ 'isChecked': true, "doctorId": req.user.data[1] });
     const operation = await Operation.find({ 'isChecked': true, "doctorId": req.user.data[1] });
 
+   
     const getDoctorName = async (id) => {
       const doctor = await Doctor.findOne({ _id: id }).lean()
       return doctor
@@ -1374,9 +1375,9 @@ exports.generateOpNote = async (req, res, next) => {
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
     const doctorName = await getDoctorName(problem.doctorId)
-
     
-
+const skinText =  getTreatments(operation.surgicalSiteExam);
+     
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     
@@ -1404,7 +1405,7 @@ exports.generateOpNote = async (req, res, next) => {
         suggestedFollowUp:operation.suggestedFollowup,
         DD: str_DD ? str_DD : "none",
         vitals:problem.dignosis.vitals,
-        skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
+        skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength[1],
         ST: STA,
