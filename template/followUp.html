@@ -120,8 +120,16 @@
     <ol>{{#each DDarray}} <li>{{this}}</li> {{/each}}</ol>
     <h2>Plan:</h2> <p>{{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{DD}} Diagnosis,
          diagnostic studies, and treatment plans were reviewed with the patient at
-    today’s visit. Treatment plan includes  {{#each treatmentPlane}}{{this.treatmentName}}  {{/each}}. The
-    patient will follow up {{suggestedFollowUp}}. The patient was provided with {{medicalEquipment}}. The patient is happy with the
+    today’s visit. Treatment plan includes  
+    <ul>
+        {{#each treatmentPlane}}
+        <li>
+            {{this.treatmentName}}{{this.treatmentDetail}}
+        </li>
+        {{/each}}   
+    </ul>
+    . The
+    patient will follow up {{suggestedFollowUp}}. {{medicalEquipmentText}} {{medicalEquipment}}{{dot}}The patient is happy with the
     plan moving forward.</p>
 
     <div >

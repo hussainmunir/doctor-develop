@@ -666,12 +666,14 @@ const getSkin = (skinArray,fullBodyCoordinates) => {
       
      
     }
-  console.log("tempString",tempString.length)
-  if(tempString.length > 1){
+  console.log("tempString",tempString)
+  if(tempString.length > 2){
   tempString.splice(tempString.length-1,0,"and ")
   let str =  tempString.toString()
   var result = str.replace(/,/g,'') 
   }
+  let str =  tempString.toString()
+  var result = str.replace(/,/g,'') 
     skin.push(result)
   }
   return skin;
@@ -878,7 +880,7 @@ exports.generateReport = async (req, res, next) => {
         DOB: moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         MRN: patient.insurance.membershipId,
         date: moment(problem.dignosis.date).format('MMMM Do, YYYY'),
-        followup:followUpText? followUpText : problem.dignosis.suggestedFollowup,
+        followup:followUpText? followUpText : `in ${problem.dignosis.suggestedFollowup}`,
         diagnosis: problem.dignosis.assessment,
         treatments: getTreatments(problem.dignosis.treatmentPlan),
         name: `${patient.fname} ${patient.lname}`,
@@ -948,8 +950,8 @@ exports.generateReport = async (req, res, next) => {
         occupation:patient.socialHistory.occupation,
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next
-        visit on ${problem.dignosis.nextVisit}`, // Array
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} ${strToTheIncludes} until next
+        visit in ${problem.dignosis.nextVisit}`, // Array
         workDIncludes: strWDIncludes ? strWDIncludes : '',
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
         diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
@@ -1309,7 +1311,7 @@ exports.generateFollowUp = async (req, res, next) => {
         fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including ":"no trauma.",
         strength:strength[1],
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         followUpVisit:followUp.followUpVisit,
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
@@ -1334,6 +1336,8 @@ exports.generateFollowUp = async (req, res, next) => {
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail,
         medicalEquipment:followUp.followUpVisit.medicalEquipment,
+        medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
+        dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
         problem_areasToUpperCase,
         problem_concatenated,
         signatureUrl:followUp.signature.eSignaturePhotoUrl,
@@ -1395,7 +1399,7 @@ const skinText =  getTreatments(operation.surgicalSiteExam);
         Age:getAge(patient.dateOfBirth),
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(operation.date).format('MMMM Do, YYYY'),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         problem_areasToUpperCase,
         problem_concatenated,
         gender:patient.gender,
@@ -1421,12 +1425,12 @@ const skinText =  getTreatments(operation.surgicalSiteExam);
         imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
         designations:doctorName.designations,
-        treatmentPlane:operation.treatmentPlan,
+        painDetail:operation.medicationRequired? operation.painDetail : "",
         patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? "is ambulating with" : "Is ambulating without any assistive devices",
         assistiveDevice:operation.patientAmbulating.assistiveDevice,
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
-        medicationtxt:operation.treatmentPlan.length >=1 ? "with medication including" : "without medication",
+        medicationtxt:operation.medicationRequired ? "with medication including" : "without medication",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
