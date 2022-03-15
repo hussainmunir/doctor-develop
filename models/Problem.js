@@ -244,7 +244,14 @@ const hpiProblemSchema = new mongoose.Schema({
             andIs: [String]
 
         },
-        skin: [String],
+        skin: [
+            {
+                name: String,
+                location:String,
+                size:String,
+                description: String
+            }
+        ],
         physicalExam: [
             {
                 name: String,

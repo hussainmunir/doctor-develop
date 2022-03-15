@@ -142,7 +142,7 @@ exports.setProblems = async (req, res, next) => {
             symptomsDuration: req.body.symptomsDuration,
             symptomsAtBest: req.body.symptomsAtBest,
             symptomsAtWorst: req.body.symptomsAtWorst,
-            "symptomsRadiation.isRadiate": req.body.isRaditate,
+            "symptomsRadiation.isRadiate": req.body.isRadiate,
             "symptomsRadiation.radiateAt": req.body.radiateAt,
             "symptomsRadiation.radiateDetails": req.body.radiateDetails,
             radiationDistribution: req.body.radiationDistribution,
@@ -161,6 +161,7 @@ exports.setProblems = async (req, res, next) => {
         });
         const p = await Patient.findOne({ '_id': req.user.data[1] });
         problem.patientName = `${p.fname} ${p.lname}`;
+        console.log("problem",problem)
         const result = await problem.save();
         return res.status(200).json({
             success: true,

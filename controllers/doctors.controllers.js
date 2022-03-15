@@ -653,29 +653,70 @@ const getFollowUp = (surgery) => {
   return followUp;
 }
 
-const getSkin = (skinArray,fullBodyCoordinates) => {
+// const getSkin = (skinArray,fullBodyCoordinates) => {
+//   console.log("skinArray",skinArray)
+//   console.log("fullBodyCoordinates",fullBodyCoordinates)
+//   let skin = [] ;
+
+//   for(i=0; i < skinArray.length; i++){
+//     let tempString = []
+//            tempString.push(`${skinArray[`${i}`]} to the `)
+//     for(k=0; k < fullBodyCoordinates.length; k++) {
+//       tempString.push(`${fullBodyCoordinates[`${k}`]}  `)
+      
+     
+//     }
+//   console.log("tempString",tempString)
+//   if(tempString.length > 2){
+//   tempString.splice(tempString.length-1,0,"and ")
+//   let str =  tempString.toString()
+//   var result = str.replace(/,/g,'') 
+//   }
+//   let str =  tempString.toString()
+//   var result = str.replace(/,/g,'') 
+//     skin.push(result)
+//   }
+//   return skin;
+
+// }
+
+
+const getSkin = (skinArray) => {
   console.log("skinArray",skinArray)
-  console.log("fullBodyCoordinates",fullBodyCoordinates)
+
   let skin = [] ;
 
   for(i=0; i < skinArray.length; i++){
-    let tempString = []
-           tempString.push(`${skinArray[`${i}`]} to the `)
-    for(k=0; k < fullBodyCoordinates.length; k++) {
-      tempString.push(`${fullBodyCoordinates[`${k}`]}  `)
+    var tempString = []
+           tempString.push(`${skinArray[`${i}`].name} `);
+
+           if(skinArray[i].location){
+            tempString.push(`to the ${skinArray[`${i}`].location} `);
+           }
+
+           if(skinArray[i].size){
+            tempString.push(`${skinArray[`${i}`].size} in size`)
+           }
+
+           if(skinArray[i].description){
+            tempString.push(`${skinArray[`${i}`].description} `)
+           }
+   
       
+  let str =  tempString.toString()
+  console.log("str",str)
+  str.replace("size", "size,")
+  var result = str.replace(/,/g,'') 
+ const text =  result.replace("size", "size, ")
+    skin.push(text)
+  
      
     }
   console.log("tempString",tempString)
-  if(tempString.length > 2){
-  tempString.splice(tempString.length-1,0,"and ")
-  let str =  tempString.toString()
-  var result = str.replace(/,/g,'') 
-  }
-  let str =  tempString.toString()
-  var result = str.replace(/,/g,'') 
-    skin.push(result)
-  }
+  
+
+    console.log("skin",skin)
+    
   return skin;
 
 }
@@ -802,7 +843,7 @@ exports.generateReport = async (req, res, next) => {
     // const smokeDrink = getSocial(patient.socialHistory)
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
-    const pTreatString = getPreviousTreatments(problem.previousTreatment);
+    const pTreatString = getPreviousTreatments(problem.previousTreatment).toLowerCase();
     let pronoun;
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
@@ -862,7 +903,7 @@ exports.generateReport = async (req, res, next) => {
     let general_exam = getGeneralExam(problem.dignosis.generalExam)
     let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
     let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
-    let skinFullBodyCoordinate = getSkin (problem.dignosis.skin,problem.fullBodyCoordinates)
+    let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
    
     const options = {
@@ -888,6 +929,7 @@ exports.generateReport = async (req, res, next) => {
         gender: patient.gender,
         problems: getProblems(problem.symptoms),
         symptomsDuration:problem.symptomsDuration,
+        symptomsDevelop:problem.symptomsDevelop,
         problem_concatenated: problem_concatenated,
         pronoun,
         toHasortoHer:pronoun == "He"? "to his" : "to her",
@@ -1368,6 +1410,8 @@ exports.generateOpNote = async (req, res, next) => {
       return doctor
      
     }
+    
+
     let strength= getStrength(problem.dignosis.strength);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -1427,7 +1471,7 @@ const skinText =  getTreatments(operation.surgicalSiteExam);
         designations:doctorName.designations,
         painDetail:operation.medicationRequired? operation.painDetail : "",
         patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? "is ambulating with" : "Is ambulating without any assistive devices",
-        assistiveDevice:operation.patientAmbulating.assistiveDevice,
+        assistiveDevice:operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()}),
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
         medicationtxt:operation.medicationRequired ? "with medication including" : "without medication",

@@ -98,9 +98,9 @@
     <h2>Diagnostic Studies:</h2>
     <h2>Assessment: {{patient.fname}} {{patient.lname}} is a {{Age}} year old {{patient.gender}} S/P:</h2>
     <h2>1.) (Surgery Perfomed)</h2>
-    <p>Plan: {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with {{DD}}
+    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with {{DD}}
          Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
-        today’s visit. Treatment plan includes {{#each treatmentPlane}}{{this.treatmentName}}  {{/each}}. The
+        today’s visit. Treatment plan includes: {{#each treatmentPlane}}- {{this.treatmentName}}  {{/each}}. The
         patient will follow up {{suggestedFollowUp}}. The patient was provided with {{medicalEquipment}}. The patient is happy with the
         plan moving forward.</p>
  

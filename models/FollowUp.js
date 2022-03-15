@@ -131,6 +131,12 @@ const followUpSchema = new mongoose.Schema({
        
         medicalEquipment: [String],
         suggestedFollowup: String,
+        workDutyType : String,
+        workDutyIncludes : [String],
+        toThe: String,
+        toTheInclude : [String],
+        greaterThan : String,
+        nextVisit: String
       
        
     },
