@@ -127,8 +127,8 @@ const hpiProblemSchema = new mongoose.Schema({
     },
     symptomsDevelop: {
         type: String,
-        required: [true, 'Please enter how did the symptoms develop'],
-        enum: ['gradually', 'suddenly']
+        // required: [true, 'Please enter how did the symptoms develop'],
+        // enum: ['gradually', 'suddenly']
     },
     injury: {
         isInjury: {

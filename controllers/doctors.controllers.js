@@ -1410,8 +1410,30 @@ exports.generateOpNote = async (req, res, next) => {
       return doctor
      
     }
-    
+    function appendAndToArray(arr){
+      if(arr.length > 1){
+        arr.splice(arr.length-1,0," and ")
+        }
+        
+      let str = arr.toString()
+      let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
+        console.log("str",removeLastComma)
 
+        return removeLastComma;
+    }
+    const diagnosedText = (cptCode,fullBodyCoordinates) => {
+      let str = "";
+      let diagnosedStr = [];
+      for(i=0; i<cptCode.length; i++){
+        str = `${cptCode[i].name} (${cptCode[i].code})`
+        diagnosedStr.push(str)
+
+        
+      }
+      let result = appendAndToArray(diagnosedStr)
+      return result;
+    }
+   
     let strength= getStrength(problem.dignosis.strength);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -1423,9 +1445,12 @@ exports.generateOpNote = async (req, res, next) => {
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
     const doctorName = await getDoctorName(problem.doctorId)
-    
-const skinText =  getTreatments(operation.surgicalSiteExam);
-     
+    const skinText =  getTreatments(operation.surgicalSiteExam);
+    let diagnosis = diagnosedText(operation.cPTCode)
+    let fullBodyText =appendAndToArray(operation.fullBodyCoordinates)
+   
+
+
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     
@@ -1451,7 +1476,8 @@ const skinText =  getTreatments(operation.surgicalSiteExam);
         hisORHer:patient.gender == "male"?"his" :"her",
         MRN: patient.insurance.membershipId,
         suggestedFollowUp:operation.suggestedFollowup,
-        DD: str_DD ? str_DD : "none",
+        DD: diagnosis,
+        fullBodyText,
         vitals:problem.dignosis.vitals,
         skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",

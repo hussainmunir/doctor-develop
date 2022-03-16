@@ -47,6 +47,7 @@ exports.getProblemList = async (req, res, next) => {
   console.log("id",req.params.patientId)
   try {
     const problems = await Problem.find({patientID: req.params.patientId,isChecked: true });
+    console.log("problems",problems)
     if (problems == null) {
       res.status(200).json({
         success: true, data: "This patient have no problem in The database"
