@@ -16,6 +16,21 @@ const pdf = require('pdf-creator-node')
 const moment = require('moment')
 var count = 0;
 
+
+
+
+function appendAndToArray(arr){
+  if(arr.length > 1){
+    arr.splice(arr.length-1,0," and ")
+    }
+    
+  let str = arr.toString()
+  let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
+    console.log("str",removeLastComma)
+
+    return removeLastComma;
+}
+
 /** 
 // ! @dec Get doctor by id in params
 // ! @route GET /api/v1/doctors/:id
@@ -339,9 +354,12 @@ const getSocial = (sH) => {
 }
 
 
-const getRadiateStr = (condition, pr) => {
+const getRadiateStr = (condition,Radiate,radiateDetails, pr) => {
+ let result =  appendAndToArray(Radiate)
+ let comma = radiateDetails.length >=1?",":"";
+ let at = result.length>=1?"at":""
   if (condition) {
-    return `${pr} admits to the radiation of symptoms.`
+    return `${pr} admits to the radiation of symptoms ${at} ${result} ${comma} ${radiateDetails}.`
   } else {
     return `${pr} denies any radiating symptoms.`
   }
@@ -848,7 +866,7 @@ exports.generateReport = async (req, res, next) => {
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
     else { pronoun = 'They' }
-    const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate, pronoun);
+    const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate,problem.symptomsRadiation.radiateAt,problem.symptomsRadiation.radiateDetails, pronoun);
     const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
     const template = fs.readFileSync('./template/template.html', 'utf-8');
    
@@ -1340,6 +1358,7 @@ exports.generateFollowUp = async (req, res, next) => {
 
       html: followUpNote,
       data: {
+        diagnosticSudies,
         patient,
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),
@@ -1364,8 +1383,8 @@ exports.generateFollowUp = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
         RadiationDistributionTxt:problem.dignosis.radiationDistribution.length >=1 ? "Distribution Of Radiation:":'',
-        diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
-        diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
+        diagnosticSudies:followUp.followUpVisit.diagnosticStudies ? followUp.followUpVisit.diagnosticStudies: " ", // Array
+        diagnosticSudiesText:followUp.followUpVisit.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
         allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
@@ -1410,17 +1429,7 @@ exports.generateOpNote = async (req, res, next) => {
       return doctor
      
     }
-    function appendAndToArray(arr){
-      if(arr.length > 1){
-        arr.splice(arr.length-1,0," and ")
-        }
-        
-      let str = arr.toString()
-      let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
-        console.log("str",removeLastComma)
-
-        return removeLastComma;
-    }
+   
     const diagnosedText = (cptCode,fullBodyCoordinates) => {
       let str = "";
       let diagnosedStr = [];
