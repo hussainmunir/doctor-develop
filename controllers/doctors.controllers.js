@@ -367,7 +367,12 @@ const getRadiateStr = (condition,Radiate,radiateDetails, pr) => {
 const getPreviousTreatments = (sPT) => {
   let str = ""
   if (sPT.isPreviousTreatment) {
-   
+   if(sPT.physicalTherapy == undefined){
+     sPT.physicalTherapy = {
+      whenBegin:"",
+       numberOfSession:""
+  }
+   }
    if( sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length >= 1){
     
     return str=`has received previous treatment including ${sPT.previousTreatmentInclude.map((item)=>` ${item}`)} and physical therapy which started on ${sPT.physicalTherapy.whenBegin} and has completed ${sPT.physicalTherapy.numberOfSession} sessions`
