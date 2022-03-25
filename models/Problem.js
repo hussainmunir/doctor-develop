@@ -249,7 +249,11 @@ const hpiProblemSchema = new mongoose.Schema({
                 name: String,
                 location:String,
                 size:String,
-                description: String
+                description: String,
+                photos: [{
+                    url: String,
+                    public_id: String
+                }],
             }
         ],
         physicalExam: [

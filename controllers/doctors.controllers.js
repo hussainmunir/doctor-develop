@@ -256,6 +256,7 @@ exports.searchCode = async (req, res, next) => {
 
 exports.diagnosis = async (req, res, next) => {
   req.body.dignosis.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  console.log("req.body",req.body)
   try {
     const prb = await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -275,11 +276,35 @@ exports.diagnosis = async (req, res, next) => {
         
       const result = updatePatient[0].surgicalHistory.concat(prb.dignosis.surgeryRecommendedByDoctor);
 
-      console.log("problem surgery ",prb.dignosis.surgeryRecommendedByDoctor)
-      console.log("patient  surgicalHistory",patient[0].surgicalHistory)
       
       const update = await Patient.findOneAndUpdate({ '_id': prb.patientID },{"surgicalHistory":result});
     } 
+    // if (req.files) {
+    //   if (req.files.photos.length != 0) {
+    //     if (Array.isArray(req.files.photos)) {
+          
+    //       for (i = 0; i < req.files.photos.length; i++) {
+    //         console.log("checking for photos")
+    //         const urlId = await uploadImage(req.files.photos[i], next)
+    //         console.log(urlId)
+    //         var setPhotos = {
+    //           "url": urlId.url,
+    //           "public_id": urlId.public_id
+    //         }
+    //         prb.dignosis.skin.photos[i] = setPhotos
+    //       }
+    //     }
+    //     else {
+    //       const urlId = await uploadImage(req.files.photos, next)
+    //       var setPhotos = {
+    //         "url": urlId.url,
+    //         "public_id": urlId.public_id
+    //       }
+    //       toBeAdded.photos = setPhotos
+    //     }
+    //   }
+     
+    // }
 
     await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -357,9 +382,9 @@ const getSocial = (sH) => {
 const getRadiateStr = (condition,Radiate,radiateDetails, pr) => {
  let result =  appendAndToArray(Radiate)
  let comma = radiateDetails.length >=1?",":"";
- let at = result.length>=1?"at":""
+//  let at = result.length>=1?"at":""
   if (condition) {
-    return `${pr} admits to the radiation of symptoms ${at} ${result} ${comma} ${radiateDetails}.`
+    return `${pr} admits to the radiation of symptoms ${result.toLowerCase()} ${comma} ${radiateDetails}.`
   } else {
     return `${pr} denies any radiating symptoms.`
   }
@@ -1020,6 +1045,7 @@ exports.generateReport = async (req, res, next) => {
         workDIncludes: strWDIncludes ? strWDIncludes : '',
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
         diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
+        diagnosticSudiesTextTwo:problem.dignosis.diagnosticStudies.length >=1 ? ", diagnostic studies," : "",
         toThe: problem.dignosis.toThe,
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
