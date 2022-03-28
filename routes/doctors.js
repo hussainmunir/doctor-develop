@@ -23,7 +23,9 @@ const { getDoctorById,
     combineWaitingList,
     followUpSignature,
     operationSignature,
-    combinePreviousVisite
+    combinePreviousVisite,
+    createTemplate,
+    updateTemplate
 } = require('../controllers/doctors.controllers');
 
 
@@ -37,6 +39,8 @@ router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
 router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
+router.put('/createTemplate/:doctorId', checkAuth, createTemplate);
+router.put('/updateTemplate/:templateId', checkAuth, updateTemplate);
 router.get('/followUp/:FollowId', checkAuth, generateFollowUp);
 router.get('/operationNote/:opId', checkAuth, generateOpNote);
 router.get('/', checkAuth, getAllDoctors)

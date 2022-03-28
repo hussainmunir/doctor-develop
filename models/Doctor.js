@@ -1,17 +1,20 @@
 const mongoose = require("mongoose")
 
+const templateNoteSchema = new mongoose.Schema(
+       
+    {templateName: String,
+     treatmentPlan: String,
+     treatmentDetail: String,
+     doctorId: String,
+     },
+
+)
 const doctorSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
     },
-    designations:{
-        type: String,
-
-    },
-    companyName:{
-        type:String,
-    },
+   
     email: {
         type: String,
         required: true,
@@ -54,6 +57,14 @@ const doctorSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add your DEA']
     },
+    designations:{
+        type: String,
+
+    },
+    companyName:{
+        type:String,
+    },
+    templateNotes: [templateNoteSchema],
  
 });
 

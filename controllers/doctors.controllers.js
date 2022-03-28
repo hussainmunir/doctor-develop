@@ -279,32 +279,32 @@ exports.diagnosis = async (req, res, next) => {
       
       const update = await Patient.findOneAndUpdate({ '_id': prb.patientID },{"surgicalHistory":result});
     } 
-    // if (req.files) {
-    //   if (req.files.photos.length != 0) {
-    //     if (Array.isArray(req.files.photos)) {
+    if (req.files) {
+      if (req.files.photos.length != 0) {
+        if (Array.isArray(req.files.photos)) {
           
-    //       for (i = 0; i < req.files.photos.length; i++) {
-    //         console.log("checking for photos")
-    //         const urlId = await uploadImage(req.files.photos[i], next)
-    //         console.log(urlId)
-    //         var setPhotos = {
-    //           "url": urlId.url,
-    //           "public_id": urlId.public_id
-    //         }
-    //         prb.dignosis.skin.photos[i] = setPhotos
-    //       }
-    //     }
-    //     else {
-    //       const urlId = await uploadImage(req.files.photos, next)
-    //       var setPhotos = {
-    //         "url": urlId.url,
-    //         "public_id": urlId.public_id
-    //       }
-    //       toBeAdded.photos = setPhotos
-    //     }
-    //   }
+          for (i = 0; i < req.files.photos.length; i++) {
+            console.log("checking for photos")
+            const urlId = await uploadImage(req.files.photos[i], next)
+            console.log(urlId)
+            var setPhotos = {
+              "url": urlId.url,
+              "public_id": urlId.public_id
+            }
+            prb.dignosis.skin.photos[i] = setPhotos
+          }
+        }
+        else {
+          const urlId = await uploadImage(req.files.photos, next)
+          var setPhotos = {
+            "url": urlId.url,
+            "public_id": urlId.public_id
+          }
+          toBeAdded.photos = setPhotos
+        }
+      }
      
-    // }
+    }
 
     await Problem.findOneAndUpdate(
       { '_id': req.params.pID },
@@ -320,7 +320,81 @@ exports.diagnosis = async (req, res, next) => {
     return next(new ErrorResponse(err.message, 500))
   }
 }
+//create template in the doctor profile
+exports.createTemplate = async (req, res, next) => {
+  
+  console.log("req.body",req.body)
+  try {
+    const doct = await Doctor.findOne({ _id: req.params.doctorId }).lean();
+    
 
+    const doctor = await Doctor.findOneAndUpdate(
+      { '_id': req.params.doctorId },
+      {"templateNotes":[...doct.templateNotes,...req.body.templateNotes]},
+      {
+        new: true,
+        runValidators: true,
+      });
+
+    if (!doct) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+
+  
+
+  
+    res.status(200).json({
+      success: true,
+      data: doctor
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+
+//update template in the doctor profile
+
+exports.updateTemplate = async (req, res, next) => {
+  console.log("req.user",req.user)
+  console.log("req.body",req.body)
+  try {
+    const doct = await Doctor.findOne({ _id: req.user.data[1] }).lean();
+
+    if (!doct) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+
+  
+const newArr = doct.templateNotes.map(obj => {
+ 
+  if (obj._id == req.params.templateId) {
+    console.log("matched")
+    let {templateName,treatmentPlan,treatmentDetail} = req.body.templateNotes;
+    return {...obj, templateName,treatmentPlan,treatmentDetail};
+  }
+
+  return obj;
+});
+console.log("newArr",newArr)
+    const doctor = await Doctor.findOneAndUpdate(
+      { '_id': req.user.data[1] },
+      {"templateNotes":newArr},
+      {
+        new: true,
+        runValidators: true,
+      });
+
+  
+    res.status(200).json({
+      success: true,
+      data: doctor
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
 //helper functions for generation of report
 const getAge = (dob) => {
   let month_diff = Date.now() - dob.getTime();
