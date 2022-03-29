@@ -1066,19 +1066,26 @@ exports.getOperationWaitingList = async (req, res, next) => {
     }
   
     let SurgicalArray = patient[0].surgicalHistory;
+    // if(SurgicalArray){
+      
+    //   const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
+    //   list=recomendedByDoctor;
+    // }
     if(SurgicalArray){
       
-      const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
+      const recomendedByDoctor=SurgicalArray.filter((item) => {
+        if (item.hasOwnProperty('recommendByDoctor')){
+          item.recommendByDoctor === true}
+        }
+      
+        )
       list=recomendedByDoctor;
     }
-   
 
 var test = [];
     for(i=0; i<list.length; i++) {
       const problem = await Problem.find({_id:list[i].problemId}).lean();
       test.push(problem[0])
-      
-      
     }
     
     const problem = await Problem.find({_id:list[0].problemId}).lean();

@@ -96,7 +96,7 @@ const surgicalSchema = new mongoose.Schema({
 const hpiProblemSchema = new mongoose.Schema({
     patientID: {
         type: String,
-        required: [true, 'Please add a referral object id of the patient']
+        // required: [true, 'Please add a referral object id of the patient']
     },
     patientName: {
         type: String,
@@ -115,15 +115,15 @@ const hpiProblemSchema = new mongoose.Schema({
     },
     fullBodyCoordinates: {
         type: [String],
-        required: [true, 'Please add the coordinates for full body 3d Model']
+        // required: [true, 'Please add the coordinates for full body 3d Model']
     },
     symptoms: {
         type: [String],
-        required: [true, 'Please add symptoms for the problem you mentioned in full body 3D model']
+        // required: [true, 'Please add symptoms for the problem you mentioned in full body 3D model']
     },
     symptomsStarted: {
         type: String,
-        required: [true, 'Please add when did when symptoms started']
+        // required: [true, 'Please add when did when symptoms started']
     },
     symptomsDevelop: {
         type: String,
@@ -133,7 +133,7 @@ const hpiProblemSchema = new mongoose.Schema({
     injury: {
         isInjury: {
             type: Boolean,
-            required: [false, 'Please enter whether you have injury or not'],
+            // required: [false, 'Please enter whether you have injury or not'],
             default: false
         },
         Details: {
@@ -143,20 +143,20 @@ const hpiProblemSchema = new mongoose.Schema({
     },
     symptomsDuration: {
         type: String,
-        required: [true, 'Please add the duration of symptoms']
+        // required: [true, 'Please add the duration of symptoms']
     },
     symptomsAtBest: {
         type: String,
-        required: [true, 'Please enter symptoms at best']
+        // required: [true, 'Please enter symptoms at best']
     },
     symptomsAtWorst: {
         type: String,
-        required: [true, 'Please enter symptoms at worst']
+        // required: [true, 'Please enter symptoms at worst']
     },
     symptomsRadiation: {
         isRadiate: {
             type: Boolean,
-            required: [true, 'Please enter the choice of radiation'],
+            // required: [true, 'Please enter the choice of radiation'],
             default: false
         },
         radiateAt: {
@@ -171,11 +171,11 @@ const hpiProblemSchema = new mongoose.Schema({
   
     aggravatingFactors: {
         type: [String],
-        required: [true, 'Please enter aggravating factors']
+        // required: [true, 'Please enter aggravating factors']
     },
     alleviatingFactors: {
         type: [String],
-        required: [true, 'Please enter alleviating factors']
+        // required: [true, 'Please enter alleviating factors']
     },
     previousTreatment: {
         isPreviousTreatment: {
@@ -202,7 +202,7 @@ const hpiProblemSchema = new mongoose.Schema({
             frequency: String,
             frequencyasneeded: String
         }],
-        required: [true, 'Please add current medications'],
+        // required: [true, 'Please add current medications'],
     },
     createdAt: {
         type: String,
@@ -233,9 +233,11 @@ const hpiProblemSchema = new mongoose.Schema({
 
             },
         },
+        roomNumber: String,
+        castNumber: String,
         radiationDistribution: {
             type: [String],
-            required: [true, 'Please add where is the radiation distribution in radiation 3d model']
+            // required: [true, 'Please add where is the radiation distribution in radiation 3d model']
         },
         generalExam: {
             patientIs: [String],
@@ -250,10 +252,7 @@ const hpiProblemSchema = new mongoose.Schema({
                 location:String,
                 size:String,
                 description: String,
-                photos: [{
-                    url: String,
-                    public_id: String
-                }],
+                skinPhotos: [String],
             }
         ],
         physicalExam: [

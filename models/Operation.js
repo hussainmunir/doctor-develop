@@ -121,7 +121,8 @@ const operationSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-  
+    roomNumber: String,
+    castNumber: String,
     signature: {
         eSignaturePhotoUrl: String,
         public_id: String,

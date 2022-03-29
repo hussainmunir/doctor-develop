@@ -136,8 +136,9 @@ const followUpSchema = new mongoose.Schema({
         toThe: String,
         toTheInclude : [String],
         greaterThan : String,
-        nextVisit: String
-      
+        nextVisit: String,
+        roomNumber: String,
+        castNumber: String,
        
     },
     signature: {

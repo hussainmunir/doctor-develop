@@ -75,6 +75,27 @@ exports.getProblems = async (req, res, next) => {
 
 }
 
+exports.getProblem = async (req, res, next) => {
+
+    try {
+        const problem = await Problem.findOne({ '_id': req.params.problemId });
+       
+        if (problem.length === 0) {
+            res.status(200).json({
+                success: true,
+                data: "no problem found"
+            });
+        } else {
+            res.status(200).json({
+                success: true,  data: problem
+            });
+        }
+    } catch (err) {
+        res.status(201).json({ success: false, message: err.message })
+    }
+
+}
+
 exports.updatePatientSignature = async (req, res, next) => {
     try {
       const p = await Problem.findOne({ _id: req.body.problemId })

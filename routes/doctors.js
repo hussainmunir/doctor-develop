@@ -25,7 +25,12 @@ const { getDoctorById,
     operationSignature,
     combinePreviousVisite,
     createTemplate,
-    updateTemplate
+    updateTemplate,
+    deleteTemplate,
+    getTemplates,
+    getTemplate,
+    getPostOp,
+    getFollowUp
 } = require('../controllers/doctors.controllers');
 
 
@@ -41,6 +46,9 @@ router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
 router.put('/createTemplate/:doctorId', checkAuth, createTemplate);
 router.put('/updateTemplate/:templateId', checkAuth, updateTemplate);
+router.delete('/deleteTemplate/:templateId', checkAuth, deleteTemplate);
+router.get('/allTemplate/:doctorId', checkAuth, getTemplates)
+router.get('/template/:treatmentPlan', checkAuth, getTemplate)
 router.get('/followUp/:FollowId', checkAuth, generateFollowUp);
 router.get('/operationNote/:opId', checkAuth, generateOpNote);
 router.get('/', checkAuth, getAllDoctors)
@@ -54,6 +62,9 @@ router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments);
 router.get('/combinePreviousVisit', checkAuth, combinePreviousVisite);
+router.get('/getcptCode',checkAuth,getCptCode);
+router.get('/getFollowUpById/:followUpId', checkAuth, getFollowUp);
+router.get('/getPostOpById/:postOpId', checkAuth, getPostOp);
 router.get('/getcptCode',checkAuth,getCptCode);
 router.post('/postcptCode',postCptCode);
 router.post('/followUpSignature',followUpSignature );

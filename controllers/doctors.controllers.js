@@ -255,7 +255,11 @@ exports.searchCode = async (req, res, next) => {
 }
 
 exports.diagnosis = async (req, res, next) => {
-  req.body.dignosis.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+ 
+  if(req.body.dignosis.date){
+    req.body.dignosis.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  }
+  
   console.log("req.body",req.body)
   try {
     const prb = await Problem.findOneAndUpdate(
@@ -270,6 +274,7 @@ exports.diagnosis = async (req, res, next) => {
       return next(new ErrorResponse('problem does not exist', 400))
     }
 
+    console.log("prb",prb)
     if(prb.dignosis.surgeryRecommendedByDoctor.name !== "") {
       const patient = await Patient.find( { '_id': prb.patientID }).lean()
       const updatePatient = patient
@@ -353,6 +358,58 @@ exports.createTemplate = async (req, res, next) => {
   }
 }
 
+
+exports.getTemplates = async (req, res, next) => {
+  
+  console.log("req.body",req.body)
+  try {
+    const doct = await Doctor.findOne({ _id: req.params.doctorId }).lean();
+    
+
+  
+
+    if (!doct) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+
+  let templateNotes = doct.templateNotes ? doct.templateNotes : [];
+
+  
+    res.status(200).json({
+      success: true,
+      data: templateNotes,
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.getTemplate = async (req, res, next) => {
+  
+  console.log("req.body",req.body)
+  try {
+    const doct = await Doctor.findOne({ _id: req.user.data[1]}).lean();
+    
+
+  
+
+    if (!doct) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+
+    const template = doct.templateNotes.filter(obj => obj.treatmentPlan == req.params.treatmentPlan);
+
+  
+    res.status(200).json({
+      success: true,
+      data: template,
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
 //update template in the doctor profile
 
 exports.updateTemplate = async (req, res, next) => {
@@ -389,6 +446,38 @@ console.log("newArr",newArr)
     res.status(200).json({
       success: true,
       data: doctor
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.deleteTemplate = async (req, res, next) => {
+  console.log("req.user",req.user)
+  console.log("req.body",req.body)
+  try {
+    const doct = await Doctor.findOne({ _id: req.user.data[1] }).lean();
+
+    if (!doct) {
+      return next(new ErrorResponse('doctor does not exist', 400))
+    }
+console.log("doct",doct)
+  
+const newArr = doct.templateNotes.filter(obj => obj._id != req.params.templateId);
+console.log("newArr",newArr)
+    const doctor = await Doctor.findOneAndUpdate(
+      { '_id': req.user.data[1] },
+      {"templateNotes":newArr},
+      {
+        new: true,
+        runValidators: true,
+      });
+
+  
+    res.status(200).json({
+      success: true,
+      message:"successfully deleted"
     })
 
   } catch (err) {
@@ -1767,6 +1856,46 @@ exports.generateOpNote = async (req, res, next) => {
 catch (err) {
   next(new ErrorResponse(err.message, 500))
 }
+}
 
+exports.getPostOp = async (req, res, next) => {
+
+  try {
+      const postOp = await Operation.findOne({ '_id': req.params.postOpId });
+     
+      if (postOp.length === 0) {
+          res.status(200).json({
+              success: true,
+              data: "no postOp found"
+          });
+      } else {
+          res.status(200).json({
+              success: true,  data: postOp
+          });
+      }
+  } catch (err) {
+      res.status(201).json({ success: false, message: err.message })
+  }
+
+}
+
+exports.getFollowUp = async (req, res, next) => {
+
+  try {
+      const followUp = await FollowUpModal.findOne({ '_id': req.params.followUpId });
+     
+      if (followUp.length === 0) {
+          res.status(200).json({
+              success: true,
+              data: "no followUp found"
+          });
+      } else {
+          res.status(200).json({
+              success: true,  data: followUp
+          });
+      }
+  } catch (err) {
+      res.status(201).json({ success: false, message: err.message })
+  }
 
 }
