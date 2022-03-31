@@ -1,10 +1,12 @@
 const Doctor = require('../models/Doctor')
 const Operation = require('../models/Operation')
+const FollowUpModal = require('../models/FollowUp.js');
 const ICD = require('../models/ICDcodes')
 const Problem = require('../models/Problem')
 const Patient = require('../models/Patient')
+
 const SpecialTests = require('../models/SpecialTests')
-const FollowUpModal = require('../models/FollowUp.js');
+
 const CptCodes = require('../models/CptCodes.js');
 const ErrorResponse = require('../utils/errorResponse')
 const { destroyImage, uploadImage, uploadPdf } = require('../helpers/helpers')
@@ -316,6 +318,34 @@ exports.diagnosis = async (req, res, next) => {
       { 'isChecked': true }
     )
   
+    res.status(200).json({
+      success: true,
+      data: prb
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.addRoom = async (req, res, next) => {
+ 
+  
+  try {
+    let {roomNumber,castNumber} = req.body;
+    const prb = await Problem.findOneAndUpdate(
+      
+      { '_id': req.params.pID },
+      {'roomNumber':roomNumber,'castNumber':castNumber},
+      {
+        new: true,
+        runValidators: true,
+      });
+      console.log("req.body",req.body)
+    if (!prb) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+    console.log("prb",prb) 
     res.status(200).json({
       success: true,
       data: prb
@@ -844,11 +874,14 @@ const getProbAreasChiefCom = (areas) => {
 
 const getSurgicalHistory = (surgery) => {
    let doctroRecSergury = []
-   
+   console.log("surgery",surgery)
    for(i=0; i < surgery.length; i++) {
-    if(surgery[i].recommendByDoctor == false) {
-      doctroRecSergury.push(surgery[i])
+    if(surgery[i] != null){
+      if(surgery[i].recommendByDoctor == false) {
+        doctroRecSergury.push(surgery[i])
+      }
     }
+   
    }
    return doctroRecSergury;
 

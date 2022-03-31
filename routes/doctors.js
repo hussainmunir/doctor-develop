@@ -30,7 +30,8 @@ const { getDoctorById,
     getTemplates,
     getTemplate,
     getPostOp,
-    getFollowUp
+    getFollowUp,
+    addRoom
 } = require('../controllers/doctors.controllers');
 
 
@@ -44,6 +45,7 @@ router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
 router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
+router.put('/addPatientRoom/:pID', checkAuth, addRoom);
 router.put('/createTemplate/:doctorId', checkAuth, createTemplate);
 router.put('/updateTemplate/:templateId', checkAuth, updateTemplate);
 router.delete('/deleteTemplate/:templateId', checkAuth, deleteTemplate);

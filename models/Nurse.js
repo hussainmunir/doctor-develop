@@ -9,7 +9,6 @@ const doctorSchema = new mongoose.Schema({
    
     email: {
         type: String,
-        required: true,
         match: [
             /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
             'Please add a valid email'
@@ -18,7 +17,6 @@ const doctorSchema = new mongoose.Schema({
     },
     phone: {
         type: Number,
-        required: true,
         match: [
             /^(\([0-9]{3}\) |[0-9]{3}-)[0-9]{3}-[0-9]{4}$/,
             'Please add a valid phone number.'
@@ -26,7 +24,6 @@ const doctorSchema = new mongoose.Schema({
     },
     emergencyContact: {
         type: Number,
-        required: true,
         match: [
             /^(\([0-9]{3}\) |[0-9]{3}-)[0-9]{3}-[0-9]{4}$/,
             'Please add a valid phone number.'
@@ -35,7 +32,6 @@ const doctorSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     homeAddress: {
         type: String,

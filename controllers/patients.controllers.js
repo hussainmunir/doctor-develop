@@ -278,20 +278,21 @@ exports.updatePatientLabs = async (req, res, next) => {
 
 
 exports.getPatientLabs = async (req, res) => {
-  console.log("getting patient labs")
   try {
     const p = await Patient.findOne({ _id: req.body.patientId })
-    console.log("**************", p.labs)
+    
     if (p.labs.length <= 0) {
       return res.status(200).json({
         success: true,
         data: "No Labs Found"
       })
     }
-    else {
+    else { 
+      const completedLabs =   p.labs.filter(lab=> lab.progress == "completed")
+       console.log("completedLabs",completedLabs)
       return res.status(200).json({
         success: true,
-        data: p.labs
+        data: completedLabs
       })
     }
 

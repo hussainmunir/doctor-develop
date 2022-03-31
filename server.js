@@ -51,9 +51,9 @@ const doctors = require('./routes/doctors');
 const problems = require('./routes/problem');
 const appointments = require('./routes/appointments');
 const test = require('./routes/testroutes');
-const conversation = require('./routes/conversations')
-const lab = require('./routes/labs')
-const  templates = require('./routes/tamplateNotes')
+const conversation = require('./routes/conversations');
+const lab = require('./routes/labs');
+const  nurse = require('./routes/nurse')
 
 
 
@@ -81,7 +81,8 @@ app.use('/api/v1/appointments', appointments);
 app.use('/api/test', test);
 app.use('/api/v1/conversations', conversation);
 app.use('/api/v1/labs', lab);
-app.use('/api/v1/templates', templates);
+app.use('/api/v1/nurse', nurse);
+
 
 
 app.use(errorHandler)

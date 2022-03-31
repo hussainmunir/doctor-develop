@@ -5,6 +5,7 @@ const Lab = require("../models/Lab");
 router.get('/', async (req, res) => {
     try {
         const labs = await Lab.find({})
+        
         res.status(200).json({
             "success": true,
             "data": labs

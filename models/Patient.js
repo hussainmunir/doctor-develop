@@ -257,6 +257,9 @@ const user = new mongoose.Schema({
             name: String,
             description: String,
             date: String,
+            patientName:String,
+            progress:String,
+            byDesignation:String,
             photos: [{
                 url: String,
                 public_id: String

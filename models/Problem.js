@@ -233,8 +233,7 @@ const hpiProblemSchema = new mongoose.Schema({
 
             },
         },
-        roomNumber: String,
-        castNumber: String,
+       
         radiationDistribution: {
             type: [String],
             // required: [true, 'Please add where is the radiation distribution in radiation 3d model']
@@ -309,6 +308,8 @@ const hpiProblemSchema = new mongoose.Schema({
         },
         date: String,
     },
+    roomNumber: String,
+    castNumber: String,
     signature:[{
         publicId: {
             type: String,
