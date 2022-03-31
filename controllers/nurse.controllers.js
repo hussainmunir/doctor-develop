@@ -142,27 +142,35 @@ exports.registerNurse = async (req, res, next) => {
   
 exports.getPatientLabs = async (req, res) => {
   try {
-    const p = await Patient.findOne({ _id: req.params.patientId })
-    const doctor = await Patient.findOne({ _id: req.params.doctorId })
-    if (p.labs.length <= 0) {
+    const p = await Patient.find()
+    const patientWithLabs = await Patient.find({ 'labs.doctorId': req.params.doctorId })
+    if (patientWithLabs.length <= 0) {
       return res.status(200).json({
         success: true,
         data: "No Labs Found"
       })
     }
-    else { 
-      const completedLabs =   p.labs.filter(lab=> lab.progress == "completed")
-       console.log("completedLabs",completedLabs)
-
-       let filteredNumbers = p.labs.filter(function (currentLabs) {
-        return currentLabs.progress == "completed" && currentLabs.name == "x-Ray" && currentLabs.doctorId == req.params.id;
-      });
-      return res.status(200).json({
-        success: true,
-        data: completedLabs
-      })
-    }
-
+    
+    
+     for(i=0; i<patientWithLabs.length; i++){
+      var filteredLabs = [];
+      for(j=0; j<patientWithLabs[i].labs.length; j++){
+        
+       
+        if(patientWithLabs[i].labs[j].progress != "completed" && patientWithLabs[i].labs[j].name == "X-Ray" && patientWithLabs[i].labs[j].doctorId == req.params.doctorId){
+      let test = patientWithLabs[i].labs[j]
+    
+      filteredLabs.push(test);
+  
+          }
+      }
+    
+     }
+     console.log("filteredLabs",filteredLabs)
+     return res.status(200).json({
+      success: true,
+      data: filteredLabs
+    })
   }
   catch (e) {
     return res.status(400).json({
@@ -171,3 +179,47 @@ exports.getPatientLabs = async (req, res) => {
     })
   }
 }
+
+
+
+  
+exports.getPatientLabsCompany = async (req, res) => {
+  try {
+    const p = await Patient.find()
+    const patientWithLabs = await Patient.find({ 'labs.companyName': req.params.companyName })
+    if (patientWithLabs.length <= 0) {
+      return res.status(200).json({
+        success: true,
+        data: "No Labs Found"
+      })
+    }
+    
+    
+     for(i=0; i<patientWithLabs.length; i++){
+      var filteredLabs = [];
+      for(j=0; j<patientWithLabs[i].labs.length; j++){
+        
+       
+        if(patientWithLabs[i].labs[j].progress != "completed" && patientWithLabs[i].labs[j].name == "X-Ray" && patientWithLabs[i].labs[j].companyName == req.params.companyName){
+      let test = patientWithLabs[i].labs[j]
+    
+      filteredLabs.push(test);
+  
+          }
+      }
+    
+     }
+     console.log("filteredLabs",filteredLabs)
+     return res.status(200).json({
+      success: true,
+      data: filteredLabs
+    })
+  }
+  catch (e) {
+    return res.status(400).json({
+      success: false,
+      error: e
+    })
+  }
+}
+
