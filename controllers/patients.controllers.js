@@ -200,6 +200,10 @@ exports.updatePatientLabs = async (req, res, next) => {
         name: req.body.name,
         date: req.body.date,
         description: req.body.description,
+        patientName: req.body.patientName,
+        progress: req.body.progress,
+        companyName: req.body.companyName,
+        byDesignation: req.body.byDesignation,
         photos: [],
         pdf: []
       }

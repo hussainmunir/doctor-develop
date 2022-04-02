@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 
-const doctorSchema = new mongoose.Schema({
+const technicianSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -52,13 +52,10 @@ const doctorSchema = new mongoose.Schema({
     companyName:{
         type:String,
     },
-    doctorId:{
-        type:String,
-    },
     gender:{
         type:String,
     }
  
 });
 
-module.exports = mongoose.model('Nurse', doctorSchema);
+module.exports = mongoose.model('Technician', technicianSchema);

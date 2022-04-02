@@ -65,6 +65,9 @@ const doctorSchema = new mongoose.Schema({
         type:String,
     },
     templateNotes: [templateNoteSchema],
+    gender:{
+        type:String,
+    }
  
 });
 

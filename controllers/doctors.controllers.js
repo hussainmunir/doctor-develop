@@ -332,7 +332,8 @@ exports.addRoom = async (req, res, next) => {
  
   
   try {
-    let {roomNumber,castNumber} = req.body;
+    let {roomNumber,castNumber,vitals} = req.body;
+    console.log("vitals",vitals)
     const prb = await Problem.findOneAndUpdate(
       
       { '_id': req.params.pID },
@@ -341,11 +342,20 @@ exports.addRoom = async (req, res, next) => {
         new: true,
         runValidators: true,
       });
-      console.log("req.body",req.body)
+      const updateVitals = await Problem.findByIdAndUpdate(
+      
+        { '_id': req.params.pID},
+        {$set: {'dignosis.vitals':vitals}},
+        {
+          new: true,
+          runValidators: true,
+        });
+        console.log("updateVitals",updateVitals.dignosis.vitals)
+     
     if (!prb) {
       return next(new ErrorResponse('problem does not exist', 400))
     }
-    console.log("prb",prb) 
+ 
     res.status(200).json({
       success: true,
       data: prb

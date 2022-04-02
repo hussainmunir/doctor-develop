@@ -54,6 +54,7 @@ const test = require('./routes/testroutes');
 const conversation = require('./routes/conversations');
 const lab = require('./routes/labs');
 const  nurse = require('./routes/nurse')
+const  technician = require('./routes/technician')
 
 
 
@@ -83,6 +84,8 @@ app.use('/api/test', test);
 app.use('/api/v1/conversations', conversation);
 app.use('/api/v1/labs', lab);
 app.use('/api/v1/nurse', nurse);
+app.use('/api/v1/technician', technician);
+
 
 
 
