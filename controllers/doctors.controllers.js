@@ -1585,7 +1585,7 @@ exports.generateFollowUp = async (req, res, next) => {
 
       html: followUpNote,
       data: {
-        diagnosticSudies,
+        diagnosticSudies: problem.dignosis.diagnosticStudies,
         patient,
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),

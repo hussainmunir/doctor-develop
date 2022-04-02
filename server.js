@@ -60,7 +60,8 @@ const  nurse = require('./routes/nurse')
 
 //Body Parser
 app.use(express.json());
-
+app.use(express.json({limit:'50mb',extended:true}));
+app.use(express.urlencoded({limit:'50mb',extended:true}));
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
