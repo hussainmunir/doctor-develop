@@ -222,4 +222,118 @@ exports.getPatientLabsCompany = async (req, res) => {
     })
   }
 }
+exports.addRoomProblem = async (req, res, next) => {
+ 
+  
+  try {
+    let {roomNumber,castNumber,vitals} = req.body;
+    console.log("vitals",vitals)
+    const prb = await Problem.findOneAndUpdate(
+      
+      { '_id': req.params.pID },
+      {'roomNumber':roomNumber,'castNumber':castNumber},
+      {
+        new: true,
+        runValidators: true,
+      });
+      const updateVitals = await Problem.findByIdAndUpdate(
+      
+        { '_id': req.params.pID},
+        {$set: {'dignosis.vitals':vitals}},
+        {
+          new: true,
+          runValidators: true,
+        });
+        console.log("updateVitals",updateVitals.dignosis.vitals)
+     
+    if (!prb) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+ 
+    res.status(200).json({
+      success: true,
+      data: prb
+    })
 
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+exports.addRoomFollowUp = async (req, res, next) => {
+ 
+  
+  try {
+    let {roomNumber,castNumber,vitals} = req.body;
+    console.log("vitals",vitals)
+    console.log("RoomNumber",roomNumber)
+    console.log("CastNumber",castNumber)
+
+    const follow = await FollowUpModal.findOneAndUpdate (
+      
+      { '_id': req.params.pID },
+      {'roomNumber':roomNumber,'castNumber':castNumber},
+      {
+        new: true,
+        runValidators: true,
+      });
+      const updateVitals = await FollowUpModal.findByIdAndUpdate(
+      
+        { '_id': req.params.pID},
+        {$set: {'followUpVisit.vitals':vitals}},
+        {
+          new: true,
+          runValidators: true,
+        });
+        // console.log("updateVitals",updateVitals.dignosis.vitals)
+     
+    if (!follow) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+ 
+    res.status(200).json({
+      success: true,
+      data: follow
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.addRoomOperation = async (req, res, next) => {
+ 
+  
+  try {
+    let {roomNumber,castNumber,vitals} = req.body;
+    console.log("vitals",vitals)
+    const op = await Operation.findOneAndUpdate(
+      
+      { '_id': req.params.pID },
+      {'roomNumber':roomNumber,'castNumber':castNumber},
+      {
+        new: true,
+        runValidators: true,
+      });
+      const updateVitals = await Operation.findByIdAndUpdate(
+      
+        { '_id': req.params.pID},
+        {$set: {'vitals':vitals}},
+        {
+          new: true,
+          runValidators: true,
+        });
+      //   console.log("updateVitals",updateVitals.dignosis.vitals)
+     
+    if (!op) {
+      return next(new ErrorResponse('problem does not exist', 400))
+    }
+ 
+    res.status(200).json({
+      success: true,
+      data: op
+    })
+
+  } catch (err) {
+    return next(new ErrorResponse(err.message, 500))
+  }
+}

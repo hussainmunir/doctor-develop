@@ -104,6 +104,31 @@ const operationSchema = new mongoose.Schema({
         ambulating:Boolean,
         assistiveDevice:[String]
     },
+    vitals: {
+        height: {
+            type: String,
+        },
+        weight: {
+            type: String,
+
+        },
+        BP: {
+            type: String,
+
+        },
+        heartrate: {
+            type: String,
+
+        },
+        BMI: {
+            type: String,
+
+        },
+        respiratory: {
+            type: String,
+
+        },
+    },
     surgicalSiteExam:[String],
     rangeOfMotion: [String],
     muscularStrengthTesting: [muscularStrength],
