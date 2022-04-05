@@ -69,7 +69,27 @@ exports.registerTechnician = async (req, res, next) => {
   };
 
 
-
+  exports.getTechnician = async (req, res, next) => {
+    try {
+     console.log(req.user.data[1])
+      const technician = await Technician.findById(req.user.data[1]);
+  
+      // we are returning because if record isnt present by id it will show two errors. by returning, it will only return the first one.
+      //the catch statement will be executed if the format of the id is incorrect
+      //if statement is executed when the format is correct but id is not present into the database
+      if (!technician) {
+        return next(new ErrorResponse(`Technician not found with id of ${req.user.data[1]}`, 404));
+      }
+  
+      res.status(200).json({
+        success: true, data: technician
+      })
+  
+    } catch (err) {
+      next(new ErrorResponse(err.message, 500));
+  
+    }
+  }
 
   
 exports.getPatientLabs = async (req, res) => {

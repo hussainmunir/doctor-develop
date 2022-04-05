@@ -68,6 +68,29 @@ exports.registerNurse = async (req, res, next) => {
   };
 
 
+  exports.getNurse = async (req, res, next) => {
+    try {
+     console.log(req.user.data[1])
+      const nurse = await Nurse.findById(req.user.data[1]);
+  
+      // we are returning because if record isnt present by id it will show two errors. by returning, it will only return the first one.
+      //the catch statement will be executed if the format of the id is incorrect
+      //if statement is executed when the format is correct but id is not present into the database
+      if (!nurse) {
+        return next(new ErrorResponse(`Nurse not found with id of ${req.user.data[1]}`, 404));
+      }
+  
+      res.status(200).json({
+        success: true, data: nurse
+      })
+  
+    } catch (err) {
+      next(new ErrorResponse(err.message, 500));
+  
+    }
+  }
+
+
   exports.combineWaitingList = async (req, res, next) => {
     try {
       const problem = await Problem.find({ 'isChecked': false, "doctorId": req.params.doctorId }).lean();

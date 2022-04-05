@@ -4,6 +4,7 @@ const checkAuth = require('../middleware/check-auth')
 const { 
     registerNurse,
     loginNurse,
+    getNurse,
     combineWaitingList,
     getPatientLabs,
     getPatientLabsCompany,
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.post('/register', registerNurse);
 router.post('/login', loginNurse);
+router.get('/getNurse', checkAuth, getNurse);
 router.get('/getCombineWaitingList/:doctorId', checkAuth, combineWaitingList);
 router.get('/getPatientLabs/:doctorId', checkAuth, getPatientLabs);
 router.get('/getPatientLabsCompany/:companyName', checkAuth, getPatientLabsCompany);
