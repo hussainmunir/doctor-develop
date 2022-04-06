@@ -1069,23 +1069,28 @@ exports.getOperationWaitingList = async (req, res, next) => {
 
       })
     }
-  
+   
     let SurgicalArray = patient[0].surgicalHistory;
-    // if(SurgicalArray){
-      
-    //   const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
-    //   list=recomendedByDoctor;
-    // }
+  
     if(SurgicalArray){
       
-      const recomendedByDoctor=SurgicalArray.filter((item) => {
-        if (item.hasOwnProperty('recommendByDoctor')){
-          item.recommendByDoctor === true}
-        }
-      
-        )
+      const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
       list=recomendedByDoctor;
+      console.log(list)
     }
+    // if(SurgicalArray){
+      
+    //   const recomendedByDoctor=SurgicalArray.filter((item) => {
+    //     if (item.hasOwnProperty('recommendByDoctor')){
+    //       item.recommendByDoctor == true}
+         
+    //     }
+        
+    //     )
+      
+    //     console.log(list)
+      
+    // }
 
 var test = [];
     for(i=0; i<list.length; i++) {

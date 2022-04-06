@@ -13,6 +13,7 @@ const fileupload = require('express-fileupload');
 const errorHandler = require('./middleware/error');
 const uuid = require('uuid');
 const http = require('http');
+const bodyparser = require('body-parser');
 
 
 
@@ -63,6 +64,14 @@ const  technician = require('./routes/technician')
 app.use(express.json());
 app.use(express.json({limit:'50mb',extended:true}));
 app.use(express.urlencoded({limit:'50mb',extended:true}));
+app.use(bodyparser.json({limit: '50mb', extended: true}))
+app.use(bodyparser.urlencoded({limit: '50mb', extended: true}))
+
+// app.use(bodyparser());
+// bodyparser ={
+//     json: {limit: '50mb', extended: true},
+//     urlencoded: {limit: '50mb', extended: true}
+//   }
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
