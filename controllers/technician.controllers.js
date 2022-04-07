@@ -91,6 +91,39 @@ exports.registerTechnician = async (req, res, next) => {
     }
   }
 
+
+  exports.updateTechnician = async (req, res, next) => {
+    if (req.body.password) {
+      let salt = bcrypt.genSaltSync(10);
+      let hash = bcrypt.hashSync(req.body.password, salt);
+  
+      req.body.password = hash;
+    }
+  
+    try {
+      const technician = await Technician.findByIdAndUpdate(req.user.data[1], req.body, {
+        new: true,
+        runValidators: true, // this is mongoose validators
+      });
+  
+      if (!technician) {
+        res.status(400).json({
+          success: false,
+          message: "Technician not found!"
+        })
+      }
+  
+  
+      res.status(200).json({
+        success: true,
+        message: "Technician updated successfully!"
+      })
+  
+    } catch (err) {
+      next(new ErrorResponse(err.message, 500))
+    }
+  }
+
   
 exports.getPatientLabs = async (req, res) => {
   try {

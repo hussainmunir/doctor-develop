@@ -309,7 +309,7 @@ const hpiProblemSchema = new mongoose.Schema({
         date: String,
     },
     roomNumber: String,
-    castNumber: String,
+    // castNumber: String,
     signature:[{
         publicId: {
             type: String,

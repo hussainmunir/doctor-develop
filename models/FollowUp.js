@@ -171,7 +171,7 @@ const followUpSchema = new mongoose.Schema({
         isSignature:Boolean,
     },
     roomNumber: String,
-    castNumber: String,
+    // castNumber: String,
     updatedAt:String,
     createdAt: String,
 });

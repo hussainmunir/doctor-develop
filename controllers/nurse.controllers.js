@@ -90,6 +90,38 @@ exports.registerNurse = async (req, res, next) => {
     }
   }
 
+  exports.updateNurse = async (req, res, next) => {
+    if (req.body.password) {
+      let salt = bcrypt.genSaltSync(10);
+      let hash = bcrypt.hashSync(req.body.password, salt);
+  
+      req.body.password = hash;
+    }
+
+    try {
+      const nurse = await Nurse.findByIdAndUpdate(req.user.data[1], req.body, {
+        new: true,
+        runValidators: true, // this is mongoose validators
+      });
+  
+      if (!nurse) {
+        res.status(400).json({
+          success: false,
+          message: "Nurse not found!"
+        })
+      }
+  
+  
+      res.status(200).json({
+        success: true,
+        message: "Nurse updated successfully!"
+      })
+  
+    } catch (err) {
+      next(new ErrorResponse(err.message, 500))
+    }
+  }
+
 
   exports.combineWaitingList = async (req, res, next) => {
     try {
@@ -249,12 +281,14 @@ exports.addRoomProblem = async (req, res, next) => {
  
   
   try {
-    let {roomNumber,castNumber,vitals} = req.body;
+    // let {roomNumber,castNumber,vitals} = req.body;
+    let {roomNumber,vitals} = req.body;
     console.log("vitals",vitals)
     const prb = await Problem.findOneAndUpdate(
       
       { '_id': req.params.pID },
-      {'roomNumber':roomNumber,'castNumber':castNumber},
+      // {'roomNumber':roomNumber,'castNumber':castNumber},
+      {'roomNumber':roomNumber},
       {
         new: true,
         runValidators: true,
@@ -286,15 +320,17 @@ exports.addRoomFollowUp = async (req, res, next) => {
  
   
   try {
-    let {roomNumber,castNumber,vitals} = req.body;
+    // let {roomNumber,castNumber,vitals} = req.body;
+    let {roomNumber,vitals} = req.body;
     console.log("vitals",vitals)
     console.log("RoomNumber",roomNumber)
-    console.log("CastNumber",castNumber)
+    // console.log("CastNumber",castNumber)
 
     const follow = await FollowUpModal.findOneAndUpdate (
       
       { '_id': req.params.pID },
-      {'roomNumber':roomNumber,'castNumber':castNumber},
+      // {'roomNumber':roomNumber,'castNumber':castNumber},
+      {'roomNumber':roomNumber},
       {
         new: true,
         runValidators: true,
@@ -310,7 +346,7 @@ exports.addRoomFollowUp = async (req, res, next) => {
         // console.log("updateVitals",updateVitals.dignosis.vitals)
      
     if (!follow) {
-      return next(new ErrorResponse('problem does not exist', 400))
+      return next(new ErrorResponse('Follow Up does not exist', 400))
     }
  
     res.status(200).json({
@@ -327,12 +363,14 @@ exports.addRoomOperation = async (req, res, next) => {
  
   
   try {
-    let {roomNumber,castNumber,vitals} = req.body;
+    // let {roomNumber,castNumber,vitals} = req.body;
+    let {roomNumber,vitals} = req.body;
     console.log("vitals",vitals)
     const op = await Operation.findOneAndUpdate(
       
       { '_id': req.params.pID },
-      {'roomNumber':roomNumber,'castNumber':castNumber},
+      // {'roomNumber':roomNumber,'castNumber':castNumber},
+      {'roomNumber':roomNumber},
       {
         new: true,
         runValidators: true,
@@ -348,7 +386,7 @@ exports.addRoomOperation = async (req, res, next) => {
       //   console.log("updateVitals",updateVitals.dignosis.vitals)
      
     if (!op) {
-      return next(new ErrorResponse('problem does not exist', 400))
+      return next(new ErrorResponse('Post Op does not exist', 400))
     }
  
     res.status(200).json({
