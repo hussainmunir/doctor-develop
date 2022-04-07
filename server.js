@@ -13,7 +13,8 @@ const fileupload = require('express-fileupload');
 const errorHandler = require('./middleware/error');
 const uuid = require('uuid');
 const http = require('http');
-const bodyparser = require('body-parser');
+// const bodyParser = require('body-parser');
+var bodyParser = require('body-parser');
 
 
 
@@ -61,11 +62,41 @@ const  technician = require('./routes/technician')
 
 
 //Body Parser
+
+app.use(express.json({limit:'50mb',extended:true,parameterLimit: 10000000000000000000000,type: 'application/json'}));
+app.use(express.urlencoded({limit:'50mb',extended:true,parameterLimit: 10000000000000000000000,type: 'application/json'}));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+ //   app.use(bodyParser.urlencoded({
+//     limit: '50mb',
+//     parameterLimit: 100000,
+//     extended: true 
+//   }));
+// parse application/json
+app.use(bodyParser.json());
 app.use(express.json());
-app.use(express.json({limit:'50mb',extended:true}));
-app.use(express.urlencoded({limit:'50mb',extended:true}));
-app.use(bodyparser.json({limit: '50mb', extended: true}))
-app.use(bodyparser.urlencoded({limit: '50mb', extended: true}))
+
+// app.use(bodyParser.json({limit: '50mb', extended: true}))
+// app.use(bodyParser.urlencoded({limit: '50mb', extended: true}))
+// app.use(bodyParser.json({
+//     limit: '50mb'
+//   }));
+  
+//   app.use(bodyParser.urlencoded({
+//     limit: '50mb',
+//     parameterLimit: 100000,
+//     extended: true 
+//   }));
+
+// app.use(bodyParser.urlencoded({
+//     parameterLimit: 10000000000000000000000,
+//     limit: '50mb',
+//     extended: true,
+//     type: 'application/json'
+//   }));
+//   app.use(bodyParser.json({limit: '50mb', type: 'application/json'}));
+
 
 // app.use(bodyparser());
 // bodyparser ={
