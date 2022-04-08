@@ -91,12 +91,30 @@ exports.registerNurse = async (req, res, next) => {
   }
 
   exports.updateNurse = async (req, res, next) => {
-    if (req.body.password) {
+
+
+    const resNurse = await Nurse.findById(req.user.data[1]);
+    console.log(resNurse.password)
+    if (req.body.password == resNurse.password) {
+      // great, allow this user access
+      console.log('password matched!');
+    }
+
+    else {
+      console.log('password doesnot match');
+
       let salt = bcrypt.genSaltSync(10);
       let hash = bcrypt.hashSync(req.body.password, salt);
   
       req.body.password = hash;
     }
+
+    // if (req.body.password) {
+    //   let salt = bcrypt.genSaltSync(10);
+    //   let hash = bcrypt.hashSync(req.body.password, salt);
+  
+    //   req.body.password = hash;
+    // }
 
     try {
       const nurse = await Nurse.findByIdAndUpdate(req.user.data[1], req.body, {

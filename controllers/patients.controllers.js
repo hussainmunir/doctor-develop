@@ -310,7 +310,7 @@ exports.getPatientLabs = async (req, res) => {
 }
 exports.updatePatient = async (req, res) => {
 
-  const body = req.body;
+  // const body = req.body;
   // const password = body.password;
 
   // there must be a password in body
@@ -320,6 +320,21 @@ exports.updatePatient = async (req, res) => {
   // body.password = hash;
 
   // console.log("I am In Update Patient Route")
+  const resPatient = await Nurse.findById(req.user.data[1]);
+  console.log(resPatient.password)
+  if (req.body.password == resPatient.password) {
+    // great, allow this user access
+    console.log('password matched!');
+  }
+
+  else {
+    console.log('password doesnot match');
+
+    let salt = bcrypt.genSaltSync(10);
+    let hash = bcrypt.hashSync(req.body.password, salt);
+
+    req.body.password = hash;
+  }
   console.log(req.body)
   try {
     const p = await Patient.findOne({ '_id': req.user.data[1] })
@@ -329,7 +344,7 @@ exports.updatePatient = async (req, res) => {
       })
     }
     else {
-      const updatedPatient = await Patient.findOneAndUpdate({ _id: req.user.data[1] }, body)
+      const updatedPatient = await Patient.findOneAndUpdate({ _id: req.user.data[1] }, req.body)
       return res.status(200).json({
         "message": "record updated successfully",
         'data': updatedPatient
