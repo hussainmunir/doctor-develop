@@ -2,7 +2,8 @@ const mongoose = require("mongoose")
 
 const templateNoteSchema = new mongoose.Schema(
        
-    {templateName: String,
+    {
+     templateName: String,
      treatmentPlan: String,
      treatmentDetail: String,
      doctorId: String,

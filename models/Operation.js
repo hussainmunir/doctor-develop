@@ -154,6 +154,7 @@ const operationSchema = new mongoose.Schema({
         date: String,
         isSignature:Boolean,
     },
+    operationDate:String,
     updatedAt:String,
     createdAt: String,
 });

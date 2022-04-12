@@ -470,39 +470,75 @@ exports.getTemplate = async (req, res, next) => {
 //update template in the doctor profile
 
 exports.updateTemplate = async (req, res, next) => {
-  console.log("req.user",req.user)
-  console.log("req.body",req.body)
+  console.log("req.user",req.user.data[1])
+  // console.log("req.body",req.body)
   try {
-    const doct = await Doctor.findOne({ _id: req.user.data[1] }).lean();
+    const doct = await Doctor.find({ '_id': req.user.data[1] }).lean();
+
+    const tempNoteTemplate = doct[0].templateNotes;
+
+    console.log("req body",req.body.templateNotes[0].doctorId);
 
     if (!doct) {
-      return next(new ErrorResponse('problem does not exist', 400))
+      return next(new ErrorResponse('doctor does not exist', 400))
     }
 
-  
-const newArr = doct.templateNotes.map(obj => {
- 
-  if (obj._id == req.params.templateId) {
-    console.log("matched")
-    let {templateName,treatmentPlan,treatmentDetail} = req.body.templateNotes;
-    return {...obj, templateName,treatmentPlan,treatmentDetail};
-  }
+    for (i=0; i<tempNoteTemplate.length; i++){
+      // console.log(tempNoteTemplate[i])
+      if (tempNoteTemplate[i]._id == req.params.templateId) {
+        console.log("matched obj");
+        let {templateName,treatmentPlan,treatmentDetail, doctorId} = req.body.templateNotes[0];
+       
+        tempNoteTemplate[i].doctorId = doctorId
+        tempNoteTemplate[i].templateName = templateName
+        tempNoteTemplate[i].treatmentPlan = treatmentPlan
+        tempNoteTemplate[i].treatmentDetail = treatmentDetail
 
-  return obj;
-});
-console.log("newArr",newArr)
-    const doctor = await Doctor.findOneAndUpdate(
+        console.log("updated obj",tempNoteTemplate[i]);
+      }
+    }
+    console.log("Doct note update",tempNoteTemplate);
+
+// const newArr = doct.templateNotes.map(obj => {
+ 
+//   if (obj._id == req.params.templateId) {
+//     // console.log("matched obj",obj);
+//     let {templateName,treatmentPlan,treatmentDetail} = req.body.templateNotes[0];
+
+//     return {...obj,templateName,treatmentPlan,treatmentDetail};
+//   }
+
+//   return obj;
+// });
+
+// console.log("newArr",newArr)
+//     const doctor = await Doctor.findOneAndUpdate(
+//       { '_id': req.user.data[1] },
+//       {"templateNotes":newArr},
+//       {
+//         new: true,
+//         runValidators: true,
+//       });
+
+
+
+    const doctor = await Doctor.findByIdAndUpdate(
+      
       { '_id': req.user.data[1] },
-      {"templateNotes":newArr},
+      {$set: {'templateNotes':tempNoteTemplate}},
       {
         new: true,
         runValidators: true,
       });
 
-  
+
+      if (!doctor) {
+        return next(new ErrorResponse('template note does not exist', 400))
+      }
+
     res.status(200).json({
       success: true,
-      data: doctor
+      data: tempNoteTemplate
     })
 
   } catch (err) {
