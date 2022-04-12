@@ -1073,26 +1073,39 @@ exports.postOperation = async (req, res, next) => {
 
 exports.getOperationWaitingList = async (req, res, next) => {
     try {
-    const patient = await Patient.find({_id:req.params.patientId}).lean();
+      var patient = [];
+     patient = await Patient.find({_id:req.params.patientId}).lean();
   
     
      var list = [];
 
+     if (patient.length < 1) {
+      return next(new ErrorResponse(`Patient not found with id of ${req.params.patientId}`, 404));
+    }
     if (!patient) {
+      if (patient.length < 1){
       res.status(200).json({
-        data: "No patients in waiting",
+        success: false,
+        message: "Patient Not Found",
+        data: list 
 
       })
     }
-   
+    return;
+  }
+
+  if (patient[0].surgicalHistory.length > 0) {
+    
     let SurgicalArray = patient[0].surgicalHistory;
-  
+    console.log(SurgicalArray)
     if(SurgicalArray){
       
       const recomendedByDoctor=SurgicalArray.filter((item) => item.recommendByDoctor === true)
       list=recomendedByDoctor;
       console.log(list)
     }
+  }
+    console.log(list)
     // if(SurgicalArray){
       
     //   const recomendedByDoctor=SurgicalArray.filter((item) => {
@@ -1106,26 +1119,36 @@ exports.getOperationWaitingList = async (req, res, next) => {
     //     console.log(list)
       
     // }
+    if(list.length > 0) 
+    {
+        var test = [];
+            for(i=0; i<list.length; i++) {
+              const problem = await Problem.find({_id:list[i].problemId}).lean();
+              test.push(problem[0])
+            }
+            
+            const problem = await Problem.find({_id:list[0].problemId}).lean();
+          
+            list.map((item,i) => {
+              item.differentialDignosis =test[i].dignosis.differentialDignosis
+              item.fullBodyCoordinates = test[i].fullBodyCoordinates
+            })
+          
 
-var test = [];
-    for(i=0; i<list.length; i++) {
-      const problem = await Problem.find({_id:list[i].problemId}).lean();
-      test.push(problem[0])
+            res.status(200).json({
+              // count: waiting.length,
+              message: "Patients found in waiting list",
+              success: true,
+              data: list
+            })
     }
-    
-    const problem = await Problem.find({_id:list[0].problemId}).lean();
-   
-    list.map((item,i) => {
-      item.differentialDignosis =test[i].dignosis.differentialDignosis
-      item.fullBodyCoordinates = test[i].fullBodyCoordinates
-    })
-  
-
-    res.status(200).json({
-      // count: waiting.length,
-      success: true,
-      data: list
-    })
+    else {
+      res.status(200).json({
+        success: false,
+        message: "No patients in waiting",
+        data: list 
+      })
+    }
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
   }

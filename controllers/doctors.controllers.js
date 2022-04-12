@@ -477,7 +477,7 @@ exports.updateTemplate = async (req, res, next) => {
 
     const tempNoteTemplate = doct[0].templateNotes;
 
-    console.log("req body",req.body.templateNotes[0].doctorId);
+    console.log("req body",req.body.templateNotes.doctorId);
 
     if (!doct) {
       return next(new ErrorResponse('doctor does not exist', 400))
@@ -487,7 +487,7 @@ exports.updateTemplate = async (req, res, next) => {
       // console.log(tempNoteTemplate[i])
       if (tempNoteTemplate[i]._id == req.params.templateId) {
         console.log("matched obj");
-        let {templateName,treatmentPlan,treatmentDetail, doctorId} = req.body.templateNotes[0];
+        let {templateName,treatmentPlan,treatmentDetail, doctorId} = req.body.templateNotes;
        
         tempNoteTemplate[i].doctorId = doctorId
         tempNoteTemplate[i].templateName = templateName
