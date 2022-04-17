@@ -21,18 +21,19 @@
     <strong>Work Duty:</strong> {{workDType}}<br><br>
   
    <h2>History of Presenting Illness</h2>
-        <p>{{patient.fname}} {{patient.lname}}  presents today for first post-op visit up. Since surgery, the patient
-            {{#each operation.patientAdmits}}
+        <p>{{patient.fname}} {{patient.lname}}  presents today for first post-op visit up.{{patientAdmits}} 
+            <!-- Since surgery, the patient admits to -->
+            <!-- {{#each operation.patientAdmits}}
             {{this}}
-            {{/each}} .
+            {{/each}}. -->
             {{pronoun}} states {{hisORHer}} pain is  {{isPain}} 
-            {{medicationtxt}} {{painDetail}}. Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
+            {{medicationtxt}}{{painDetail}}. Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
           <span style="display: {{ambulatingStyle}};"> {{patientAmbulating}} {{assistiveDevice}}</span> {{isNotAmbulating}}
         </p> 
 
 <p><strong>Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
-    appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
-    commands appropriately. They are in no acute distress.</p>
+    appears {{hisORHer}} stated age. {{pronoun}} have a pleasant demeanor. {{pronoun}} is able to follow
+    commands appropriately. {{pronoun}} is in no acute distress.</p>
 
     <!-- <strong >Vitals:</strong>
     <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
@@ -66,6 +67,7 @@
         </tr>
         {{/each}}
     </table>
+    <div style="display: {{ReflexesStyles}}">
     <h2>Reflexes:</h2>
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
             <tr>
@@ -81,6 +83,7 @@
             </tr>
             {{/each}}
         </table>
+    </div>
         <!-- <strong>{{positiveHeading}}</strong>
         <ul>
             {{#each ST}}
@@ -94,14 +97,13 @@
             {{/each}}
         </ul>  -->
   
-    <h2>Distribution of Radiation:</h2>
-    <h2>Diagnostic Studies:</h2>
+    <!-- <h2>Distribution of Radiation:</h2> -->
+    <!-- <h2>Diagnostic Studies:</h2> -->
+    <br>
     <h2>Assessment: {{patient.fname}} {{patient.lname}} is a {{Age}} year old {{patient.gender}} S/P:</h2>
-    <h2>1.) (Surgery Perfomed)</h2>
-    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with {{DD}}
-         Diagnosis, diagnostic studies, and treatment plans were reviewed with the patient at
-        today’s visit. Treatment plan includes: {{#each treatmentPlane}}- {{this.treatmentName}}  {{/each}}. The
-        patient will follow up {{suggestedFollowUp}}. The patient was provided with {{medicalEquipment}}. The patient is happy with the
+    <h2>1.) {{SurgeryPerformed}}</h2>
+    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents S/P {{DD}}.<br>Treatment plan includes: {{#each treatmentPlane}}- {{this.treatmentName}}  {{/each}}. The
+        patient will follow up in {{suggestedFollowUp}}.{{medicalEquipment}} The patient is happy with the
         plan moving forward.</p>
  
 </body>

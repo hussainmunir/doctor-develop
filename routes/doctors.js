@@ -31,7 +31,8 @@ const { getDoctorById,
     getTemplate,
     getPostOp,
     getFollowUp,
-    addRoom
+    addRoom,
+    uploadImage
 } = require('../controllers/doctors.controllers');
 
 
@@ -71,5 +72,6 @@ router.get('/getcptCode',checkAuth,getCptCode);
 router.post('/postcptCode',postCptCode);
 router.post('/followUpSignature',followUpSignature );
 router.post('/operationSignature',operationSignature );
+router.post('/uploadImage', uploadImage );
 
 module.exports = router;

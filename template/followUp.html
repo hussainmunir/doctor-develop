@@ -20,10 +20,9 @@
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
     <h2>History Of Presenting Illness</h2>
     <p>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient {{hasBeen}} compliant
-         with treatment plan including {{#each ptreatmentPlane}}{{this.treatmentName}}  {{/each}}. {{pronoun}} states
+         with treatment plan{{pTreatmentPlanIncluding}}{{ ptreatmentPlane}}. {{pronoun}} states
         that since last visit, symptoms are {{patientInWaitingRoom.symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
-        level intensity.The patient reports {{injectionDetail}} in symptoms since receiving injection at last visit, and states that it was helpful
-        {{improveDetail}}. The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}.
+        level intensity. {{injectionDetail}}{{improveDetail}} The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}
         </p>
 
     <h2><strong>{{allergiesText}}</strong> </h2>
@@ -69,6 +68,7 @@
         <li>{{this}}</li>
         {{/each}}
     </ul>
+    <div style = "display: {{strengthStyle}}">
     <h2>Strength:</h2>
     <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
         <tr>
@@ -84,6 +84,8 @@
         </tr>
         {{/each}}
     </table>
+    </div>
+    <div style="display: {{ReflexesStyles}}">
     <h2>Reflexes:</h2>
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
             <tr>
@@ -99,6 +101,7 @@
             </tr>
             {{/each}}
         </table>
+    </div>
         <strong>{{positiveHeading}}</strong>
         <ul>
             {{#each ST}}

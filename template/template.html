@@ -49,7 +49,7 @@
         <p><strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}</p>
         <strong>History Of Presenting Illness:</strong><br>
         <p>
-            {{name}} is a very pleasant {{age}} year old {{gender}} who presents with the complaint of {{symptomsDuration}}
+            {{name}} is a very pleasant {{age}} year old, {{handDominanceText}}, {{gender}}{{occupationText}}. He comes in today complaining of {{symptomsDuration}}
              {{problems}} {{toHasortoHer}} {{problemAreas}}.
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity and developed {{symptomsDevelop}}.
             {{pronoun}} {{injury}}.
@@ -109,6 +109,7 @@
             {{/each}}
         </ol>
 
+        <div style = "display: {{PshStyle}}">
         <strong>Past Surgical History:</strong>
         <!-- <ul>
             {{#each PSH}}
@@ -120,7 +121,7 @@
             <li>{{this.name}} </li>
             {{/each}}
         </ul>
-    
+     </div>
 
         <br><strong>Family History:</strong><br>
             <strong>Mother's Conditions:</strong> {{mMC}}</br>

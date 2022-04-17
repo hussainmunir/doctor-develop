@@ -9,7 +9,7 @@ const SpecialTests = require('../models/SpecialTests')
 
 const CptCodes = require('../models/CptCodes.js');
 const ErrorResponse = require('../utils/errorResponse')
-const { destroyImage, uploadImage, uploadPdf } = require('../helpers/helpers')
+const { destroyImage, uploadImage, uploadPdf,uploadToCloudinary } = require('../helpers/helpers')
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
@@ -686,6 +686,14 @@ const getDDStr = (dd) => {
   return arr;
 }
 
+const getSurgeryPerformed = (sp) => {
+  let arr = [];
+  sp.forEach(item => {
+    arr.push(`${item.name} (${item.code})`);
+  });
+  return arr;
+}
+
 const getCurrMed = (med) => {
   let meds = [];
   let str = "";
@@ -1125,6 +1133,9 @@ return concatenatedArray ;
 //   }
 // }
 
+
+
+
 exports.generateReport = async (req, res, next) => {
   try {
     const problem = await Problem.findOne({ _id: req.params.pID }).lean();
@@ -1253,6 +1264,7 @@ exports.generateReport = async (req, res, next) => {
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
         PMH: getMedicalHistory(patient.medicalConditions),
         pmhText:patient.medicalConditions.length >= 1 ? "Past Medical History:" : '',
+        PshStyle: recommendedBydoctorSurgery.length == 0 ? "none" : "",
         PSH: recommendedBydoctorSurgery,
         newMedications: newMedicationsName,//after med changes
         medicationHistory: newMedicationsName.length >= 1 ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
@@ -1296,7 +1308,9 @@ exports.generateReport = async (req, res, next) => {
         sMC: str_SMC ? str_SMC : "none",
         maritalStatus: patient.socialHistory.maritalStatus,
         handDominance: patient.socialHistory.handDominance,
+        handDominanceText: patient.socialHistory.handDominance==="ambidextrous" ? `${patient.socialHistory.handDominance}` : `${patient.socialHistory.handDominance} hand dominant`,
         occupation:patient.socialHistory.occupation,
+        occupationText: patient.socialHistory.occupation ? ` who works as an ${patient.socialHistory.occupation}` : "",
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} ${strToTheIncludes} until next
@@ -1636,6 +1650,9 @@ exports.generateFollowUp = async (req, res, next) => {
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    let injectionDetailDotOrComma = followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "." : ",";
+    let fallsOrTraumaDetailDot = followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : ".";
+    var injectionDetail = followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? " The patient reports improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma :" The patient reports no improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma;
     const doctorName = await getDoctorName(problem.doctorId)
    
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
@@ -1657,13 +1674,17 @@ exports.generateFollowUp = async (req, res, next) => {
         pronoun:patient.gender == "male"? "He" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
         patientInWaitingRoom:followUp.patientInWaitingRoom,
-        injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp == true?" improvement":" no improvement",
-        improveDetail:followUp.patientInWaitingRoom.improveDetail,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including ":"no trauma.",
+        // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
+        injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
+        improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful ${followUp.patientInWaitingRoom.improveDetail}.`,
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma,including ":"no trauma.",
         strength:strength[1],
+        strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         followUpVisit:followUp.followUpVisit,
+        Reflexes: followUp.followUpVisit.reflexes,
+        ReflexesStyles:followUp.followUpVisit.reflexes.length == 0 ?"none" : "",
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
@@ -1682,10 +1703,11 @@ exports.generateFollowUp = async (req, res, next) => {
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
         suggestedFollowUp:followUp.followUpVisit.suggestedFollowup,
-        hasBeen:followUp.followUpVisit.treatmentPlan.length >= 1 ? "has been" : "has not been",
-        ptreatmentPlane:followUp.followUpVisit.treatmentPlan,
+        hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
+        pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
+        ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow),
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail,
+        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
         medicalEquipment:followUp.followUpVisit.medicalEquipment,
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
@@ -1746,8 +1768,10 @@ exports.generateOpNote = async (req, res, next) => {
     const doctorName = await getDoctorName(problem.doctorId)
     const skinText =  getTreatments(operation.surgicalSiteExam);
     let diagnosis = diagnosedText(operation.cPTCode)
-    let fullBodyText =appendAndToArray(operation.fullBodyCoordinates)
-   
+    let fullBodyText = appendAndToArray(operation.fullBodyCoordinates)
+    let patientAmbulatingWithA = operation.patientAmbulating.assistiveDevice.length > 1 ? "":" a";
+    let assistiveDevices = operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()});
+    let patientAdmitsArr = `${appendAndToArray(operation.patientAdmits)}`;
 
 
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
@@ -1775,9 +1799,11 @@ exports.generateOpNote = async (req, res, next) => {
         hisORHer:patient.gender == "male"?"his" :"her",
         MRN: patient.insurance.membershipId,
         suggestedFollowUp:operation.suggestedFollowup,
+        SurgeryPerformed: appendAndToArray(getSurgeryPerformed(operation.surgicalHistory)),
         DD: diagnosis,
         fullBodyText,
         vitals:problem.dignosis.vitals,
+        patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength[1],
@@ -1785,7 +1811,7 @@ exports.generateOpNote = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
-        medicalEquipment:operation.medicalEquipment,
+        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${operation.medicalEquipment}.`:"",
         isPain:operation.isPain? "controlled" : "not controlled",
         patientAmbulating:operation.patientAmbulating.ambulating,
         signatureUrl:operation.signature.eSignaturePhotoUrl,
@@ -1794,12 +1820,13 @@ exports.generateOpNote = async (req, res, next) => {
         imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
         designations:doctorName.designations,
-        painDetail:operation.medicationRequired? operation.painDetail : "",
-        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? "is ambulating with" : "Is ambulating without any assistive devices",
-        assistiveDevice:operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()}),
+        painDetail:operation.painDetail === "" ? "" : ` including ${operation.painDetail} `,
+        ReflexesStyles:operation.reflexes.length == 0 ?"none" : "",
+        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating with${patientAmbulatingWithA}` : "is ambulating without any assistive devices.",
+        assistiveDevice:`${appendAndToArray(assistiveDevices)}${operation.patientAmbulating.assistiveDevice.length >=1 ? ".":""}`,
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
-        medicationtxt:operation.medicationRequired ? "with medication including" : "without medication",
+        medicationtxt:operation.medicationRequired ? "with medication" : "without medication",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
@@ -1994,4 +2021,75 @@ exports.getFollowUp = async (req, res, next) => {
       res.status(201).json({ success: false, message: err.message })
   }
 
+}
+
+
+exports.uploadImage = async (req, res, next) => {
+  try 
+  {
+
+    
+  //   const img =  req.body.skinPhoto;
+  //   console.log(req.files.skinPhoto)
+  //    if (!img) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     data: null
+  //   })
+  //     }
+  //   else {
+  //     console.log(req.body)
+  //       if (req.body.skinPhoto) { 
+  //           const urlId = await uploadToCloudinary(req.body.skinPhoto, next)
+  //           var toBeAdded = {
+  //             IsSignature: true,
+  //             eSignaturePhotoUrl:urlId.url,
+  //             public_id:urlId.public_id,
+  //             date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  //           }
+
+         
+  //       }
+
+  //     return res.status(200).json({
+  //     success: true,
+  //     data: toBeAdded
+  //   })
+
+  // }
+    
+
+  //   if (!p) {
+  //     return res.status(404).json({
+  //       "message": "Problem not found"
+  //     })
+  //   }
+  //   else {
+      
+
+            
+ 
+         
+  //     }
+  // }
+  // const updateSignature = await Operation.findOneAndUpdate({ _id: req.body.problemId }, { signature: toBeAdded } , { new: true, })
+  // if (!updateSignature) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     data: null
+  //   })
+  // }
+  // else {
+  //   return res.status(200).json({
+  //     success: true,
+  //     data: updateSignature
+  //   })
+  // }
+
+
+
+
+} catch (err) {
+next(new ErrorResponse(err.message, 500))
+}
 }
