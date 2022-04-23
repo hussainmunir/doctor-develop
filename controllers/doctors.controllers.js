@@ -734,10 +734,10 @@ const getPhysicalExam = (physicalExam) => {
     }
   }
   finalHandFootArray = handFootArray.map((item) => {
-    return `${item.jointname} ${item.name} at ${getFinger(item.values)}`
+    return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
   })
   finalOtherBodyPartArray = otherBodyPartArray.map((item) => {
-    return `${item.jointname}  ${item.name}`
+    return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""}`
   })
   return [finalOtherBodyPartArray, finalHandFootArray]
 
@@ -1166,6 +1166,10 @@ exports.generateReport = async (req, res, next) => {
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
     else { pronoun = 'They' }
+    let pronounLowercase;
+    if (patient.gender === 'male') { pronounLowercase = 'he' }
+    else if (patient.gender === 'female') { pronounLowercase = 'she' }
+    else { pronounLowercase = 'they' }
     const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate,problem.symptomsRadiation.radiateAt,problem.symptomsRadiation.radiateDetails, pronoun);
     const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
     const template = fs.readFileSync('./template/template.html', 'utf-8');
@@ -1250,6 +1254,7 @@ exports.generateReport = async (req, res, next) => {
         symptomsDevelop:problem.symptomsDevelop,
         problem_concatenated: problem_concatenated,
         pronoun,
+        pronounLowercase,
         toHasortoHer:pronoun == "He"? "to his" : "to her",
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
@@ -1672,6 +1677,7 @@ exports.generateFollowUp = async (req, res, next) => {
         Age:getAge(patient.dateOfBirth),
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
+        pronounLowercase: patient.gender == "male"? "he" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
         patientInWaitingRoom:followUp.patientInWaitingRoom,
         // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
@@ -1702,12 +1708,14 @@ exports.generateFollowUp = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
-        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup,
+        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `The patient will follow up in ${followUp.followUpVisit.suggestedFollowup}.`,
         hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
         pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
-        ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow),
+        ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
+        symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
+        treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
+        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
         medicalEquipment:followUp.followUpVisit.medicalEquipment,
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
@@ -1796,6 +1804,7 @@ exports.generateOpNote = async (req, res, next) => {
         problem_concatenated,
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
+        pronounLowercase: patient.gender == "male"? "he" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
         MRN: patient.insurance.membershipId,
         suggestedFollowUp:operation.suggestedFollowup,

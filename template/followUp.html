@@ -18,31 +18,31 @@
     <strong>Diagnosis:</strong> {{DD}}</br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
+<br></br>
     <h2>History Of Presenting Illness</h2>
-    <p>{{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, the patient {{hasBeen}} compliant
+    {{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, {{pronounLowercase}} {{hasBeen}} compliant
          with treatment plan{{pTreatmentPlanIncluding}}{{ ptreatmentPlane}}. {{pronoun}} states
-        that since last visit, symptoms are {{patientInWaitingRoom.symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
+        that since last visit, symptoms are {{symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
         level intensity. {{injectionDetail}}{{improveDetail}} The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}
-        </p>
-
-    <h2><strong>{{allergiesText}}</strong> </h2>
-        <ol>
+        <br></br>
+        <strong>{{allergiesText}}</strong>
+        <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each patient.allergies}}
             <li>{{this.name}} {{this.reaction}}</li>
             {{/each}}
         </ol>
-        <h2>{{medicationsText}}</h2> 
-        <ol>
+        <strong>{{medicationsText}}</strong>
+        <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each medications}}
             <li>{{this}}</li>
             {{/each}}
         </ol>
     <h2>Physical Examination: </h2>
-    <p>{{patient.fname}},{{patient.lname}} is an awake, alert and oriented {{patient.gender}} that
-        appears {{hisORHer}} stated age. They have a pleasant demeanor. They are able to follow
-        commands appropriately. They are in no acute distress.
-    </p>
-
+    {{patient.fname}},{{patient.lname}} is an awake, alert and oriented {{patient.gender}} that
+        appears {{hisORHer}} stated age. {{pronoun}} have a pleasant demeanor. {{pronoun}} are able to follow
+        commands appropriately. {{pronoun}} are in no acute distress.
+    
+<br></br>
     <strong >Vitals:</strong>
     <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
     <li style="list-style-type: none;">Wt:  {{vitals.weight}}</li>
@@ -50,9 +50,12 @@
     <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
     <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li>
+    </br>
     <strong>Skin:</strong> {{skin}} 
-    <h2>{{physicalExamText}}</h2>
-    <p> {{#each handFootLandMarks}}
+    <br></br>
+    <strong>{{physicalExamText}}</strong>
+    <ul style="margin-top: 0px; padding-top: 0px;">
+    {{#each handFootLandMarks}}
     <li>{{this}}</li>
     {{/each}}
     {{#each generalBodyParts}}
@@ -60,10 +63,10 @@
     {{/each}}  
     {{#each physicalExamThreeDModal}}
     <li>{{this}}</li>
-    {{/each}}</p>
-    <h2>{{rangeOFMotion}}</h2>
-    
-    <ul>
+    {{/each}}
+    </ul>
+    <strong>{{rangeOFMotion}}</strong>
+    <ul style="margin-top: 0px; padding-top: 0px;">
         {{#each followUpVisit.rangeOfMotion}}
         <li>{{this}}</li>
         {{/each}}
@@ -102,14 +105,15 @@
             {{/each}}
         </table>
     </div>
+    <br></br>
         <strong>{{positiveHeading}}</strong>
-        <ul>
+        <ul style="margin-top: 0px; padding-top: 0px;">
             {{#each ST}}
             <li>{{this}}</li>
             {{/each}}
         </ul>
         <strong>{{RadiationDistributionTxt}}</strong>
-        <ul >
+        <ul style="margin-top: 0px; padding-top: 0px;" >
           {{#each RadiationDistribution}}
           <li>{{this}}</li>
           {{/each}}
@@ -119,11 +123,16 @@
     {{#each diagnosticSudies}}
     <p>{{this.labResult}}</p>
     {{/each}}
-    <h2>Assessment: {{fname}} {{lname}} is a {{Age}} year old {{sex}} with:</h2>
-    <ol>{{#each DDarray}} <li>{{this}}</li> {{/each}}</ol>
-    <h2>Plan:</h2> <p>{{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{DD}} Diagnosis,
+    <strong>Assessment: {{fname}} {{lname}} is a {{Age}} year old {{sex}} with:</strong>
+    <ol style="margin-top: 0px; padding-top: 0px;">
+        {{#each DDarray}} 
+        <li>{{this}}</li>
+         {{/each}}
+        </ol>
+    <h2>Plan:</h2> 
+    {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{DD}} Diagnosis,
          diagnostic studies, and treatment plans were reviewed with the patient at
-    today’s visit. Treatment plan includes  
+    today’s visit. {{treatmentPlanIncludesText}}  
     <ul>
         {{#each treatmentPlane}}
         <li>
@@ -131,9 +140,8 @@
         </li>
         {{/each}}   
     </ul>
-    . The
-    patient will follow up {{suggestedFollowUp}}. {{medicalEquipmentText}} {{medicalEquipment}}{{dot}}The patient is happy with the
-    plan moving forward.</p>
+    {{suggestedFollowUp}} {{medicalEquipmentText}} {{medicalEquipment}}{{dot}}The patient is happy with the
+    plan moving forward.
 
     <div >
         <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
