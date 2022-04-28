@@ -9,7 +9,7 @@ const SpecialTests = require('../models/SpecialTests')
 
 const CptCodes = require('../models/CptCodes.js');
 const ErrorResponse = require('../utils/errorResponse')
-const { destroyImage, uploadImage, uploadPdf } = require('../helpers/helpers')
+const { destroyImage, uploadImage, uploadPdf,uploadToCloudinary } = require('../helpers/helpers')
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
@@ -133,12 +133,29 @@ exports.companiesAllDoctors = async (req, res, next) => {
 * !@access Private
  */
 exports.updateDoctor = async (req, res, next) => {
-  if (req.body.password) {
+ 
+  const resDoctor = await Doctor.findById(req.user.data[1]);
+  console.log(resDoctor.password)
+  if (req.body.password == resDoctor.password) {
+    // great, allow this user access
+    console.log('password matched!');
+  }
+
+  else {
+    console.log('password doesnot match');
+
     let salt = bcrypt.genSaltSync(10);
     let hash = bcrypt.hashSync(req.body.password, salt);
 
     req.body.password = hash;
   }
+ 
+  // if (req.body.password) {
+  //   let salt = bcrypt.genSaltSync(10);
+  //   let hash = bcrypt.hashSync(req.body.password, salt);
+
+  //   req.body.password = hash;
+  // }
 
   try {
     const doctor = await Doctor.findByIdAndUpdate(req.user.data[1], req.body, {
@@ -332,7 +349,8 @@ exports.addRoom = async (req, res, next) => {
  
   
   try {
-    let {roomNumber,castNumber} = req.body;
+    let {roomNumber,castNumber,vitals} = req.body;
+    console.log("vitals",vitals)
     const prb = await Problem.findOneAndUpdate(
       
       { '_id': req.params.pID },
@@ -341,11 +359,20 @@ exports.addRoom = async (req, res, next) => {
         new: true,
         runValidators: true,
       });
-      console.log("req.body",req.body)
+      const updateVitals = await Problem.findByIdAndUpdate(
+      
+        { '_id': req.params.pID},
+        {$set: {'dignosis.vitals':vitals}},
+        {
+          new: true,
+          runValidators: true,
+        });
+        console.log("updateVitals",updateVitals.dignosis.vitals)
+     
     if (!prb) {
       return next(new ErrorResponse('problem does not exist', 400))
     }
-    console.log("prb",prb) 
+ 
     res.status(200).json({
       success: true,
       data: prb
@@ -443,39 +470,75 @@ exports.getTemplate = async (req, res, next) => {
 //update template in the doctor profile
 
 exports.updateTemplate = async (req, res, next) => {
-  console.log("req.user",req.user)
-  console.log("req.body",req.body)
+  console.log("req.user",req.user.data[1])
+  // console.log("req.body",req.body)
   try {
-    const doct = await Doctor.findOne({ _id: req.user.data[1] }).lean();
+    const doct = await Doctor.find({ '_id': req.user.data[1] }).lean();
+
+    const tempNoteTemplate = doct[0].templateNotes;
+
+    console.log("req body",req.body.templateNotes.doctorId);
 
     if (!doct) {
-      return next(new ErrorResponse('problem does not exist', 400))
+      return next(new ErrorResponse('doctor does not exist', 400))
     }
 
-  
-const newArr = doct.templateNotes.map(obj => {
- 
-  if (obj._id == req.params.templateId) {
-    console.log("matched")
-    let {templateName,treatmentPlan,treatmentDetail} = req.body.templateNotes;
-    return {...obj, templateName,treatmentPlan,treatmentDetail};
-  }
+    for (i=0; i<tempNoteTemplate.length; i++){
+      // console.log(tempNoteTemplate[i])
+      if (tempNoteTemplate[i]._id == req.params.templateId) {
+        console.log("matched obj");
+        let {templateName,treatmentPlan,treatmentDetail, doctorId} = req.body.templateNotes;
+       
+        tempNoteTemplate[i].doctorId = doctorId
+        tempNoteTemplate[i].templateName = templateName
+        tempNoteTemplate[i].treatmentPlan = treatmentPlan
+        tempNoteTemplate[i].treatmentDetail = treatmentDetail
 
-  return obj;
-});
-console.log("newArr",newArr)
-    const doctor = await Doctor.findOneAndUpdate(
+        console.log("updated obj",tempNoteTemplate[i]);
+      }
+    }
+    console.log("Doct note update",tempNoteTemplate);
+
+// const newArr = doct.templateNotes.map(obj => {
+ 
+//   if (obj._id == req.params.templateId) {
+//     // console.log("matched obj",obj);
+//     let {templateName,treatmentPlan,treatmentDetail} = req.body.templateNotes[0];
+
+//     return {...obj,templateName,treatmentPlan,treatmentDetail};
+//   }
+
+//   return obj;
+// });
+
+// console.log("newArr",newArr)
+//     const doctor = await Doctor.findOneAndUpdate(
+//       { '_id': req.user.data[1] },
+//       {"templateNotes":newArr},
+//       {
+//         new: true,
+//         runValidators: true,
+//       });
+
+
+
+    const doctor = await Doctor.findByIdAndUpdate(
+      
       { '_id': req.user.data[1] },
-      {"templateNotes":newArr},
+      {$set: {'templateNotes':tempNoteTemplate}},
       {
         new: true,
         runValidators: true,
       });
 
-  
+
+      if (!doctor) {
+        return next(new ErrorResponse('template note does not exist', 400))
+      }
+
     res.status(200).json({
       success: true,
-      data: doctor
+      data: tempNoteTemplate
     })
 
   } catch (err) {
@@ -623,6 +686,14 @@ const getDDStr = (dd) => {
   return arr;
 }
 
+const getSurgeryPerformed = (sp) => {
+  let arr = [];
+  sp.forEach(item => {
+    arr.push(`${item.name} (${item.code})`);
+  });
+  return arr;
+}
+
 const getCurrMed = (med) => {
   let meds = [];
   let str = "";
@@ -663,10 +734,10 @@ const getPhysicalExam = (physicalExam) => {
     }
   }
   finalHandFootArray = handFootArray.map((item) => {
-    return `${item.jointname} ${item.name} at ${getFinger(item.values)}`
+    return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
   })
   finalOtherBodyPartArray = otherBodyPartArray.map((item) => {
-    return `${item.jointname}  ${item.name}`
+    return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""}`
   })
   return [finalOtherBodyPartArray, finalHandFootArray]
 
@@ -1062,6 +1133,9 @@ return concatenatedArray ;
 //   }
 // }
 
+
+
+
 exports.generateReport = async (req, res, next) => {
   try {
     const problem = await Problem.findOne({ _id: req.params.pID }).lean();
@@ -1092,6 +1166,10 @@ exports.generateReport = async (req, res, next) => {
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
     else { pronoun = 'They' }
+    let pronounLowercase;
+    if (patient.gender === 'male') { pronounLowercase = 'he' }
+    else if (patient.gender === 'female') { pronounLowercase = 'she' }
+    else { pronounLowercase = 'they' }
     const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate,problem.symptomsRadiation.radiateAt,problem.symptomsRadiation.radiateDetails, pronoun);
     const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
     const template = fs.readFileSync('./template/template.html', 'utf-8');
@@ -1176,6 +1254,7 @@ exports.generateReport = async (req, res, next) => {
         symptomsDevelop:problem.symptomsDevelop,
         problem_concatenated: problem_concatenated,
         pronoun,
+        pronounLowercase,
         toHasortoHer:pronoun == "He"? "to his" : "to her",
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
@@ -1190,6 +1269,7 @@ exports.generateReport = async (req, res, next) => {
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
         PMH: getMedicalHistory(patient.medicalConditions),
         pmhText:patient.medicalConditions.length >= 1 ? "Past Medical History:" : '',
+        PshStyle: recommendedBydoctorSurgery.length == 0 ? "none" : "",
         PSH: recommendedBydoctorSurgery,
         newMedications: newMedicationsName,//after med changes
         medicationHistory: newMedicationsName.length >= 1 ? "	has	taken	the	following	medications	to	help	with this	condition: " : "has not taken any medications to help with this issue.",
@@ -1233,7 +1313,9 @@ exports.generateReport = async (req, res, next) => {
         sMC: str_SMC ? str_SMC : "none",
         maritalStatus: patient.socialHistory.maritalStatus,
         handDominance: patient.socialHistory.handDominance,
+        handDominanceText: patient.socialHistory.handDominance==="ambidextrous" ? `${patient.socialHistory.handDominance}` : `${patient.socialHistory.handDominance} hand dominant`,
         occupation:patient.socialHistory.occupation,
+        occupationText: patient.socialHistory.occupation ? ` who works as an ${patient.socialHistory.occupation}` : "",
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} ${strToTheIncludes} until next
@@ -1423,7 +1505,7 @@ exports.putDoctorFollowUp = async (req, res, next) => {
       });
 
     if (!followUp) {
-      return next(new ErrorResponse('follow up note does not exist', 400))
+      return next(new ErrorResponse('follow up does not exist', 400))
     }
     if(followUp.followUpVisit.surgeryRecommendedByDoctor.name !== "") {
       const patient = await Patient.find( { '_id': followUp.patientId }).lean()
@@ -1431,6 +1513,23 @@ exports.putDoctorFollowUp = async (req, res, next) => {
       const result = updatePatient[0].surgicalHistory.concat(followUp.followUpVisit.surgeryRecommendedByDoctor);
       const update = await Patient.findOneAndUpdate({ '_id': followUp.patientId },{"surgicalHistory":result});
     } 
+
+    // const differentialDignosis = req.body.followUpVisit.differentialDignosis
+    // console.log(differentialDignosis)
+
+    // if (differentialDignosis.length > 0) {
+
+    // const problem = await Problem.find( { '_id': followUp.problemId }).lean()
+    // const updateProblem = problem
+    // console.log(updateProblem[0].dignosis.differentialDignosis)
+    // const result = updateProblem[0].dignosis.differentialDignosis.concat(differentialDignosis);
+    // console.log(result)
+    // const update = await Problem.findOneAndUpdate({ '_id': followUp.problemId },{"diagnosis.differentialDiagnosis":result});
+
+    // }
+
+
+
 console.log("followUp.patientID",followUp.patientId)
     await FollowUpModal.findOneAndUpdate(
       { '_id': req.params.followUpID },
@@ -1573,6 +1672,9 @@ exports.generateFollowUp = async (req, res, next) => {
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    let injectionDetailDotOrComma = followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "." : ",";
+    let fallsOrTraumaDetailDot = followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : ".";
+    var injectionDetail = followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? " The patient reports improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma :" The patient reports no improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma;
     const doctorName = await getDoctorName(problem.doctorId)
    
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
@@ -1585,22 +1687,27 @@ exports.generateFollowUp = async (req, res, next) => {
 
       html: followUpNote,
       data: {
-        diagnosticSudies,
+        diagnosticSudies: problem.dignosis.diagnosticStudies,
         patient,
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),
         Age:getAge(patient.dateOfBirth),
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
+        pronounLowercase: patient.gender == "male"? "he" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
         patientInWaitingRoom:followUp.patientInWaitingRoom,
-        injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp == true?" improvement":" no improvement",
-        improveDetail:followUp.patientInWaitingRoom.improveDetail,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma?" trauma,including ":"no trauma.",
+        // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
+        injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
+        improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful ${followUp.patientInWaitingRoom.improveDetail}.`,
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma,including ":"no trauma.",
         strength:strength[1],
+        strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         followUpVisit:followUp.followUpVisit,
+        Reflexes: followUp.followUpVisit.reflexes,
+        ReflexesStyles:followUp.followUpVisit.reflexes.length == 0 ?"none" : "",
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
@@ -1618,11 +1725,14 @@ exports.generateFollowUp = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
-        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup,
-        hasBeen:followUp.followUpVisit.treatmentPlan.length >= 1 ? "has been" : "has not been",
-        ptreatmentPlane:followUp.followUpVisit.treatmentPlan,
+        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `The patient will follow up in ${followUp.followUpVisit.suggestedFollowup}.`,
+        hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
+        pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
+        ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
+        symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
+        treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail,
+        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
         medicalEquipment:followUp.followUpVisit.medicalEquipment,
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
@@ -1683,8 +1793,10 @@ exports.generateOpNote = async (req, res, next) => {
     const doctorName = await getDoctorName(problem.doctorId)
     const skinText =  getTreatments(operation.surgicalSiteExam);
     let diagnosis = diagnosedText(operation.cPTCode)
-    let fullBodyText =appendAndToArray(operation.fullBodyCoordinates)
-   
+    let fullBodyText = appendAndToArray(operation.fullBodyCoordinates)
+    let patientAmbulatingWithA = operation.patientAmbulating.assistiveDevice.length > 1 ? "":" a";
+    let assistiveDevices = operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()});
+    let patientAdmitsArr = `${appendAndToArray(operation.patientAdmits)}`;
 
 
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
@@ -1709,12 +1821,15 @@ exports.generateOpNote = async (req, res, next) => {
         problem_concatenated,
         gender:patient.gender,
         pronoun:patient.gender == "male"? "He" : "she",
+        pronounLowercase: patient.gender == "male"? "he" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
         MRN: patient.insurance.membershipId,
         suggestedFollowUp:operation.suggestedFollowup,
+        SurgeryPerformed: appendAndToArray(getSurgeryPerformed(operation.surgicalHistory)),
         DD: diagnosis,
         fullBodyText,
         vitals:problem.dignosis.vitals,
+        patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength[1],
@@ -1722,7 +1837,7 @@ exports.generateOpNote = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
-        medicalEquipment:operation.medicalEquipment,
+        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${operation.medicalEquipment}.`:"",
         isPain:operation.isPain? "controlled" : "not controlled",
         patientAmbulating:operation.patientAmbulating.ambulating,
         signatureUrl:operation.signature.eSignaturePhotoUrl,
@@ -1731,12 +1846,13 @@ exports.generateOpNote = async (req, res, next) => {
         imageStyle:operation.signature.eSignaturePhotoUrl ? "width:136px;height:30px; object-fit: contain;text-align:center" : "display:none",
         doctorName:doctorName.name,
         designations:doctorName.designations,
-        painDetail:operation.medicationRequired? operation.painDetail : "",
-        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? "is ambulating with" : "Is ambulating without any assistive devices",
-        assistiveDevice:operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()}),
+        painDetail:operation.painDetail === "" ? "" : ` including ${operation.painDetail} `,
+        ReflexesStyles:operation.reflexes.length == 0 ?"none" : "",
+        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating with${patientAmbulatingWithA}` : "is ambulating without any assistive devices.",
+        assistiveDevice:`${appendAndToArray(assistiveDevices)}${operation.patientAmbulating.assistiveDevice.length >=1 ? ".":""}`,
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
-        medicationtxt:operation.medicationRequired ? "with medication including" : "without medication",
+        medicationtxt:operation.medicationRequired ? "with medication" : "without medication",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }
@@ -1931,4 +2047,75 @@ exports.getFollowUp = async (req, res, next) => {
       res.status(201).json({ success: false, message: err.message })
   }
 
+}
+
+
+exports.uploadImage = async (req, res, next) => {
+  try 
+  {
+
+    
+  //   const img =  req.body.skinPhoto;
+  //   console.log(req.files.skinPhoto)
+  //    if (!img) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     data: null
+  //   })
+  //     }
+  //   else {
+  //     console.log(req.body)
+  //       if (req.body.skinPhoto) { 
+  //           const urlId = await uploadToCloudinary(req.body.skinPhoto, next)
+  //           var toBeAdded = {
+  //             IsSignature: true,
+  //             eSignaturePhotoUrl:urlId.url,
+  //             public_id:urlId.public_id,
+  //             date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+  //           }
+
+         
+  //       }
+
+  //     return res.status(200).json({
+  //     success: true,
+  //     data: toBeAdded
+  //   })
+
+  // }
+    
+
+  //   if (!p) {
+  //     return res.status(404).json({
+  //       "message": "Problem not found"
+  //     })
+  //   }
+  //   else {
+      
+
+            
+ 
+         
+  //     }
+  // }
+  // const updateSignature = await Operation.findOneAndUpdate({ _id: req.body.problemId }, { signature: toBeAdded } , { new: true, })
+  // if (!updateSignature) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     data: null
+  //   })
+  // }
+  // else {
+  //   return res.status(200).json({
+  //     success: true,
+  //     data: updateSignature
+  //   })
+  // }
+
+
+
+
+} catch (err) {
+next(new ErrorResponse(err.message, 500))
+}
 }

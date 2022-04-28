@@ -76,6 +76,8 @@ const ddschema = new mongoose.Schema({
 
     }
 })
+
+
 const surgicalSchema = new mongoose.Schema({
     name: {
         type: String
@@ -110,6 +112,31 @@ const followUpSchema = new mongoose.Schema({
         differentialDignosis: [ddschema],
     },
     followUpVisit:{
+        vitals: {
+            height: {
+                type: String,
+            },
+            weight: {
+                type: String,
+
+            },
+            BP: {
+                type: String,
+
+            },
+            heartrate: {
+                type: String,
+
+            },
+            BMI: {
+                type: String,
+
+            },
+            respiratory: {
+                type: String,
+
+            },
+        },
         physicalExamThreeDModal: [String],
         rangeOfMotion: [String],
         physicalExam: [
@@ -124,6 +151,8 @@ const followUpSchema = new mongoose.Schema({
         reflexes: [reflexesSchema],
         diagnosticStudies: [diagnosticSchema],
         surgeryRecommendedByDoctor: [surgicalSchema],
+        assessmentUpdate: String,
+        differentialDignosis: [ddschema],
         treatmentPlan: {
             type: [treatmentSchema],
     
@@ -137,8 +166,6 @@ const followUpSchema = new mongoose.Schema({
         toTheInclude : [String],
         greaterThan : String,
         nextVisit: String,
-        roomNumber: String,
-        castNumber: String,
        
     },
     signature: {
@@ -147,6 +174,8 @@ const followUpSchema = new mongoose.Schema({
         date: String,
         isSignature:Boolean,
     },
+    roomNumber: String,
+    // castNumber: String,
     updatedAt:String,
     createdAt: String,
 });
