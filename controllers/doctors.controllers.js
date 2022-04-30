@@ -662,6 +662,9 @@ const getPreviousTreatments = (sPT) => {
     if(sPT.physicalTherapy.whenBegin != ""  && sPT.previousTreatmentInclude.length == 0){
       return str=`has received previous treatment including physical therapy which started on ${sPT.physicalTherapy.whenBegin} and has completed ${sPT.physicalTherapy.numberOfSession} sessions`
     }
+    if(sPT.physicalTherapy.whenBegin === ""  && sPT.previousTreatmentInclude.length == 0){
+      return str=`has received previous treatment`
+    }
     if(sPT.physicalTherapy.whenBegin == ""){
       if(sPT.previousTreatmentInclude.length > 1){
         sPT.previousTreatmentInclude.splice(sPT.previousTreatmentInclude.length-1,0,"and")
@@ -1226,6 +1229,7 @@ exports.generateReport = async (req, res, next) => {
     let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
     let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
     let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
+    let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
    
     const options = {
@@ -1265,6 +1269,7 @@ exports.generateReport = async (req, res, next) => {
         isPastTreatment: problem.previousTreatment.isPreviousTreatment,
         pastTreatmentText: problem.previousTreatment.isPreviousTreatment? "has received treatment for this issue in the past including": "has not received any treatment for this issue in the past.",
         pastTreatmentString: pTreatString,
+        pastTreatmentOtherString: problem.previousTreatment.otherTreatments === "" ? "" : `${problem.previousTreatment.otherTreatments}${pastTreatmentOtherStringDot}`,
         allergies: str_allergies,
         allergiesText:str_allergies.length >= 1? 'Allergies:' : '',
         PMH: getMedicalHistory(patient.medicalConditions),
@@ -1294,7 +1299,7 @@ exports.generateReport = async (req, res, next) => {
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
         treatmentPlan: problem.dignosis.treatmentPlan,
-        medicalEquipment:problem.dignosis.medicalEquipment,
+        medicalEquipment: appendAndToArray(problem.dignosis.medicalEquipment),
         range: problem.dignosis.rangeOfMotion,
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength?strength[1]:[],
@@ -1664,7 +1669,19 @@ exports.generateFollowUp = async (req, res, next) => {
     let strength= getStrength(followUp.followUpVisit.strength);
     let physicalExam = getPhysicalExam(followUp.followUpVisit.physicalExam);
     const STA = getPassST(followUp.followUpVisit.specialTests);
-    let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
+    var combine_arr_DD
+    var arrDDnew 
+    if (followUp.followUpVisit.differentialDignosis != undefined) {
+    combine_arr_DD = followUp.followUpVisit.
+    differentialDignosis.length > 0 ? problem.dignosis.differentialDignosis.concat(followUp.followUpVisit.
+      differentialDignosis) : problem.dignosis.differentialDignosis
+      arrDDnew = followUp.followUpVisit.differentialDignosis.length > 0 ? `and new onset ${getDDStr(followUp.followUpVisit.differentialDignosis)}` : ""
+    }
+    else {
+      combine_arr_DD = problem.dignosis.differentialDignosis
+      arrDDnew = ""
+    }
+    let arr_DD = getDDStr(combine_arr_DD);
     let str_DD = getTreatments(arr_DD);
     let medicationsName = getCurrMed(patient.currentMedications);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
@@ -1721,6 +1738,9 @@ exports.generateFollowUp = async (req, res, next) => {
         diagnosticSudiesText:followUp.followUpVisit.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
+        DDarrayNew: ` ${arrDDnew}`,
+        DDarrayOld:  getTreatments(getDDStr(problem.dignosis.differentialDignosis)),
+        assessmentText: followUp.followUpVisit.assessmentUpdate === "none" ? "" : `${followUp.followUpVisit.assessmentUpdate} `,
         allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
@@ -1733,7 +1753,7 @@ exports.generateFollowUp = async (req, res, next) => {
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
-        medicalEquipment:followUp.followUpVisit.medicalEquipment,
+        medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
         problem_areasToUpperCase,
