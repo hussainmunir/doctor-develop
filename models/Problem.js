@@ -254,6 +254,19 @@ const hpiProblemSchema = new mongoose.Schema({
                 skinPhotos: [String],
             }
         ],
+        vascularExam: [ 
+        {
+            partName: String,
+            pulseLabel: String,
+            value: String,
+        }
+        ],
+        sensationExam: [ 
+            {
+                sensationValue: String,
+                nerveDistribution: String,
+            }
+            ],
         physicalExam: [
             {
                 name: String,

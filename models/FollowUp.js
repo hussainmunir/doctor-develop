@@ -76,6 +76,8 @@ const ddschema = new mongoose.Schema({
 
     }
 })
+
+
 const surgicalSchema = new mongoose.Schema({
     name: {
         type: String
@@ -149,6 +151,8 @@ const followUpSchema = new mongoose.Schema({
         reflexes: [reflexesSchema],
         diagnosticStudies: [diagnosticSchema],
         surgeryRecommendedByDoctor: [surgicalSchema],
+        assessmentUpdate: String,
+        differentialDignosis: [ddschema],
         treatmentPlan: {
             type: [treatmentSchema],
     
