@@ -1753,11 +1753,7 @@ exports.generateFollowUp = async (req, res, next) => {
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
-<<<<<<< HEAD
-        medicalEquipment:followUp.followUpVisit.medicalEquipment,
-=======
         medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
->>>>>>> master
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
         problem_areasToUpperCase,
