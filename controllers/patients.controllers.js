@@ -320,7 +320,7 @@ exports.updatePatient = async (req, res) => {
   // body.password = hash;
 
   // console.log("I am In Update Patient Route")
-  const resPatient = await Nurse.findById(req.user.data[1]);
+  const resPatient = await Patient.findById(req.user.data[1]);
   console.log(resPatient.password)
   if (req.body.password == resPatient.password) {
     // great, allow this user access
