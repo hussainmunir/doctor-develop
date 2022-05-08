@@ -136,6 +136,7 @@ exports.updateDoctor = async (req, res, next) => {
  
   const resDoctor = await Doctor.findById(req.user.data[1]);
   console.log(resDoctor.password)
+  if (req.body.password != undefined) {
   if (req.body.password == resDoctor.password) {
     // great, allow this user access
     console.log('password matched!');
@@ -149,6 +150,7 @@ exports.updateDoctor = async (req, res, next) => {
 
     req.body.password = hash;
   }
+}
  
   // if (req.body.password) {
   //   let salt = bcrypt.genSaltSync(10);
@@ -1716,8 +1718,8 @@ exports.generateFollowUp = async (req, res, next) => {
         patientInWaitingRoom:followUp.patientInWaitingRoom,
         // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
         injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
-        improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful ${followUp.patientInWaitingRoom.improveDetail}.`,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma,including ":"no trauma.",
+        improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful for ${followUp.patientInWaitingRoom.injectionHelpDetail}.`,
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma, including ":"no trauma.",
         strength:strength[1],
         strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
@@ -1728,7 +1730,7 @@ exports.generateFollowUp = async (req, res, next) => {
         generalBodyParts: physicalExam[0],
         handFootLandMarks: physicalExam[1],
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
-        physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
+        physicalExamThreeDModal: followUp.followUpVisit.physicalExamThreeDModal,
         vitals:problem.dignosis.vitals,
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
@@ -1752,7 +1754,7 @@ exports.generateFollowUp = async (req, res, next) => {
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `${followUp.patientInWaitingRoom.fallsTraumaDetail}${fallsOrTraumaDetailDot}`,
+        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
         medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",

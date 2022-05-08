@@ -95,6 +95,7 @@ exports.registerNurse = async (req, res, next) => {
 
     const resNurse = await Nurse.findById(req.user.data[1]);
     console.log(resNurse.password)
+    if (req.body.password != undefined) {
     if (req.body.password == resNurse.password) {
       // great, allow this user access
       console.log('password matched!');
@@ -108,6 +109,7 @@ exports.registerNurse = async (req, res, next) => {
   
       req.body.password = hash;
     }
+  }
 
     // if (req.body.password) {
     //   let salt = bcrypt.genSaltSync(10);
