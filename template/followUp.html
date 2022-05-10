@@ -13,7 +13,9 @@
 <body>
     <strong>{{patient.fname}},{{patient.lname}}</strong><br>
     <strong>DOB:</strong> {{dateOfBirth}}<br>
-    <strong>Date Of Encounter:</strong> {{date}}<br><br>
+    <strong>Date Of Encounter:</strong> {{date}}<br>
+    <strong>MRN:</strong> {{MRN}} <br>
+    <br>
     <strong>Return:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> {{DD}}</br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
@@ -39,17 +41,23 @@
         </ol>
     <h2>Physical Examination: </h2>
     {{patient.fname}},{{patient.lname}} is an awake, alert and oriented {{patient.gender}} that
-        appears {{hisORHer}} stated age. {{pronoun}} have a pleasant demeanor. {{pronoun}} are able to follow
-        commands appropriately. {{pronoun}} are in no acute distress.
+        appears {{hisORHer}} stated age. {{pronoun}} has a pleasant demeanor. {{pronoun}} is able to follow
+        commands appropriately. {{pronoun}} is in no acute distress.
     
 <br></br>
-    <strong >Vitals:</strong>
-    <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
+    <strong style = "display: {{vitalStyle}}">Vitals:</strong>
+    <!-- <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
     <li style="list-style-type: none;">Wt:  {{vitals.weight}}</li>
     <li style="list-style-type: none;">BMI:  {{vitals.BMI}}</li>
     <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
-    <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li>
+    <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li> -->
+    <li style="list-style-type: none;">{{height}}</li>
+    <li style="list-style-type: none;">{{weight}}</li>
+    <li style="list-style-type: none;">{{BMI}}</li>
+    <li style="list-style-type: none;">{{BP}}</li>
+    <li style="list-style-type: none;">{{heartrate}}</li>
+    <li style="list-style-type: none;">{{respiratory}}</li>
     </br>
     <strong>Skin:</strong> {{skin}} 
     <br></br>

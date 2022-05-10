@@ -1127,17 +1127,28 @@ exports.getOperationWaitingList = async (req, res, next) => {
     // }
     if(list.length > 0) 
     {
+      
         var test = [];
             for(i=0; i<list.length; i++) {
               const problem = await Problem.find({_id:list[i].problemId}).lean();
               test.push(problem[0])
             }
-            
-            const problem = await Problem.find({_id:list[0].problemId}).lean();
-          
+            console.log(test.length)
+            // const problem = await Problem.find({_id:list[0].problemId}).lean();
+            if (test.length < 1) {
+              return next(new ErrorResponse(`Problem not found`, 404));
+            }
+           
             list.map((item,i) => {
+              
+              if (test[i] != undefined) {
+                console.log(test[i].dignosis.differentialDignosis)
               item.differentialDignosis =test[i].dignosis.differentialDignosis
+              }
+              if (test[i] != undefined) {
+                console.log(test[i].fullBodyCoordinates)
               item.fullBodyCoordinates = test[i].fullBodyCoordinates
+              }
             })
           
 

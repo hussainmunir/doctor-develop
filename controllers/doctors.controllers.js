@@ -26,7 +26,8 @@ function appendAndToArray(arr){
     arr.splice(arr.length-1,0," and ")
     }
     
-  let str = arr.toString()
+  // let str = arr.toString()
+  let str = arr.join([separator = ', '])
   let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
     console.log("str",removeLastComma)
 
@@ -742,7 +743,7 @@ const getPhysicalExam = (physicalExam) => {
     return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
   })
   finalOtherBodyPartArray = otherBodyPartArray.map((item) => {
-    return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""}`
+    return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
   })
   return [finalOtherBodyPartArray, finalHandFootArray]
 
@@ -1322,7 +1323,7 @@ exports.generateReport = async (req, res, next) => {
         handDominance: patient.socialHistory.handDominance,
         handDominanceText: patient.socialHistory.handDominance==="ambidextrous" ? `${patient.socialHistory.handDominance}` : `${patient.socialHistory.handDominance} hand dominant`,
         occupation:patient.socialHistory.occupation,
-        occupationText: patient.socialHistory.occupation ? ` who works as an ${patient.socialHistory.occupation}` : "",
+        occupationText: patient.socialHistory.occupation ? ` who works as an ${patient.socialHistory.occupation.toLowerCase()}` : "",
         smokes: getSocial(patient.socialHistory),
         drinks: getSocial(patient.socialHistory),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} ${strToTheIncludes} until next
@@ -1695,6 +1696,13 @@ exports.generateFollowUp = async (req, res, next) => {
     let fallsOrTraumaDetailDot = followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : ".";
     var injectionDetail = followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? " The patient reports improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma :" The patient reports no improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma;
     const doctorName = await getDoctorName(problem.doctorId)
+    var vitalStyle = "none"
+    if (followUp.followUpVisit.vitals.BMI === "" && followUp.followUpVisit.vitals.height === "" && followUp.followUpVisit.vitals.weight === "" && followUp.followUpVisit.vitals.heartrate === "" && followUp.followUpVisit.vitals.respiratory === "") {
+      vitalStyle = "none"
+    }
+    else {
+      vitalStyle = ""
+    }
    
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
@@ -1712,6 +1720,7 @@ exports.generateFollowUp = async (req, res, next) => {
         date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),
         Age:getAge(patient.dateOfBirth),
         gender:patient.gender,
+        MRN: patient.insurance.membershipId,
         pronoun:patient.gender == "male"? "He" : "she",
         pronounLowercase: patient.gender == "male"? "he" : "she",
         hisORHer:patient.gender == "male"?"his" :"her",
@@ -1732,6 +1741,13 @@ exports.generateFollowUp = async (req, res, next) => {
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
         physicalExamThreeDModal: followUp.followUpVisit.physicalExamThreeDModal,
         vitals:problem.dignosis.vitals,
+        vitalStyle,
+        BMI:followUp.followUpVisit.vitals.BMI?`BMI:  ${followUp.followUpVisit.vitals.BMI}`:"",
+        height:followUp.followUpVisit.vitals.height?`Ht:  ${followUp.followUpVisit.vitals.height}`:"",
+        weight:followUp.followUpVisit.vitals.weight?`Wt:  ${followUp.followUpVisit.vitals.weight}`:"",
+        BP:followUp.followUpVisit.vitals.BP?`BP:  ${followUp.followUpVisit.vitals.BP}`:"",
+        heartrate:followUp.followUpVisit.vitals.heartrate?`Pulse:  ${followUp.followUpVisit.vitals.heartrate}`:"",
+        respiratory:followUp.followUpVisit.vitals.respiratory?`RR:  ${followUp.followUpVisit.vitals.respiratory}`:"",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
@@ -1752,7 +1768,7 @@ exports.generateFollowUp = async (req, res, next) => {
         pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
         ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
-        treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes": "",
+        treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
         medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
@@ -1802,7 +1818,7 @@ exports.generateOpNote = async (req, res, next) => {
       return result;
     }
    
-    let strength= getStrength(problem.dignosis.strength);
+    let strength= getStrength(operation.muscularStrengthTesting);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms) 
@@ -1854,7 +1870,10 @@ exports.generateOpNote = async (req, res, next) => {
         patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
-        strength:strength[1],
+        // strength:strength,
+        spainStyle:strength[0].length ==0 ? "none":"",
+        strength:strength?strength[1]:[],
+        spain:strength?strength[0]:[],
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,

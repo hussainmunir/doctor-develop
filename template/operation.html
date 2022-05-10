@@ -43,15 +43,16 @@
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
     <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li> -->
     <strong>Skin:</strong> Incision is {{skin}} 
-    <h2>The patient has tenderness to palpation at:</h2>
+
+    <!-- <h2>The patient has tenderness to palpation at:</h2>
     <h2>{{rangeOFMotion}}</h2>
     
     <ul>
         {{#each operation.rangeOfMotion}}
         <li>{{this}}</li>
         {{/each}}
-    </ul>
-   
+    </ul> -->
+    <br />
     <h2>Strength:</h2>
     <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
         <tr>
@@ -67,6 +68,22 @@
         </tr>
         {{/each}}
     </table>
+    <br />
+    <div style="display: {{spainStyle}};">
+        <strong>Spine Strength: </strong>
+        <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+            <tr>
+                <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
+                <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">value</th>
+            </tr>
+            {{#each spain}}
+            <tr>
+                <td style="border: 1px solid black; text-align:center">{{this.strengthName}}</td>
+                <td style="border: 1px solid black;">{{this.right}}/5</td>
+            </tr>
+            {{/each}}
+        </table>
+       </div>
     <div style="display: {{ReflexesStyles}}">
     <h2>Reflexes:</h2>
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
