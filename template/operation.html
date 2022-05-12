@@ -119,8 +119,20 @@
     <br>
     <h2>Assessment: {{patient.fname}} {{patient.lname}} is a {{Age}} year old {{patient.gender}} S/P:</h2>
     <h2>1.) {{SurgeryPerformed}}</h2>
-    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents S/P {{DD}}.<br>Treatment plan includes: {{#each treatmentPlane}}- {{this.treatmentName}}  {{/each}}. The
-        patient will follow up in {{suggestedFollowUp}}.{{medicalEquipment}} The patient is happy with the
+    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents S/P {{DD}}. {{treatmentPlanStr}}
+        <ul>
+            {{#each treatmentPlane}}
+            <li>
+                {{this.treatmentName}}{{this.treatmentDetail}}
+            </li>
+            {{/each}}   
+            {{#each medicalEquipmentArr}}
+            <li>
+                {{this}}
+            </li>
+            {{/each}} 
+        </ul>
+        The patient will follow up in {{suggestedFollowUp}}.{{medicalEquipment}} The patient is happy with the
         plan moving forward.</p>
  
 </body>

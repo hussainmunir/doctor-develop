@@ -25,6 +25,8 @@ const { getPatient,
     getOtherMeds,
     getPatientById,
     getPreviousTreatments,
+    getPreviousTreatmentsFromId,
+    combineProblemListForPatient,
     postPatientFollowUp,
     getProblemList,
     postOperation,
@@ -72,6 +74,8 @@ router.get('/getInsuranceInfo', checkAuth, getInsuranceInfo);
 router.get('/getInsuranceInfo', checkAuth, getInsuranceInfo);
 router.get('/search', checkAuth, getOtherMeds);
 router.get('/prev', checkAuth, getPreviousTreatments);
+router.get('/patientPreviousTreatments',getPreviousTreatmentsFromId);
+router.get('/combineProblemListForPatient', checkAuth, combineProblemListForPatient);
 router.get('/getProblemList/:patientId',checkAuth, getProblemList)
 router.get('/getOperationWaitingList/:patientId',checkAuth, getOperationWaitingList)
 module.exports = router;

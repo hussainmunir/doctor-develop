@@ -24,6 +24,7 @@ const { getDoctorById,
     followUpSignature,
     operationSignature,
     combinePreviousVisite,
+    combineProblemListForDoctor,
     createTemplate,
     updateTemplate,
     deleteTemplate,
@@ -65,6 +66,7 @@ router.get('/getWaiting', checkAuth, getWaitingList);
 router.get('/getCombineWaitingList', checkAuth, combineWaitingList);
 router.get('/prev', checkAuth, getPreviousAppointments);
 router.get('/combinePreviousVisit', checkAuth, combinePreviousVisite);
+router.get('/combinePreviousVisitForDoctor', combineProblemListForDoctor);
 router.get('/getcptCode',checkAuth,getCptCode);
 router.get('/getFollowUpById/:followUpId', checkAuth, getFollowUp);
 router.get('/getPostOpById/:postOpId', checkAuth, getPostOp);

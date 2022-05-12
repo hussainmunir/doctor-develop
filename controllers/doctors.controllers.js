@@ -22,17 +22,34 @@ var count = 0;
 
 
 function appendAndToArray(arr){
-  if(arr.length > 1){
-    arr.splice(arr.length-1,0," and ")
+  var tempArr = []
+  tempArr = arr
+  if(tempArr.length > 1){
+    tempArr.splice(tempArr.length-1,0,"and")
     }
-    
   // let str = arr.toString()
-  let str = arr.join([separator = ', '])
+  let str = tempArr.join([separator = ', '])
   let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
     console.log("str",removeLastComma)
-
+    tempArr = tempArr.filter(e => e !== 'and'); 
+    arr.splice(arr.indexOf('and'), 1);
     return removeLastComma;
 }
+
+// const appendAndToArray = async (arr) => {
+//   var tempArr = []
+//   tempArr = arr
+//   if(tempArr.length > 1){
+//     tempArr.splice(tempArr.length-1,0,"and")
+//     }
+//   // let str = arr.toString()
+//   let str = tempArr.join([separator = ', '])
+//   let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
+//     console.log("str",removeLastComma)
+
+//     return removeLastComma;
+ 
+// }
 
 /** 
 // ! @dec Get doctor by id in params
@@ -1177,7 +1194,7 @@ exports.generateReport = async (req, res, next) => {
     else if (patient.gender === 'female') { pronounLowercase = 'she' }
     else { pronounLowercase = 'they' }
     const pRadiateStr = getRadiateStr(problem.symptomsRadiation.isRadiate,problem.symptomsRadiation.radiateAt,problem.symptomsRadiation.radiateDetails, pronoun);
-    const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
+    // const tret = [...problem.dignosis.treatmentPlan, ...problem.dignosis.medicalEquipment];
     const template = fs.readFileSync('./template/template.html', 'utf-8');
    
     let str_aggFactors = getTreatments(problem.aggravatingFactors);
@@ -1234,6 +1251,9 @@ exports.generateReport = async (req, res, next) => {
     let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
     let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
+    // console.log(appendAndToArray(problem.dignosis.medicalEquipment),"medical eqp str")
+    console.log(problem.dignosis.medicalEquipment,"medical eqp Arr")
+
    
     const options = {
       format: 'A4',
@@ -1302,7 +1322,8 @@ exports.generateReport = async (req, res, next) => {
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
         treatmentPlan: problem.dignosis.treatmentPlan,
-        medicalEquipment: appendAndToArray(problem.dignosis.medicalEquipment),
+        medicalEquipmentArr: problem.dignosis.medicalEquipment,
+        // medicalEquipment: appendAndToArray(problem.dignosis.medicalEquipment),
         range: problem.dignosis.rangeOfMotion,
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength?strength[1]:[],
@@ -1353,6 +1374,7 @@ exports.generateReport = async (req, res, next) => {
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`
     }
+
     pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`))
   } catch (err) {
     return next(new ErrorResponse(err.message + "in main document function", 500))
@@ -1393,6 +1415,79 @@ exports.combineWaitingList = async (req, res, next) => {
     const problem = await Problem.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
     const operation = await Operation.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
     const followUpModal = await FollowUpModal.find({ 'isChecked': false, "doctorId": req.user.data[1] }).lean();
+  
+   for(i=0; i<problem.length; i++){
+    const patient = await Patient.findOne({ _id: problem[i].patientID}).lean();
+   
+    problem.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+
+   }
+   
+   for(i=0; i<operation.length; i++){
+    const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
+   
+    operation.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   for(i=0; i<followUpModal.length; i++){
+    const patient = await Patient.findOne({ _id: followUpModal[i].patientId}).lean();
+   
+    followUpModal.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   
+
+    if (!problem && !operation && !followUpModal) {
+      res.status(200).json({
+        data: "No thing in waiting list",
+
+      })
+    }
+    var followUpArray = [];
+   for(i=0; i<followUpModal.length; i++){
+     let obj = {}
+     obj.waitingListType="followUp";
+     obj.problem={};
+     obj.followUp=followUpModal[i];
+     obj.postOp={};
+     followUpArray.push(obj)
+   }
+   var problemArray = [];
+   for(i=0; i<problem.length; i++){
+     let obj = {}
+     obj.waitingListType="problem";
+     obj.followUp={};
+     obj.problem=problem[i];
+     obj.postOp={};
+     problemArray.push(obj)
+   }
+   var operationArray = [];
+   for(i=0; i<operation.length; i++){
+     let obj = {}
+     obj.waitingListType="operation";
+     obj.problem={};
+     obj.followUp={};
+     obj.postOp=operation[i];
+     operationArray.push(obj)
+   }
+   const waitingList = followUpArray.concat(problemArray,operationArray)
+    res.status(200).json({
+      success: true,
+      data: waitingList
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+
+exports.combineProblemListForDoctor = async (req, res, next) => {
+  try {
+    let patientId = req.body.patientId
+    const problem = await Problem.find({ 'isChecked': true, "patientID": patientId }).lean();
+    const operation = await Operation.find({ 'isChecked': true, "patientId": patientId }).lean();
+    const followUpModal = await FollowUpModal.find({ 'isChecked': true, "patientId": patientId }).lean();
   
    for(i=0; i<problem.length; i++){
     const patient = await Patient.findOne({ _id: problem[i].patientID}).lean();
@@ -1771,6 +1866,7 @@ exports.generateFollowUp = async (req, res, next) => {
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
         thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
+        medicalEquipmentArr: followUp.followUpVisit.medicalEquipment,
         medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
         dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
@@ -1878,7 +1974,8 @@ exports.generateOpNote = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
-        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${operation.medicalEquipment}.`:"",
+        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${appendAndToArray(operation.medicalEquipment)}.`:"",
+        medicalEquipmentArr:operation.medicalEquipment,
         isPain:operation.isPain? "controlled" : "not controlled",
         patientAmbulating:operation.patientAmbulating.ambulating,
         signatureUrl:operation.signature.eSignaturePhotoUrl,
@@ -1894,6 +1991,8 @@ exports.generateOpNote = async (req, res, next) => {
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
         medicationtxt:operation.medicationRequired ? "with medication" : "without medication",
+        treatmentPlan:operation.treatmentPlan,
+        treatmentPlanStr: operation.treatmentPlan.length > 0 ? `Treatment plan includes:` : "",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
     }

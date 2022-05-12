@@ -147,8 +147,13 @@
             {{this.treatmentName}}{{this.treatmentDetail}}
         </li>
         {{/each}}   
+        {{#each medicalEquipmentArr}}
+        <li>
+            {{this}}
+        </li>
+        {{/each}} 
     </ul>
-    {{suggestedFollowUp}} {{medicalEquipmentText}} {{medicalEquipment}}{{dot}}The patient is happy with the
+    {{suggestedFollowUp}} {{medicalEquipmentText}} {{medicalEquipment}}{{dot}} The patient is happy with the
     plan moving forward.
 
     <div >

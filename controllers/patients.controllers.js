@@ -5,6 +5,7 @@ const OtherMedConditions = require('../models/OtherMedicalConditions');
 const Test = require('../models/Test');
 const Problem = require('../models/Problem');
 const FollowUp = require('../models/FollowUp.js');
+const FollowUpModal = require('../models/FollowUp.js');
 const Operation = require('../models/Operation')
 const ErrorResponse = require('../utils/errorResponse');
 const path = require('path');
@@ -1003,6 +1004,99 @@ exports.getPreviousTreatments = async (req, res, next) => {
       count: prev.length,
       success: true,
       data: prev
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.getPreviousTreatmentsFromId = async (req, res, next) => {
+  try {
+    let patientId = req.body.patientId
+    // console.log(req.body)
+    // const patient = await Patient.find( { '_id': req.body.patientId }).lean()
+    const prev = await Problem.find({ 'isChecked': true, "patientID": patientId });
+    console.log(prev)
+    if (!prev) {
+      res.status(200).json({
+        data: "No previous treatments",
+      })
+    }
+    res.status(200).json({
+      count: prev.length,
+      success: true,
+      data: prev
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.combineProblemListForPatient = async (req, res, next) => {
+  try {
+    const problem = await Problem.find({ 'isChecked': true, "patientID": req.user.data[1] }).lean();
+    const operation = await Operation.find({ 'isChecked': true, "patientId": req.user.data[1] }).lean();
+    const followUpModal = await FollowUpModal.find({ 'isChecked': true, "patientId": req.user.data[1] }).lean();
+  
+   for(i=0; i<problem.length; i++){
+    const patient = await Patient.findOne({ _id: problem[i].patientID}).lean();
+   
+    problem.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+
+   }
+   
+   for(i=0; i<operation.length; i++){
+    const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
+   
+    operation.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   for(i=0; i<followUpModal.length; i++){
+    const patient = await Patient.findOne({ _id: followUpModal[i].patientId}).lean();
+   
+    followUpModal.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   
+
+    if (!problem && !operation && !followUpModal) {
+      res.status(200).json({
+        data: "No thing in waiting list",
+
+      })
+    }
+    var followUpArray = [];
+   for(i=0; i<followUpModal.length; i++){
+     let obj = {}
+     obj.waitingListType="followUp";
+     obj.problem={};
+     obj.followUp=followUpModal[i];
+     obj.postOp={};
+     followUpArray.push(obj)
+   }
+   var problemArray = [];
+   for(i=0; i<problem.length; i++){
+     let obj = {}
+     obj.waitingListType="problem";
+     obj.followUp={};
+     obj.problem=problem[i];
+     obj.postOp={};
+     problemArray.push(obj)
+   }
+   var operationArray = [];
+   for(i=0; i<operation.length; i++){
+     let obj = {}
+     obj.waitingListType="operation";
+     obj.problem={};
+     obj.followUp={};
+     obj.postOp=operation[i];
+     operationArray.push(obj)
+   }
+   const waitingList = followUpArray.concat(problemArray,operationArray)
+    res.status(200).json({
+      success: true,
+      data: waitingList
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
