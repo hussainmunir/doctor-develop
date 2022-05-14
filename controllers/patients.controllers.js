@@ -400,7 +400,10 @@ exports.registerUser = async (req, res, next) => {
       for (let i = 0; i < JSON.parse(req.body.surgicalHistName).length; i++) {
         let surgObj = {
           "name": JSON.parse(req.body.surgicalHistName)[i],
-          "code": JSON.parse(req.body.surgicalHistCode)[i]
+          "code": JSON.parse(req.body.surgicalHistCode)[i], 
+          "surgicalId" : "",
+          "recommendByDoctor": false,
+          "problemId" : ""
         }
         surgHistArr.push(surgObj);
       }
@@ -411,6 +414,7 @@ exports.registerUser = async (req, res, next) => {
         "code": JSON.parse(req.body.surgicalHistCode)[0],
         "problemId": JSON.parse(req.body.problemId)[0],
         "recommendByDoctor": req.body.recommendByDoctor[0],
+        "surgicalId" : "",
       }
       surgHistArr.push(surgObj);
     }

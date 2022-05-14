@@ -42,18 +42,17 @@
     <li style="list-style-type: none;">BP:  {{vitals.BP}}</li>
     <li style="list-style-type: none;">Pulse:  {{vitals.heartrate}}</li>
     <li style="list-style-type: none;">RR:  {{vitals.respiratory}}</li> -->
-    <strong>Skin:</strong> Incision is {{skin}} 
-
+    <strong>Skin:</strong> Incision is {{skin}}
     <!-- <h2>The patient has tenderness to palpation at:</h2>
-    <h2>{{rangeOFMotion}}</h2>
-    
+    <h2>{{rangeOFMotion}}</h2>    
     <ul>
         {{#each operation.rangeOfMotion}}
         <li>{{this}}</li>
         {{/each}}
     </ul> -->
+    <div style="display: {{strengthStyle}};"></div>
     <br />
-    <h2>Strength:</h2>
+    <h2 style="display: {{strengthStyle}};">Strength:</h2>
     <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
         <tr>
             <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>
@@ -68,6 +67,7 @@
         </tr>
         {{/each}}
     </table>
+    </div>
     <br />
     <div style="display: {{spainStyle}};">
         <strong>Spine Strength: </strong>
@@ -84,6 +84,7 @@
             {{/each}}
         </table>
        </div>
+       <br />
     <div style="display: {{ReflexesStyles}}">
     <h2>Reflexes:</h2>
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">

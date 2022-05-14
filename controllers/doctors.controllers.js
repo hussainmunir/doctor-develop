@@ -1891,6 +1891,7 @@ exports.generateFollowUp = async (req, res, next) => {
 exports.generateOpNote = async (req, res, next) => {
   try {
     
+    
     const operation = await Operation.findOne({ _id: req.params.opId }).lean();
     const patient = await Patient.findOne({ _id: operation.patientId }).lean();
     const problem = await Problem.findOne({ _id: operation.problemId }).lean();
@@ -1913,7 +1914,11 @@ exports.generateOpNote = async (req, res, next) => {
       let result = appendAndToArray(diagnosedStr)
       return result;
     }
-   
+    // console.log(operation)
+    // console.log(patient)
+    // console.log(problem)
+
+
     let strength= getStrength(operation.muscularStrengthTesting);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -1932,6 +1937,36 @@ exports.generateOpNote = async (req, res, next) => {
     let assistiveDevices = operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()});
     let patientAdmitsArr = `${appendAndToArray(operation.patientAdmits)}`;
 
+   let spainStyleTemp
+   let strengthTemp
+   let spainTemp
+   let tempStrengthStyle
+
+   if (strength != undefined){
+   if (strength.length > 0) {
+    spainStyleTemp = strength[0].length ==0 ? "none":""
+    tempStrengthStyle = strength[1].length ==0 ? "none":""
+    strengthTemp = strength?strength[1]:[]
+    spainTemp = strength?strength[0]:[]
+   }
+   else {
+    spainStyleTemp = "none"
+    tempStrengthStyle = "none"
+    strengthTemp = []
+    spainTemp = []
+  }
+
+  }
+  else {
+    spainStyleTemp = "none"
+    tempStrengthStyle = "none"
+    strengthTemp = []
+    spainTemp = []
+  }
+  console.log(spainStyleTemp)
+  console.log(strengthTemp)
+  console.log(spainTemp)
+  console.log(tempStrengthStyle)
 
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
@@ -1966,10 +2001,13 @@ exports.generateOpNote = async (req, res, next) => {
         patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
-        // strength:strength,
-        spainStyle:strength[0].length ==0 ? "none":"",
-        strength:strength?strength[1]:[],
-        spain:strength?strength[0]:[],
+        // spainStyle:strength[0].length ==0 ? "none":"",
+        // strength:strength?strength[1]:[],
+        // spain:strength?strength[0]:[],
+        spainStyle:spainStyleTemp,
+        strength:strengthTemp,
+        spain:spainTemp,
+        strengthStyle: tempStrengthStyle,
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
