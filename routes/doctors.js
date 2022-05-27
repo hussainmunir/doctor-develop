@@ -8,6 +8,7 @@ const { getDoctorById,
     loginDoctor,
     searchCode,
     diagnosis,
+    UploadSkinPictureNewProblem,
     generateReport,
     getAllDoctors,
     getWaitingList,
@@ -15,6 +16,7 @@ const { getDoctorById,
     getPreviousAppointments,
     companiesAllDoctors,
     putOperation,
+    UploadSurgicalSiteOperation,
     putDoctorFollowUp,
     generateFollowUp,
     generateOpNote,
@@ -47,6 +49,9 @@ router.get('/doctors',getAllDoctors)
 router.get('/companyNames',getAllCompanies)
 router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
+router.put('/uploadSkinPicture', checkAuth, UploadSkinPictureNewProblem);
+router.put('/uploadSurgicalSitePicture', checkAuth, UploadSurgicalSiteOperation);
+
 router.put('/addPatientRoom/:pID', checkAuth, addRoom);
 router.put('/createTemplate/:doctorId', checkAuth, createTemplate);
 router.put('/updateTemplate/:templateId', checkAuth, updateTemplate);

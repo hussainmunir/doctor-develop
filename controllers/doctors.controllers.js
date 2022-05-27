@@ -293,6 +293,88 @@ exports.searchCode = async (req, res, next) => {
   }
 }
 
+exports.UploadSkinPictureNewProblem = async (req, res, next) => {
+  console.log(req.body)
+  console.log(req.files)
+  try {
+    const p = await Problem.findOne({ _id: req.body.problemId })
+    // console.log(p)
+    if (!p) {
+      return res.status(404).json({
+        "message": "Problem not found"
+      })
+    }
+    else {
+      var toBeAdded = {
+        size: req.body.size,
+        description: req.body.description,
+        location: req.body.location,
+        name: req.body.name,
+        skinPhotos: [],
+      }
+      if (req.files) {
+        // if (req.files.photos) {
+
+          if (Array.isArray(req.files.photos)) {
+            for (i = 0; i < req.files.photos.length; i++) {
+              console.log("checking for photos")
+              const urlId = await uploadImage(req.files.photos[i], next)
+              console.log(urlId)
+              var setPhotos = {
+                "url": urlId.url,
+                "public_id": urlId.public_id
+              }
+              toBeAdded.skinPhotos[i] = setPhotos
+              console.log(setPhotos)
+            }
+          }
+          else {
+            const urlId = await uploadImage(req.files.photos, next)
+            console.log("checking for photo")
+            var setPhotos = {
+              "url": urlId.url,
+              "public_id": urlId.public_id
+            }
+            toBeAdded.skinPhotos[0] = setPhotos
+            console.log(setPhotos)
+          }
+        
+        // }
+
+      }
+      // var setPhotos = {
+      //   "url": "https://res.cloudinary.com/macro-soar-technologies/image/upload/v1653324532/qfgv9k3wtnkhwkihl3l9.jpg",
+      //   "public_id": "qfgv9k3wtnkhwkihl3l9"
+      // }
+      // for (i = 0; i < 1; i++) {
+        // toBeAdded.skinPhotos[0] = setPhotos
+      // }
+      
+      console.log(toBeAdded)
+      const updatedDiagnosisSkin = await Problem.findOneAndUpdate({ _id: req.body.problemId }, { $push: { "dignosis.skin": toBeAdded } })
+      // console.log(updatedDiagnosisSkin.diagnosis.skin)
+      if (!updatedDiagnosisSkin) {
+        return res.status(400).json({
+          success: false,
+          data: null
+        })
+      }
+      else {
+        return res.status(200).json({
+          success: true,
+          data: toBeAdded
+        })
+      }
+
+    }
+  }
+
+  catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+
+}
+
 exports.diagnosis = async (req, res, next) => {
  
   if(req.body.dignosis.date){
@@ -933,13 +1015,21 @@ const getTreatments = (fullBodyCoordinates) => {
 }
 
 const getGeneralExam = (generalExam) => {
-  if (generalExam.whoAppears.length <= 0 || generalExam.has.length <= 0 || generalExam.andIs <= 0 || generalExam.patientIs <= 0) {
+  if (generalExam.whoAppears.length <= 0 || generalExam.has.length <= 0 || generalExam.andIs <= 0 || generalExam.patientIs <= 0 || generalExam.gaitIs <= 0) {
     return false
+  }
+ var tempGaitIs = "" 
+  if (generalExam.gaitIs != undefined) {
+    if (generalExam.gaitIs[0].trim() != ""){
+      tempGaitIs = `Gait is ${generalExam.gaitIs[0].toLowerCase()}`
+    }
+    
   }
   const finalGeneralExam = {
     "whoAppears": generalExam.whoAppears[0].toLowerCase(),
     "has": generalExam.has[0].toLowerCase(),
-    "andIs": generalExam.andIs[0].toLowerCase()
+    "andIs": generalExam.andIs[0].toLowerCase(),
+    "gaitIs": tempGaitIs 
   }
   if (generalExam.patientIs[0][0].toUpperCase() === 'A' || generalExam.patientIs[0][0].toUpperCase() === 'E' || generalExam.patientIs[0][0].toUpperCase() === 'I'
     || generalExam.patientIs[0][0].toUpperCase() === 'O' || generalExam.patientIs[0][0].toUpperCase() === 'U') {
@@ -1056,6 +1146,120 @@ const getSkin = (skinArray) => {
     console.log("skin",skin)
     
   return skin;
+
+}
+
+const getSkin2 = (skinArray) => {
+  console.log("skinArray",skinArray)
+
+  let skin = [] ;
+  let tempSkinArr = []
+
+
+  for(i=0; i < skinArray.length; i++){
+    var tempString = []
+    var tempSkinImagesStyle = ""
+    
+           tempString.push(`${skinArray[`${i}`].name} `);
+
+           if(skinArray[i].location){
+            tempString.push(`to the ${skinArray[`${i}`].location} `);
+           }
+
+           if(skinArray[i].size){
+            tempString.push(`${skinArray[`${i}`].size} in size`)
+           }
+
+           if(skinArray[i].description){
+            tempString.push(`${skinArray[`${i}`].description} `)
+           }
+           if (skinArray[i].skinPhotos){
+           if (skinArray[i].skinPhotos.length > 0) {
+               tempSkinImagesStyle = ("")
+            }
+            else {
+              tempSkinImagesStyle = ("display:none")
+             }
+             
+           }
+           else {
+            tempSkinImagesStyle = ("display:none")
+           }
+   
+      
+  let str =  tempString.toString()
+  console.log("str",str)
+  str.replace("size", "size,")
+  var result = str.replace(/,/g,'') 
+ const text =  result.replace("size", "size, ")
+    skin.push(text)
+
+    var skinObj = {
+      "skinText": text,
+      "skinImg":skinArray[`${i}`].skinPhotos,
+      "skinImgStyle":tempSkinImagesStyle
+    }
+    // console.log(skinObj)
+
+   tempSkinArr.push(skinObj)
+     
+    }
+  console.log("tempSkinArray2",tempSkinArr)
+  
+
+  return tempSkinArr;
+
+}
+
+const getSkinPostOp = (skinArray) => {
+  console.log("skinArray",skinArray)
+
+  let skin = [] ;
+  let tempSkinArr = []
+
+
+  for(i=0; i < skinArray.length; i++){
+    var tempString = []
+    var tempSkinImagesStyle = ""
+    
+           tempString.push(`${skinArray[`${i}`].surgicalSiteName} `);
+
+          
+           if (skinArray[i].surgicalSitePhotos){
+           if (skinArray[i].surgicalSitePhotos.length > 0) {
+               tempSkinImagesStyle = ("")
+            }
+            else {
+              tempSkinImagesStyle = ("display:none")
+             }
+             
+           }
+           else {
+            tempSkinImagesStyle = ("display:none")
+           }
+   
+      
+  let str =  tempString.toString()
+  console.log("str",str)
+  str.replace("size", "size,")
+  var result = str.replace(/,/g,'') 
+ const text =  result.replace("size", "size, ")
+    skin.push(text)
+
+    var skinObj = {
+      "skinText": text,
+      "skinImg":skinArray[`${i}`].surgicalSitePhotos,
+      "skinImgStyle":tempSkinImagesStyle
+    }
+    // console.log(skinObj)
+
+   tempSkinArr.push(skinObj)
+     
+    }
+  console.log("tempSkinArray2",tempSkinArr)
+  
+
+  return tempSkinArr;
 
 }
 
@@ -1249,11 +1453,19 @@ exports.generateReport = async (req, res, next) => {
     let recommendedBydoctorSurgery = getSurgicalHistory(patient.surgicalHistory)
     let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
     let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
+    let skinFullBodyCoordinate2 = getSkin2(problem.dignosis.skin)
+
     let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
     // console.log(appendAndToArray(problem.dignosis.medicalEquipment),"medical eqp str")
     console.log(problem.dignosis.medicalEquipment,"medical eqp Arr")
-
+    var vitalStyle = "none"
+    if (problem.dignosis.vitals.BMI === "" && problem.dignosis.vitals.height === "" && problem.dignosis.vitals.weight === "" && problem.dignosis.vitals.heartrate === "" && problem.dignosis.vitals.respiratory === ""&& problem.dignosis.vitals.cardiovascular === ""&& problem.dignosis.vitals.pulmonary === "") { 
+      vitalStyle = "none"
+    }
+    else {
+      vitalStyle = ""
+    }
    
     const options = {
       format: 'A4',
@@ -1305,6 +1517,7 @@ exports.generateReport = async (req, res, next) => {
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
         skin: skinFullBodyCoordinate,
+        skin2: skinFullBodyCoordinate2,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
         problemAreas: problem_areas ? problem_areas : "none",
         problem_areasToUpperCase,
@@ -1357,12 +1570,15 @@ exports.generateReport = async (req, res, next) => {
         toTheInclude: strToTheIncludes ? strToTheIncludes : "none", // Array,
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
+        vitalStyle,
         BMI:problem.dignosis.vitals.BMI?`BMI:  ${problem.dignosis.vitals.BMI}`:"",
         height:problem.dignosis.vitals.height?`Ht:  ${problem.dignosis.vitals.height}`:"",
         weight:problem.dignosis.vitals.weight?`Wt:  ${problem.dignosis.vitals.weight}`:"",
         BP:problem.dignosis.vitals.BP?`BP:  ${problem.dignosis.vitals.BP}`:"",
         heartrate:problem.dignosis.vitals.heartrate?`Pulse:  ${problem.dignosis.vitals.heartrate}`:"",
         respiratory:problem.dignosis.vitals.respiratory?`RR:  ${problem.dignosis.vitals.respiratory}`:"",
+        cardiovascular:problem.dignosis.vitals.cardiovascular?`CV:  ${problem.dignosis.vitals.cardiovascular}`:"",
+        pulmonary:problem.dignosis.vitals.pulmonary?`PL:  ${problem.dignosis.vitals.pulmonary}`:"",
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
         doctorNameStyle:problem.signature.eSignaturePhotoUrl?" ":"none",
@@ -1554,12 +1770,91 @@ exports.combineProblemListForDoctor = async (req, res, next) => {
   }
 }
 
+exports.UploadSurgicalSiteOperation = async (req, res, next) => {
+  console.log(req.body)
+  console.log(req.files)
+  try {
+    const p = await Operation.findOne({ _id: req.body.problemId })
+    // console.log(p)
+    if (!p) {
+      return res.status(404).json({
+        "message": "Operation not found"
+      })
+    }
+    else {
+      var toBeAdded = {
+        surgicalSiteName: req.body.surgicalSiteName,
+        surgicalSitePhotos: [],
+      }
+      if (req.files) {
+        // if (req.files.photos) {
+
+          if (Array.isArray(req.files.photos)) {
+            for (i = 0; i < req.files.photos.length; i++) {
+              console.log("checking for photos")
+              const urlId = await uploadImage(req.files.photos[i], next)
+              console.log(urlId)
+              var setPhotos = {
+                "url": urlId.url,
+                "public_id": urlId.public_id
+              }
+              toBeAdded.surgicalSitePhotos[i] = setPhotos
+              console.log(setPhotos)
+            }
+          }
+          else {
+            const urlId = await uploadImage(req.files.photos, next)
+            console.log("checking for photo")
+            var setPhotos = {
+              "url": urlId.url,
+              "public_id": urlId.public_id
+            }
+            toBeAdded.surgicalSitePhotos[0] = setPhotos
+            console.log(setPhotos)
+          }
+        
+        // }
+
+      }
+
+      //   var setPhotos = {
+      //   "url": "https://res.cloudinary.com/macro-soar-technologies/image/upload/v1653324532/qfgv9k3wtnkhwkihl3l9.jpg",
+      //   "public_id": "qfgv9k3wtnkhwkihl3l9"
+      // }
+      // for (i = 0; i < 1; i++) {
+        // toBeAdded.surgicalSitePhotos[0] = setPhotos
+      // }
+      console.log(toBeAdded)
+      const updatedOperationSurgicalSite = await Operation.findOneAndUpdate({ _id: req.body.problemId }, { $push: { "surgicalSiteExam": toBeAdded } })
+      if (!updatedOperationSurgicalSite) {
+        return res.status(400).json({
+          success: false,
+          data: null
+        })
+      }
+      else {
+        return res.status(200).json({
+          success: true,
+          data: toBeAdded
+        })
+      }
+
+    }
+  }
+
+  catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+
+}
+
 exports.putOperation = async (req, res, next) => {
   try {
     req.body.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
       const operation = await Operation.findOneAndUpdate(
         { '_id': req.params.operationId },
         req.body,
+
         {
           new: true,
           runValidators: true,
@@ -1599,6 +1894,7 @@ exports.putOperation = async (req, res, next) => {
 exports.putDoctorFollowUp = async (req, res, next) => {
   try {
     req.body.patientInWaitingRoom.date=new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+    console.log(req.body)
     const followUp = await FollowUpModal.findOneAndUpdate(
       { '_id': req.params.followUpID },
       req.body,
@@ -1792,7 +2088,7 @@ exports.generateFollowUp = async (req, res, next) => {
     var injectionDetail = followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? " The patient reports improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma :" The patient reports no improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma;
     const doctorName = await getDoctorName(problem.doctorId)
     var vitalStyle = "none"
-    if (followUp.followUpVisit.vitals.BMI === "" && followUp.followUpVisit.vitals.height === "" && followUp.followUpVisit.vitals.weight === "" && followUp.followUpVisit.vitals.heartrate === "" && followUp.followUpVisit.vitals.respiratory === "") {
+    if (followUp.followUpVisit.vitals.BMI === "" && followUp.followUpVisit.vitals.height === "" && followUp.followUpVisit.vitals.weight === "" && followUp.followUpVisit.vitals.heartrate === "" && followUp.followUpVisit.vitals.respiratory === ""&& followUp.followUpVisit.vitals.cardiovascular === ""&& followUp.followUpVisit.vitals.pulmonary === "") { 
       vitalStyle = "none"
     }
     else {
@@ -1843,6 +2139,8 @@ exports.generateFollowUp = async (req, res, next) => {
         BP:followUp.followUpVisit.vitals.BP?`BP:  ${followUp.followUpVisit.vitals.BP}`:"",
         heartrate:followUp.followUpVisit.vitals.heartrate?`Pulse:  ${followUp.followUpVisit.vitals.heartrate}`:"",
         respiratory:followUp.followUpVisit.vitals.respiratory?`RR:  ${followUp.followUpVisit.vitals.respiratory}`:"",
+        cardiovascular:followUp.followUpVisit.vitals.cardiovascular?`CV:  ${followUp.followUpVisit.vitals.cardiovascular}`:"", 
+        pulmonary:followUp.followUpVisit.vitals.pulmonary?`PL:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
@@ -1931,11 +2229,28 @@ exports.generateOpNote = async (req, res, next) => {
     const negativeSTA = getFailST(problem.dignosis.specialTests);
     const doctorName = await getDoctorName(problem.doctorId)
     const skinText =  getTreatments(operation.surgicalSiteExam);
+    const skinText2 = getSkinPostOp(operation.surgicalSiteExam);
     let diagnosis = diagnosedText(operation.cPTCode)
     let fullBodyText = appendAndToArray(operation.fullBodyCoordinates)
     let patientAmbulatingWithA = operation.patientAmbulating.assistiveDevice.length > 1 ? "":" a";
     let assistiveDevices = operation.patientAmbulating.assistiveDevice.map(element => {return element.toLowerCase()});
     let patientAdmitsArr = `${appendAndToArray(operation.patientAdmits)}`;
+    if (operation.vitals.cardiovascular == undefined){
+      operation.vitals.cardiovascular = ""
+    }
+    if (operation.vitals.pulmonary == undefined){
+      operation.vitals.pulmonary = ""
+    }
+    
+    var vitalStyle = "none"
+    if (operation.vitals.BMI.trim() === "" && operation.vitals.height.trim() === "" && operation.vitals.weight.trim() === "" && operation.vitals.heartrate.trim() === "" && operation.vitals.respiratory.trim() === "" && operation.vitals.cardiovascular === "" && operation.vitals.pulmonary === "") {
+      vitalStyle = "none"
+      console.log("Vitals Style None")
+    }
+    else {
+      vitalStyle = ""
+      console.log("Vitals Style Show")
+    }
 
    let spainStyleTemp
    let strengthTemp
@@ -1998,8 +2313,19 @@ exports.generateOpNote = async (req, res, next) => {
         DD: diagnosis,
         fullBodyText,
         vitals:problem.dignosis.vitals,
+        vitalStyle,
+        BMI:operation.vitals.BMI?`BMI:  ${operation.vitals.BMI}`:"",
+        height:operation.vitals.height?`Ht:  ${operation.vitals.height}`:"",
+        weight:operation.vitals.weight?`Wt:  ${operation.vitals.weight}`:"",
+        BP:operation.vitals.BP?`BP:  ${operation.vitals.BP}`:"",
+        heartrate:operation.vitals.heartrate?`Pulse:  ${operation.vitals.heartrate}`:"",
+        respiratory:operation.vitals.respiratory?`RR:  ${operation.vitals.respiratory}`:"",
+        cardiovascular:operation.vitals.cardiovascular ?`CV:  ${operation.vitals.cardiovascular}`:"",
+        pulmonary:operation.vitals.pulmonary?`PL:  ${operation.vitals.pulmonary}`:"",
         patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
+        skin2: skinText2,
+        skinText: operation.surgicalSiteExam.length > 0 ? "Incision is" : "",
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         // spainStyle:strength[0].length ==0 ? "none":"",
         // strength:strength?strength[1]:[],

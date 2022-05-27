@@ -232,6 +232,12 @@ const hpiProblemSchema = new mongoose.Schema({
                 type: String,
 
             },
+            cardiovascular: {
+                type: String,
+            },
+            pulmonary: {
+                type: String,
+            },
         },
        
         radiationDistribution: {
@@ -242,7 +248,8 @@ const hpiProblemSchema = new mongoose.Schema({
             patientIs: [String],
             whoAppears: [String],
             has: [String],
-            andIs: [String]
+            andIs: [String],
+            gaitIs: [String]
 
         },
         skin: [
@@ -251,7 +258,10 @@ const hpiProblemSchema = new mongoose.Schema({
                 location:String,
                 size:String,
                 description: String,
-                skinPhotos: [String],
+                skinPhotos: [{
+                    url: String,
+                    public_id: String
+                }]
             }
         ],
         vascularExam: [ 

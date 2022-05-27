@@ -136,6 +136,12 @@ const followUpSchema = new mongoose.Schema({
                 type: String,
 
             },
+            cardiovascular: {
+                type: String,
+            },
+            pulmonary: {
+                type: String,
+            },
         },
         physicalExamThreeDModal: [String],
         rangeOfMotion: [String],
@@ -151,7 +157,12 @@ const followUpSchema = new mongoose.Schema({
         reflexes: [reflexesSchema],
         diagnosticStudies: [diagnosticSchema],
         surgeryRecommendedByDoctor: [surgicalSchema],
-        assessmentUpdate: String,
+        assessmentUpdate: [
+            {
+                diagnosisName: String,
+                assessment: String
+            }
+        ],
         differentialDignosis: [ddschema],
         treatmentPlan: {
             type: [treatmentSchema],

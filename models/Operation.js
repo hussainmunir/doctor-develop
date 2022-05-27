@@ -128,8 +128,22 @@ const operationSchema = new mongoose.Schema({
             type: String,
 
         },
+        cardiovascular: {
+            type: String,
+        },
+        pulmonary: {
+            type: String,
+        },
     },
-    surgicalSiteExam:[String],
+    surgicalSiteExam: [
+        {
+            surgicalSiteName: String,
+            surgicalSitePhotos: [{
+                url: String,
+                public_id: String
+            }]
+        }
+    ],
     rangeOfMotion: [String],
     muscularStrengthTesting: [muscularStrength],
     reflexes: [reflexesSchema],

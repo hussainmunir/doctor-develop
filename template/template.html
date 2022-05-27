@@ -149,23 +149,31 @@
             <strong>Physical Examination: </strong>
             {{name}} is {{generalExam.patientIs}} {{gender}} that appears {{generalExam.whoAppears}}.
             {{pronoun}} has {{generalExam.has}}. {{pronoun}} is able to follow instructions.
-            {{pronoun}} is {{generalExam.andIs}}. <br /> <br />
+            {{pronoun}} is {{generalExam.andIs}}. {{generalExam.gaitIs}} <br /> <br />
 
-            <strong >Vitals:</strong>
+            <strong style = "display: {{vitalStyle}}">Vitals:</strong>
             <li style="list-style-type: none;">{{height}}</li>
             <li style="list-style-type: none;">{{weight}}</li>
             <li style="list-style-type: none;">{{BMI}}</li>
             <li style="list-style-type: none;">{{BP}}</li>
             <li style="list-style-type: none;">{{heartrate}}</li>
             <li style="list-style-type: none;">{{respiratory}}</li>
+            <li style="list-style-type: none;">{{cardiovascular}}</li>
+            <li style="list-style-type: none;">{{pulmonary}}</li>
             <br>
             <p1><strong>{{skinText}}</strong>
-                <ul>
-                    {{#each skin}}
-                    <li>{{this}}</li>
+                <ul style="margin-top: 0px; padding-top: 0px;">
+                    {{#each skin2}}
+                    <li style="margin-top: 0px; padding-top: 0px;">{{this.skinText}}</li>
+                    <div style = "display:{{this.skinImgStyle}}; margin-top: 0px; padding-top: 0px;">
+                    {{#each this.skinImg}}
+                   <img src={{this.url}} alt="" style = "width:76px;height:76px; object-fit: contain;text-align:center margin-top: 0px; padding-top: 0px; display: {{this.skinImgStyle}}">
+                    {{/each}}
+                    </div>
                     {{/each}}
                 </ul>
             </p1>
+            <br>
             <p1><strong>{{physicalExamText}}</strong>
                     {{#each handFootLandMarks}}
                     <li>{{this}}</li>
