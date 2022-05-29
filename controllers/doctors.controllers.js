@@ -696,10 +696,10 @@ const getPassST = (st) => {
     let bodypart =specialTest.bodyPart;
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="true") {
-        newArr.push(`${s.testName} on the left ${bodypart}`)
+        newArr.push(`${s.testName} on the Left ${bodypart}`)
       }
       if (s.isRightPass =="true") {
-        newArr.push(`${s.testName} on the right ${bodypart}`)
+        newArr.push(`${s.testName} on the Right ${bodypart}`)
       }
     });
   })
@@ -712,10 +712,10 @@ const getFailST = (st) => {
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="false")  {
 
-        newArr.push(`${s.testName} on the left ${bodypart}`)
+        newArr.push(`${s.testName} on the Left ${bodypart}`)
       }
       if (s.isRightPass =="false") {
-        newArr.push(`${s.testName} on the right ${bodypart}`)
+        newArr.push(`${s.testName} on the Right ${bodypart}`)
       }
     });
   });
@@ -842,8 +842,15 @@ const getPhysicalExam = (physicalExam) => {
     return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
   })
   finalOtherBodyPartArray = otherBodyPartArray.map((item) => {
+    if (item.jointname != undefined){
     return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+    }
+    else {
+      return `${item.jointName? item.jointName : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+    }
   })
+
+  console.log([finalOtherBodyPartArray, finalHandFootArray])
   return [finalOtherBodyPartArray, finalHandFootArray]
 
 }
@@ -865,6 +872,29 @@ const getFinger = (fingersArray) => {
     fingers = fingers + `${fingersArray[0]}`
   }
   return fingers;
+}
+
+const getDiagnosisAssessment = (assessmentArray) => {
+  var assessment = ''
+
+  if (assessmentArray.length > 1) {
+    for (k = assessmentArray.length - 1; k >= 0; k--) {
+      if (k <= 0) {
+        assessment = assessment + ` and ${assessmentArray[k].assessment} ${assessmentArray[k].diagnosisName}`
+      }
+      else {
+        assessment = assessment + `${assessmentArray[k].assessment} ${assessmentArray[k].diagnosisName}, `
+      }
+    }
+  }
+  else {
+    assessment = assessment + `${assessmentArray[0].assessment} ${assessmentArray[0].diagnosisName}`
+  }
+  return assessment;
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 // const getProblems = (symptoms) => {
@@ -971,13 +1001,13 @@ const getMedicalHistory = (medicalConditions) => {
     finalMedicalConditions = []
     for (e = 0; e < medicalConditions.length; e++) {
       if (medicalConditions[e].condition.toLowerCase() === 'cancer') {
-        finalMedicalConditions.push(`Cancer with type (${medicalConditions[e].value})`)
+        finalMedicalConditions.push(`Cancer with type (${capitalizeFirstLetter(medicalConditions[e].value)})`)
       }
       else if (medicalConditions[e].condition.toLowerCase() === 'diabetes') {
-        finalMedicalConditions.push(`Diabetes with AIC (${medicalConditions[e].value})`)
+        finalMedicalConditions.push(`Diabetes with AIC (${capitalizeFirstLetter(medicalConditions[e].value)})`)
       }
       else {
-        finalMedicalConditions.push(`${medicalConditions[e].condition}`)
+        finalMedicalConditions.push(`${capitalizeFirstLetter(medicalConditions[e].condition)}`)
       }
     }
     return finalMedicalConditions
@@ -1455,6 +1485,13 @@ exports.generateReport = async (req, res, next) => {
     let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
     let skinFullBodyCoordinate2 = getSkin2(problem.dignosis.skin)
 
+    let generalExamPatientIsText = ""
+    if (problem.dignosis.generalExam.patientIs != undefined){
+      if (problem.dignosis.generalExam.patientIs.length > 0){
+        generalExamPatientIsText = problem.dignosis.generalExam.patientIs[0]
+      }
+    }
+    
     let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
     // console.log(appendAndToArray(problem.dignosis.medicalEquipment),"medical eqp str")
@@ -1516,6 +1553,7 @@ exports.generateReport = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
+        generalExamPatientIs: generalExamPatientIsText === "a&o x 3" ? "awake, alert and oriented" : generalExamPatientIsText,
         skin: skinFullBodyCoordinate,
         skin2: skinFullBodyCoordinate2,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
@@ -1578,7 +1616,7 @@ exports.generateReport = async (req, res, next) => {
         heartrate:problem.dignosis.vitals.heartrate?`Pulse:  ${problem.dignosis.vitals.heartrate}`:"",
         respiratory:problem.dignosis.vitals.respiratory?`RR:  ${problem.dignosis.vitals.respiratory}`:"",
         cardiovascular:problem.dignosis.vitals.cardiovascular?`CV:  ${problem.dignosis.vitals.cardiovascular}`:"",
-        pulmonary:problem.dignosis.vitals.pulmonary?`PL:  ${problem.dignosis.vitals.pulmonary}`:"",
+        pulmonary:problem.dignosis.vitals.pulmonary?`PULM:  ${problem.dignosis.vitals.pulmonary}`:"",
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
         doctorNameStyle:problem.signature.eSignaturePhotoUrl?" ":"none",
@@ -2081,12 +2119,18 @@ exports.generateFollowUp = async (req, res, next) => {
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms)
-    let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
-    let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    let strWDIncludes = getTreatments(followUp.followUpVisit.workDutyIncludes);
+    // let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
     let injectionDetailDotOrComma = followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "." : ",";
     let fallsOrTraumaDetailDot = followUp.patientInWaitingRoom.fallsTraumaDetail === "" ? "" : ".";
     var injectionDetail = followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? " The patient reports improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma :" The patient reports no improvement in symptoms since receiving injection at last visit"+injectionDetailDotOrComma;
     const doctorName = await getDoctorName(problem.doctorId)
+    let assessmentUpdateText = ""
+   if (followUp.followUpVisit.assessmentUpdate != undefined){
+    if (followUp.followUpVisit.assessmentUpdate.length > 0){
+    assessmentUpdateText = getDiagnosisAssessment(followUp.followUpVisit.assessmentUpdate)
+    }
+   } 
     var vitalStyle = "none"
     if (followUp.followUpVisit.vitals.BMI === "" && followUp.followUpVisit.vitals.height === "" && followUp.followUpVisit.vitals.weight === "" && followUp.followUpVisit.vitals.heartrate === "" && followUp.followUpVisit.vitals.respiratory === ""&& followUp.followUpVisit.vitals.cardiovascular === ""&& followUp.followUpVisit.vitals.pulmonary === "") { 
       vitalStyle = "none"
@@ -2094,6 +2138,14 @@ exports.generateFollowUp = async (req, res, next) => {
     else {
       vitalStyle = ""
     }
+
+    var fallsTraumaDetailText = ""
+    if (followUp.patientInWaitingRoom.fallsTraumaDetail != undefined) {
+
+      fallsTraumaDetailText = followUp.patientInWaitingRoom.fallsTraumaDetail;
+    }
+
+    let strToTheIncludes = getTreatments(followUp.followUpVisit.toTheInclude);
    
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
@@ -2107,6 +2159,8 @@ exports.generateFollowUp = async (req, res, next) => {
       data: {
         diagnosticSudies: problem.dignosis.diagnosticStudies,
         patient,
+        lN: patient.lname,
+        fN: patient.fname,
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(followUp.patientInWaitingRoom.date).format('MMMM Do, YYYY'),
         Age:getAge(patient.dateOfBirth),
@@ -2123,7 +2177,9 @@ exports.generateFollowUp = async (req, res, next) => {
         strength:strength[1],
         strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        // workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        workDType: followUp.followUpVisit.workDutyType === "Full Duty" ? "Full duty" : `${followUp.followUpVisit.workDutyType} - ${strWDIncludes}  greater than ${followUp.followUpVisit.greaterThan} to the ${followUp.followUpVisit.toThe} ${strToTheIncludes} until next
+        visit in ${followUp.followUpVisit.nextVisit}`,
         followUpVisit:followUp.followUpVisit,
         Reflexes: followUp.followUpVisit.reflexes,
         ReflexesStyles:followUp.followUpVisit.reflexes.length == 0 ?"none" : "",
@@ -2140,7 +2196,7 @@ exports.generateFollowUp = async (req, res, next) => {
         heartrate:followUp.followUpVisit.vitals.heartrate?`Pulse:  ${followUp.followUpVisit.vitals.heartrate}`:"",
         respiratory:followUp.followUpVisit.vitals.respiratory?`RR:  ${followUp.followUpVisit.vitals.respiratory}`:"",
         cardiovascular:followUp.followUpVisit.vitals.cardiovascular?`CV:  ${followUp.followUpVisit.vitals.cardiovascular}`:"", 
-        pulmonary:followUp.followUpVisit.vitals.pulmonary?`PL:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
+        pulmonary:followUp.followUpVisit.vitals.pulmonary?`PULM:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
@@ -2151,19 +2207,20 @@ exports.generateFollowUp = async (req, res, next) => {
         DDarray:arr_DD,
         DDarrayNew: ` ${arrDDnew}`,
         DDarrayOld:  getTreatments(getDDStr(problem.dignosis.differentialDignosis)),
-        assessmentText: followUp.followUpVisit.assessmentUpdate === "none" ? "" : `${followUp.followUpVisit.assessmentUpdate} `,
+        // assessmentText: followUp.followUpVisit.assessmentUpdate === "none" ? "" : `${followUp.followUpVisit.assessmentUpdate} `,
+        assessmentUpdate : assessmentUpdateText != "" ? ` consistent with ${assessmentUpdateText}}` : ",",
         allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
-        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `The patient will follow up in ${followUp.followUpVisit.suggestedFollowup}.`,
+        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `in ${followUp.followUpVisit.suggestedFollowup}.`,
         hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
         pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
         ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail:followUp.patientInWaitingRoom.fallsTraumaDetail == undefined ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
+        thrumaDetail: fallsTraumaDetailText === "" ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
         medicalEquipmentArr: followUp.followUpVisit.medicalEquipment,
         medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
         medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
@@ -2321,7 +2378,7 @@ exports.generateOpNote = async (req, res, next) => {
         heartrate:operation.vitals.heartrate?`Pulse:  ${operation.vitals.heartrate}`:"",
         respiratory:operation.vitals.respiratory?`RR:  ${operation.vitals.respiratory}`:"",
         cardiovascular:operation.vitals.cardiovascular ?`CV:  ${operation.vitals.cardiovascular}`:"",
-        pulmonary:operation.vitals.pulmonary?`PL:  ${operation.vitals.pulmonary}`:"",
+        pulmonary:operation.vitals.pulmonary?`PULM:  ${operation.vitals.pulmonary}`:"",
         patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         skin2: skinText2,

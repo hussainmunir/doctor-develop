@@ -58,7 +58,8 @@
             {{#each newMedications}}
             {{this}}
             {{/each}}
-            <br><br>
+            <br>
+        </p>
             <!--  <strong>{{name}} has received treatment for this issue in the past including:</strong>
        <ol>
             {{#each medications}}
@@ -67,8 +68,7 @@
         </ol>. -->
         <!-- <p>{{name}} {{pastTreatmentText}} -->
         <!-- <strong>Past treatment (if any) includes:</strong> {{#each pastTreatments}}{{this}}, {{/each}} -->
-        </p>
-        <br>
+        
         <!-- <p>{{pronoun}} has taken the following <strong>medications</strong> to help with this condition:
         </p> -->
         <!-- <p>{{pronoun}} {{medicationHistory}}</p> -->
@@ -93,7 +93,7 @@
         <strong>{{allergiesText}}</strong> 
         <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each allergies}}
-            <li>{{this.name}} {{this.reaction}}</li>
+            <li>{{this.name}} - {{this.reaction}}</li>
             {{/each}}
         </ol>
         <strong>{{medicationsText}}</strong> 
@@ -147,12 +147,24 @@
         </p>
         <p>
             <strong>Physical Examination: </strong>
-            {{name}} is {{generalExam.patientIs}} {{gender}} that appears {{generalExam.whoAppears}}.
+            {{name}} is {{generalExamPatientIs}} {{gender}} that appears {{generalExam.whoAppears}}.
             {{pronoun}} has {{generalExam.has}}. {{pronoun}} is able to follow instructions.
             {{pronoun}} is {{generalExam.andIs}}. {{generalExam.gaitIs}} <br /> <br />
+        </p>
+            <!-- <strong style = "display: {{vitalStyle}}">Vitals:</strong> -->
+            <!-- <ul style="margin-top: 0px; padding-top: 0px;"> -->
+            <!-- <li style="list-style-type: none;">{{height}}</li>
+            <li style="list-style-type: none;">{{weight}}</li>
+            <li style="list-style-type: none;">{{BMI}}</li>
+            <li style="list-style-type: none;">{{BP}}</li>
+            <li style="list-style-type: none;">{{heartrate}}</li>
+            <li style="list-style-type: none;">{{respiratory}}</li>
+            <li style="list-style-type: none;">{{cardiovascular}}</li>
+            <li style="list-style-type: none;">{{pulmonary}}</li> -->
+            <!-- </ul> -->
 
             <strong style = "display: {{vitalStyle}}">Vitals:</strong>
-            <li style="list-style-type: none;">{{height}}</li>
+            <li style="margin-top: 0px; padding-top: 0px; list-style-type: none;">{{height}}</li>
             <li style="list-style-type: none;">{{weight}}</li>
             <li style="list-style-type: none;">{{BMI}}</li>
             <li style="list-style-type: none;">{{BP}}</li>
@@ -160,6 +172,7 @@
             <li style="list-style-type: none;">{{respiratory}}</li>
             <li style="list-style-type: none;">{{cardiovascular}}</li>
             <li style="list-style-type: none;">{{pulmonary}}</li>
+             </br>
             <br>
             <p1><strong>{{skinText}}</strong>
                 <ul style="margin-top: 0px; padding-top: 0px;">
@@ -185,7 +198,7 @@
                     <li>{{this}}</li>
                     {{/each}}
             </p1>
-        </p>
+        
 
     </div>
 
@@ -204,15 +217,17 @@
         <h1>No Affected Body Parts Found</h1>
         {{/if}}
         </p> -->
-        <p><strong>{{rangeOFMotion}} </strong></p>
-        <ul>
+        <br>
+        <strong>{{rangeOFMotion}} </strong>
+        <!-- <ol style="margin-top: 0px; padding-top: 0px;"> -->
             {{#each range}}
-            <li>{{this}}</li>
+            <li style="margin-top: 0px; padding-top: 0px;">{{this}}</li>
             {{/each}}
-        </ul>
+        <!-- </ol> -->
+        
         <br />
        <div style = "display: {{strengthStyle}}">
-        <strong>Strength: </strong><br /><br />
+        <strong>Strength: </strong>
         <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
             <tr>
                 <th style="border: 1px solid black; font-size: 14px; min-width: 50px;">Right</th>

@@ -16,7 +16,7 @@
     <strong>Date Of Encounter:</strong> {{date}}<br>
     <strong>MRN:</strong> {{MRN}} <br>
     <br>
-    <strong>Return:</strong> {{suggestedFollowUp}}<br>
+    <strong>Follow-up:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> {{DD}}</br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
@@ -30,7 +30,7 @@
         <strong>{{allergiesText}}</strong>
         <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each patient.allergies}}
-            <li>{{this.name}} {{this.reaction}}</li>
+            <li>{{this.name}} - {{this.reaction}}</li>
             {{/each}}
         </ol>
         <strong>{{medicationsText}}</strong>
@@ -133,14 +133,14 @@
     {{#each diagnosticSudies}}
     <p>{{this.labResult}}</p>
     {{/each}}
-    <strong>Assessment: {{fname}} {{lname}} is a {{Age}} year old {{sex}} with:</strong>
+    <strong>Assessment: {{fN}} {{lN}} is a {{Age}} year old {{sex}} with:</strong>
     <ol style="margin-top: 0px; padding-top: 0px;">
         {{#each DDarray}} 
         <li>{{this}}</li>
          {{/each}}
         </ol>
     <h2>Plan:</h2> 
-    {{patient.fname}} {{patient.lname}} presents with signs and symptoms consistent with  {{assessmentText}}{{DDarrayOld}}{{DDarrayNew}} Diagnosis,
+    {{patient.fname}} {{patient.lname}} presents with signs and symptoms{{assessmentUpdate}} Diagnosis,
          diagnostic studies, and treatment plans were reviewed with the patient at
     today’s visit. {{treatmentPlanIncludesText}}  
     <ul>
@@ -158,6 +158,11 @@
     {{suggestedFollowUp}} {{medicalEquipmentText}} {{medicalEquipment}}{{dot}} The patient is happy with the
     plan moving forward.
 
+    <br> <br>
+    <div>
+        <strong>Work Duty:</strong>
+        <p>{{workDType}}</p>
+    </div>
     <div >
         <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
          <img src={{signatureUrl}} alt="" style={{imageStyle}}><br>
