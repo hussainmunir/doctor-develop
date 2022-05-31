@@ -23,6 +23,28 @@
         tr {
             padding: 10px;
         }
+
+        .rotate90 {
+       -webkit-transform: rotate(90deg);
+       -moz-transform: rotate(90deg);
+       -o-transform: rotate(90deg);
+       -ms-transform: rotate(90deg);
+       transform: rotate(90deg);
+      }
+      .rotate180 {
+       -webkit-transform: rotate(180deg);
+       -moz-transform: rotate(180deg);
+       -o-transform: rotate(180deg);
+       -ms-transform: rotate(180deg);
+       transform: rotate(180deg);
+      }
+      .rotate270 {
+       -webkit-transform: rotate(270deg);
+       -moz-transform: rotate(270deg);
+       -o-transform: rotate(270deg);
+       -ms-transform: rotate(270deg);
+       transform: rotate(270deg);
+      }
     </style>
 </head>
 
@@ -48,7 +70,6 @@
     <div class="blue">
         <p><strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}</p>
         <strong>History Of Presenting Illness:</strong><br>
-        <p>
             {{name}} is a very pleasant {{age}} year old, {{handDominanceText}}, {{gender}}{{occupationText}}. He comes in today complaining of {{symptomsDuration}}
              {{problems}} {{toHasortoHer}} {{problemAreas}}.
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity and developed {{symptomsDevelop}}.
@@ -59,7 +80,6 @@
             {{this}}
             {{/each}}
             <br>
-        </p>
             <!--  <strong>{{name}} has received treatment for this issue in the past including:</strong>
        <ol>
             {{#each medications}}
@@ -90,6 +110,7 @@
             </tr>
             {{/each}}
         </table> -->
+        <br>
         <strong>{{allergiesText}}</strong> 
         <ol style="margin-top: 0px; padding-top: 0px;">
             {{#each allergies}}
@@ -146,24 +167,15 @@
             <strong>Psychiatric:</strong> {{rosPsychiatric}}</br>
         </p>
         <p>
-            <strong>Physical Examination: </strong>
-            {{name}} is {{generalExamPatientIs}} {{gender}} that appears {{generalExam.whoAppears}}.
-            {{pronoun}} has {{generalExam.has}}. {{pronoun}} is able to follow instructions.
-            {{pronoun}} is {{generalExam.andIs}}. {{generalExam.gaitIs}} <br /> <br />
-        </p>
-            <!-- <strong style = "display: {{vitalStyle}}">Vitals:</strong> -->
-            <!-- <ul style="margin-top: 0px; padding-top: 0px;"> -->
-            <!-- <li style="list-style-type: none;">{{height}}</li>
-            <li style="list-style-type: none;">{{weight}}</li>
-            <li style="list-style-type: none;">{{BMI}}</li>
-            <li style="list-style-type: none;">{{BP}}</li>
-            <li style="list-style-type: none;">{{heartrate}}</li>
-            <li style="list-style-type: none;">{{respiratory}}</li>
-            <li style="list-style-type: none;">{{cardiovascular}}</li>
-            <li style="list-style-type: none;">{{pulmonary}}</li> -->
-            <!-- </ul> -->
-
-            <strong style = "display: {{vitalStyle}}">Vitals:</strong>
+            <strong>Physical Examination: </strong><br>
+            <!-- <div style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}"> -->
+            <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
+            <p1 style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">
+            {{generalExamPatientIs}}{{generalExamWhoAppears}}
+            {{generalExamHas}} {{pronoun}} is able to follow instructions.
+            {{generalExamAndis}} {{generalExamGaitIs}}</p1>
+        </p>      
+        <strong style = "display: {{vitalStyle}}">Vitals:</strong>
             <li style="margin-top: 0px; padding-top: 0px; list-style-type: none;">{{height}}</li>
             <li style="list-style-type: none;">{{weight}}</li>
             <li style="list-style-type: none;">{{BMI}}</li>
@@ -173,20 +185,21 @@
             <li style="list-style-type: none;">{{cardiovascular}}</li>
             <li style="list-style-type: none;">{{pulmonary}}</li>
              </br>
-            <br>
             <p1><strong>{{skinText}}</strong>
                 <ul style="margin-top: 0px; padding-top: 0px;">
                     {{#each skin2}}
                     <li style="margin-top: 0px; padding-top: 0px;">{{this.skinText}}</li>
                     <div style = "display:{{this.skinImgStyle}}; margin-top: 0px; padding-top: 0px;">
                     {{#each this.skinImg}}
-                   <img src={{this.url}} alt="" style = "width:76px;height:76px; object-fit: contain;text-align:center margin-top: 0px; padding-top: 0px; display: {{this.skinImgStyle}}">
+                   <img src={{this.url}} alt="" style = "width:176px;height:176px; image-orientation: from-image; object-fit: contain;text-align:center margin-top: 0px; padding-top: 0px; display: {{this.skinImgStyle}}">
+                   <script type="text/javascript" src="exif.js"></script>
+                   <script type="text/javascript" src="rotate.js"></script>
                     {{/each}}
                     </div>
                     {{/each}}
                 </ul>
             </p1>
-            <br>
+            
             <p1><strong>{{physicalExamText}}</strong>
                     {{#each handFootLandMarks}}
                     <li>{{this}}</li>

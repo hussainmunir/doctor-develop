@@ -803,7 +803,30 @@ const getCurrMed = (med) => {
   let meds = [];
   let str = "";
   med.forEach(item => {
-    str = ` ${item.name}  ${item.dose} ${item.frequency} ${item.frequencyasneeded}`
+    var freqAsNeeded = ""
+    var freq = ""
+    if (item.frequencyasneeded != ""){
+      freqAsNeeded = "PRN"
+    }
+    if (item.frequency === "2x Daily"){
+      freq = "BID"
+    }
+    if (item.frequency === "3x Daily"){
+      freq = "TID"
+    }
+    if (item.frequency === "4x Daily"){
+      freq = "QID"
+    }
+    if (item.frequency === "1x Daily"){
+      freq = "QD"
+    }
+    if (item.frequency === "At Bedtime"){
+      freq = "Q Bedtime"
+    }
+    else {
+      freq = item.frequency
+    }
+    str = ` ${item.name}  ${item.dose} ${freq} ${freqAsNeeded}`
     meds.push(str);
   });
 
@@ -839,14 +862,17 @@ const getPhysicalExam = (physicalExam) => {
     }
   }
   finalHandFootArray = handFootArray.map((item) => {
-    return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
+    // return `${item.jointname? item.jointname : ""} ${item.name? item.name : ""} at ${getFinger(item.values)}`
+    return `${getFinger(item.values)} ${item.name? item.name : ""} ${item.jointname? item.jointname : ""}`
   })
   finalOtherBodyPartArray = otherBodyPartArray.map((item) => {
     if (item.jointname != undefined){
-    return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+    // return `${item.jointname? item.jointname : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+    return `${getFinger(item.values)} ${item.name? item.name : ""} ${item.jointname? item.jointname : ""}`
     }
     else {
-      return `${item.jointName? item.jointName : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+      // return `${item.jointName? item.jointName : ""}  ${item.name? item.name : ""} ${getFinger(item.values)}`
+      return `${getFinger(item.values)} ${item.name? item.name : ""} ${item.jointname? item.jointname : ""}`
     }
   })
 
@@ -871,7 +897,7 @@ const getFinger = (fingersArray) => {
   else {
     fingers = fingers + `${fingersArray[0]}`
   }
-  return fingers;
+  return capitalizeFirstLetter(fingers);
 }
 
 const getDiagnosisAssessment = (assessmentArray) => {
@@ -1045,22 +1071,61 @@ const getTreatments = (fullBodyCoordinates) => {
 }
 
 const getGeneralExam = (generalExam) => {
-  if (generalExam.whoAppears.length <= 0 || generalExam.has.length <= 0 || generalExam.andIs <= 0 || generalExam.patientIs <= 0 || generalExam.gaitIs <= 0) {
-    return false
+  // if (generalExam.whoAppears.length <= 0 || generalExam.has.length <= 0 || generalExam.andIs <= 0 || generalExam.patientIs <= 0 || generalExam.gaitIs <= 0) {
+  //   return false
+  // }
+ var tempWhoAppears = "" 
+  if (generalExam.whoAppears != undefined) {
+    if (generalExam.whoAppears.length > 0){
+    if (generalExam.whoAppears[0].trim() != ""){
+      tempWhoAppears = ` appears ${generalExam.whoAppears[0].toLowerCase()}.`
+    }    
   }
- var tempGaitIs = "" 
+  }
+
+  var tempHas = "" 
+  if (generalExam.has != undefined) {
+    if (generalExam.has.length > 0){
+    if (generalExam.has[0].trim() != ""){
+      tempHas = `${generalExam.has[0].toLowerCase()}.`
+    }    
+  }
+  }
+
+  var tempAndIs = "" 
+  if (generalExam.andIs != undefined) {
+    if (generalExam.andIs.length > 0){
+    if (generalExam.andIs[0].trim() != ""){
+      tempAndIs = `${generalExam.andIs[0].toLowerCase()}.`
+    }    
+  }
+  }
+
+  var tempPatientIs = "" 
+  if (generalExam.patientIs != undefined) {
+    if (generalExam.patientIs.length > 0){
+    if (generalExam.patientIs[0].trim() != ""){
+      tempPatientIs = `${generalExam.patientIs[0].toLowerCase()}.`
+    }    
+  }
+  }
+  
+  var tempGaitIs = "" 
   if (generalExam.gaitIs != undefined) {
+    if (generalExam.gaitIs.length > 0){
     if (generalExam.gaitIs[0].trim() != ""){
-      tempGaitIs = `Gait is ${generalExam.gaitIs[0].toLowerCase()}`
-    }
-    
+      tempGaitIs = `${generalExam.gaitIs[0].toLowerCase()}`
+    }    
   }
+  }
+
   const finalGeneralExam = {
-    "whoAppears": generalExam.whoAppears[0].toLowerCase(),
-    "has": generalExam.has[0].toLowerCase(),
-    "andIs": generalExam.andIs[0].toLowerCase(),
+    "whoAppears": tempWhoAppears,
+    "has": tempHas,
+    "andIs": tempAndIs,
     "gaitIs": tempGaitIs 
   }
+  if (tempPatientIs != "") {
   if (generalExam.patientIs[0][0].toUpperCase() === 'A' || generalExam.patientIs[0][0].toUpperCase() === 'E' || generalExam.patientIs[0][0].toUpperCase() === 'I'
     || generalExam.patientIs[0][0].toUpperCase() === 'O' || generalExam.patientIs[0][0].toUpperCase() === 'U') {
     finalGeneralExam.patientIs = `an ${getTreatments(generalExam.patientIs)}`
@@ -1068,6 +1133,7 @@ const getGeneralExam = (generalExam) => {
   else {
     finalGeneralExam.patientIs = `a ${getTreatments(generalExam.patientIs)}`
   }
+}
   return finalGeneralExam
 }
 
@@ -1419,6 +1485,7 @@ exports.generateReport = async (req, res, next) => {
     const STA = getPassST(problem.dignosis.specialTests);
     const negativeSTA = getFailST(problem.dignosis.specialTests);
     const pTreatString = getPreviousTreatments(problem.previousTreatment).toLowerCase();
+    const patientName = `${patient.fname} ${patient.lname}`;
     let pronoun;
     if (patient.gender === 'male') { pronoun = 'He' }
     else if (patient.gender === 'female') { pronoun = 'She' }
@@ -1488,9 +1555,24 @@ exports.generateReport = async (req, res, next) => {
     let generalExamPatientIsText = ""
     if (problem.dignosis.generalExam.patientIs != undefined){
       if (problem.dignosis.generalExam.patientIs.length > 0){
-        generalExamPatientIsText = problem.dignosis.generalExam.patientIs[0]
+        if (problem.dignosis.generalExam.patientIs[0] === "a&o x 3"){
+          generalExamPatientIsText = "is awake, alert and oriented"
+        } 
+        else {
+          generalExamPatientIsText = `${problem.dignosis.generalExam.patientIs[0]}`
+        }
+        
       }
     }
+    var generalExamStyle = ""
+
+    if (problem.dignosis.generalExam.patientIs.length < 1 && problem.dignosis.generalExam.whoAppears.length < 1 && problem.dignosis.generalExam.andIs.length < 1 && problem.dignosis.generalExam.gaitIs.length < 1) {
+      generalExamStyle = "none"
+    }
+    console.log(problem.dignosis.generalExam.patientIs, "patientIs")
+    console.log(problem.dignosis.generalExam.whoAppears, "whoAppears")
+    console.log(problem.dignosis.generalExam.andIs, "andIs")
+    console.log(problem.dignosis.generalExam.gaitIs, "gaitIs")
     
     let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
     console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
@@ -1553,7 +1635,12 @@ exports.generateReport = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
-        generalExamPatientIs: generalExamPatientIsText === "a&o x 3" ? "awake, alert and oriented" : generalExamPatientIsText,
+        generalExamPatientIs: generalExamPatientIsText != "" ? `${patientName} is ${generalExamPatientIsText}` : "",
+        generalExamWhoAppears: general_exam.whoAppears != "" ? `. ${pronoun} apprears ${general_exam.whoAppears}.` : "",
+        generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}.` : "",
+        generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}.` : "",
+        generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamSectionStyle: generalExamStyle,
         skin: skinFullBodyCoordinate,
         skin2: skinFullBodyCoordinate2,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
@@ -1616,7 +1703,7 @@ exports.generateReport = async (req, res, next) => {
         heartrate:problem.dignosis.vitals.heartrate?`Pulse:  ${problem.dignosis.vitals.heartrate}`:"",
         respiratory:problem.dignosis.vitals.respiratory?`RR:  ${problem.dignosis.vitals.respiratory}`:"",
         cardiovascular:problem.dignosis.vitals.cardiovascular?`CV:  ${problem.dignosis.vitals.cardiovascular}`:"",
-        pulmonary:problem.dignosis.vitals.pulmonary?`PULM:  ${problem.dignosis.vitals.pulmonary}`:"",
+        pulmonary:problem.dignosis.vitals.pulmonary?`Pulm:  ${problem.dignosis.vitals.pulmonary}`:"",
         signatureUrl:problem.signature.eSignaturePhotoUrl,
         signatureDate:problem.signature.date,
         doctorNameStyle:problem.signature.eSignaturePhotoUrl?" ":"none",
@@ -2196,7 +2283,7 @@ exports.generateFollowUp = async (req, res, next) => {
         heartrate:followUp.followUpVisit.vitals.heartrate?`Pulse:  ${followUp.followUpVisit.vitals.heartrate}`:"",
         respiratory:followUp.followUpVisit.vitals.respiratory?`RR:  ${followUp.followUpVisit.vitals.respiratory}`:"",
         cardiovascular:followUp.followUpVisit.vitals.cardiovascular?`CV:  ${followUp.followUpVisit.vitals.cardiovascular}`:"", 
-        pulmonary:followUp.followUpVisit.vitals.pulmonary?`PULM:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
+        pulmonary:followUp.followUpVisit.vitals.pulmonary?`Pulm:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
         ST: STA,
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
@@ -2378,7 +2465,7 @@ exports.generateOpNote = async (req, res, next) => {
         heartrate:operation.vitals.heartrate?`Pulse:  ${operation.vitals.heartrate}`:"",
         respiratory:operation.vitals.respiratory?`RR:  ${operation.vitals.respiratory}`:"",
         cardiovascular:operation.vitals.cardiovascular ?`CV:  ${operation.vitals.cardiovascular}`:"",
-        pulmonary:operation.vitals.pulmonary?`PULM:  ${operation.vitals.pulmonary}`:"",
+        pulmonary:operation.vitals.pulmonary?`Pulm:  ${operation.vitals.pulmonary}`:"",
         patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
         skin:skinText,
         skin2: skinText2,
