@@ -17,7 +17,7 @@
     <strong>MRN:</strong> {{MRN}}<br>
     <strong>Date of Encounter:</strong> {{date}}<br><br>
     <strong>Return:</strong> {{suggestedFollowUp}}<br>
-    <strong>Diagnosis:</strong> {{DD}}, {{fullBodyText}} <br>
+    <strong>Diagnosis:</strong> S/P {{fullBodyText}} {{DD}}<br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
   
    <h2>History of Presenting Illness</h2>
@@ -32,8 +32,16 @@
         </p> 
 
 <p><strong>Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
-    appears {{hisORHer}} stated age. {{pronoun}} have a pleasant demeanor. {{pronoun}} is able to follow
+    appears {{hisORHer}} stated age. {{pronoun}} has a pleasant demeanor. {{pronoun}} is able to follow
     commands appropriately. {{pronoun}} is in no acute distress.</p>
+
+    <!-- <strong>Physical Examination: </strong><br>
+    <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
+    <p1 style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">
+    {{generalExamPatientIs}} {{gender}}{{generalExamWhoAppears}}
+    {{generalExamHas}} {{pronoun}} is able to follow instructions.
+    {{generalExamAndis}} {{generalExamGaitIs}}</p1>
+    </p> -->
 
     <!-- <strong >Vitals:</strong>
     <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
@@ -144,10 +152,13 @@
     <!-- <h2>Diagnostic Studies:</h2> -->
     <br>
     <p><strong>Assessment:</strong> {{patient.fname}} {{patient.lname}} is a {{Age}} year old {{patient.gender}} S/P:</p>
-    <p>1.) {{SurgeryPerformed}}</p>
-    <p> <strong>Plan:</strong>  {{patient.fname}} {{patient.lname}} presents S/P {{DD}}. {{treatmentPlanStr}}
+    <p>{{#each NewCPTArr}}
+        <li>{{this}} {{fullBodyText}}</li>
+        {{/each}}   
+    </p>
+    <p> <strong>Plan:</strong> {{treatmentPlanStr}}
         <ul>
-            {{#each treatmentPlane}}
+            {{#each treatmentPlan}}
             <li>
                 {{this.treatmentName}}{{this.treatmentDetail}}
             </li>

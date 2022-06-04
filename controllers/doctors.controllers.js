@@ -28,12 +28,19 @@ function appendAndToArray(arr){
     tempArr.splice(tempArr.length-1,0,"and")
     }
   // let str = arr.toString()
-  let str = tempArr.join([separator = ', '])
-  let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
-    console.log("str",removeLastComma)
+  var str = tempArr.join([separator = ', '])
+  if (tempArr.length > 1){
+    str =  str.replace(/,([^,]*)$/, '$1')
+  }
+  if (tempArr.length == 1){
+    str = str.replace(/,(?=[^,]*$)/, ' and')
+  }
+  // let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
+    console.log("str",str)
+    console.log("temp arr length", tempArr.length)
     tempArr = tempArr.filter(e => e !== 'and'); 
     arr.splice(arr.indexOf('and'), 1);
-    return removeLastComma;
+    return str;
 }
 
 // const appendAndToArray = async (arr) => {
@@ -721,6 +728,88 @@ const getFailST = (st) => {
   });
   return newArr;
 }
+
+
+const getPositiveTenderAnatomical = (tenderAnatomical) => {
+  let newArr = [];
+  tenderAnatomical.forEach(tenderAnatomicalObj => {
+    let bodypart = tenderAnatomicalObj.name;
+
+      if (tenderAnatomicalObj.values[0] =="positive to the right")  {
+
+        newArr.push(`Right ${bodypart} ${tenderAnatomicalObj.jointname}`)
+      }
+      if (tenderAnatomicalObj.values[0] =="positive to the left") {
+        newArr.push(`Left ${bodypart} ${tenderAnatomicalObj.jointname}`)
+      }
+      else {
+        if ((tenderAnatomicalObj.name === "left hand" || tenderAnatomicalObj.name === "right hand" || tenderAnatomicalObj.name === "left foot" || tenderAnatomicalObj.name === "right foot")) {
+        if (tenderAnatomicalObj.jointname != undefined){
+          newArr.push(`${getFinger(tenderAnatomicalObj.values)} ${tenderAnatomicalObj.name? tenderAnatomicalObj.name : ""} ${tenderAnatomicalObj.jointname? tenderAnatomicalObj.jointname : ""}`)
+          }
+        }
+      }
+  });
+  return newArr;
+}
+
+
+const getNegativeTenderAnatomical = (tenderAnatomical) => {
+  let newArr = [];
+  tenderAnatomical.forEach(tenderAnatomicalObj => {
+    let bodypart = tenderAnatomicalObj.name;
+
+      if (tenderAnatomicalObj.values[0] =="negative to the right")  {
+
+        newArr.push(`Right ${bodypart} ${tenderAnatomicalObj.jointname}`)
+      }
+      if (tenderAnatomicalObj.values[0] =="negative to the left") {
+        newArr.push(`Left ${bodypart} ${tenderAnatomicalObj.jointname}`)
+      }
+  });
+  return newArr;
+}
+
+const getPositiveTenderAnatomicalFollowUp = (tenderAnatomical) => {
+  let newArr = [];
+  tenderAnatomical.forEach(tenderAnatomicalObj => {
+    let bodypart = tenderAnatomicalObj.name;
+
+      if (tenderAnatomicalObj.values[0] =="positive to the right")  {
+
+        newArr.push(`Right ${bodypart} ${tenderAnatomicalObj.jointName}`)
+      }
+      if (tenderAnatomicalObj.values[0] =="positive to the left") {
+        newArr.push(`Left ${bodypart} ${tenderAnatomicalObj.jointName}`)
+      }
+      else {
+        if ((tenderAnatomicalObj.name === "left hand" || tenderAnatomicalObj.name === "right hand" || tenderAnatomicalObj.name === "left foot" || tenderAnatomicalObj.name === "right foot")) {
+        if (tenderAnatomicalObj.jointName != undefined){
+          newArr.push(`${getFinger(tenderAnatomicalObj.values)} ${tenderAnatomicalObj.name? tenderAnatomicalObj.name : ""} ${tenderAnatomicalObj.jointName? tenderAnatomicalObj.jointName : ""}`)
+          }
+        }
+      }
+  });
+  return newArr;
+}
+
+
+const getNegativeTenderAnatomicalFollowUp = (tenderAnatomical) => {
+  let newArr = [];
+  tenderAnatomical.forEach(tenderAnatomicalObj => {
+    let bodypart = tenderAnatomicalObj.name;
+
+      if (tenderAnatomicalObj.values[0] =="negative to the right")  {
+
+        newArr.push(`Right ${bodypart} ${tenderAnatomicalObj.jointName}`)
+      }
+      if (tenderAnatomicalObj.values[0] =="negative to the left") {
+        newArr.push(`Left ${bodypart} ${tenderAnatomicalObj.jointName}`)
+      }
+  });
+  return newArr;
+}
+
 const getSocial = (sH) => {
   let checked = {
     doesSmoke: "No",
@@ -1551,12 +1640,17 @@ exports.generateReport = async (req, res, next) => {
     let followUpText = getFollowUp(problem.dignosis.treatmentPlan)
     let skinFullBodyCoordinate = getSkin (problem.dignosis.skin)
     let skinFullBodyCoordinate2 = getSkin2(problem.dignosis.skin)
+    let suggestedFollowup = ""
+    if (problem.dignosis.suggestedFollowup !== ""){
+      suggestedFollowup = ` in ${problem.dignosis.suggestedFollowup}`
+    }
+   
 
     let generalExamPatientIsText = ""
     if (problem.dignosis.generalExam.patientIs != undefined){
       if (problem.dignosis.generalExam.patientIs.length > 0){
         if (problem.dignosis.generalExam.patientIs[0] === "a&o x 3"){
-          generalExamPatientIsText = "is awake, alert and oriented"
+          generalExamPatientIsText = "an awake, alert and oriented"
         } 
         else {
           generalExamPatientIsText = `${problem.dignosis.generalExam.patientIs[0]}`
@@ -1569,15 +1663,15 @@ exports.generateReport = async (req, res, next) => {
     if (problem.dignosis.generalExam.patientIs.length < 1 && problem.dignosis.generalExam.whoAppears.length < 1 && problem.dignosis.generalExam.andIs.length < 1 && problem.dignosis.generalExam.gaitIs.length < 1) {
       generalExamStyle = "none"
     }
-    console.log(problem.dignosis.generalExam.patientIs, "patientIs")
-    console.log(problem.dignosis.generalExam.whoAppears, "whoAppears")
-    console.log(problem.dignosis.generalExam.andIs, "andIs")
-    console.log(problem.dignosis.generalExam.gaitIs, "gaitIs")
+    // console.log(problem.dignosis.generalExam.patientIs, "patientIs")
+    // console.log(problem.dignosis.generalExam.whoAppears, "whoAppears")
+    // console.log(problem.dignosis.generalExam.andIs, "andIs")
+    // console.log(problem.dignosis.generalExam.gaitIs, "gaitIs")
     
     let pastTreatmentOtherStringDot = problem.previousTreatment.otherTreatments.charAt(problem.previousTreatment.otherTreatments.length - 1) === "." ? " " : ". " 
-    console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
+    // console.log("skinFullBodyCoordinate",skinFullBodyCoordinate)
     // console.log(appendAndToArray(problem.dignosis.medicalEquipment),"medical eqp str")
-    console.log(problem.dignosis.medicalEquipment,"medical eqp Arr")
+    // console.log(problem.dignosis.medicalEquipment,"medical eqp Arr")
     var vitalStyle = "none"
     if (problem.dignosis.vitals.BMI === "" && problem.dignosis.vitals.height === "" && problem.dignosis.vitals.weight === "" && problem.dignosis.vitals.heartrate === "" && problem.dignosis.vitals.respiratory === ""&& problem.dignosis.vitals.cardiovascular === ""&& problem.dignosis.vitals.pulmonary === "") { 
       vitalStyle = "none"
@@ -1585,6 +1679,14 @@ exports.generateReport = async (req, res, next) => {
     else {
       vitalStyle = ""
     }
+
+    // console.log("Strength ",strength)
+
+    let positiveAnatomicalLandmarks = getPositiveTenderAnatomical(problem.dignosis.physicalExam)
+    let negativeAnatomicalLandmarks = getNegativeTenderAnatomical(problem.dignosis.physicalExam)
+
+    console.log("positive anatomical landmarks",getPositiveTenderAnatomical(problem.dignosis.physicalExam))
+    console.log("negative anatomical landmarks",getNegativeTenderAnatomical(problem.dignosis.physicalExam))
    
     const options = {
       format: 'A4',
@@ -1601,7 +1703,7 @@ exports.generateReport = async (req, res, next) => {
         DOB: moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         MRN: patient.insurance.membershipId,
         date: moment(problem.dignosis.date).format('MMMM Do, YYYY'),
-        followup:followUpText? followUpText : `in ${problem.dignosis.suggestedFollowup}`,
+        followup:followUpText? ` ${followUpText}.` : `${suggestedFollowup}.`,
         diagnosis: problem.dignosis.assessment,
         treatments: getTreatments(problem.dignosis.treatmentPlan),
         name: `${patient.fname} ${patient.lname}`,
@@ -1636,9 +1738,9 @@ exports.generateReport = async (req, res, next) => {
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         generalExam: general_exam ? general_exam : "General Exam Not Added",
         generalExamPatientIs: generalExamPatientIsText != "" ? `${patientName} is ${generalExamPatientIsText}` : "",
-        generalExamWhoAppears: general_exam.whoAppears != "" ? `. ${pronoun} apprears ${general_exam.whoAppears}.` : "",
-        generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}.` : "",
-        generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}.` : "",
+        generalExamWhoAppears: general_exam.whoAppears != "" ? `. ${pronoun} ${general_exam.whoAppears}` : "",
+        generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
+        generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
         generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
         generalExamSectionStyle: generalExamStyle,
         skin: skinFullBodyCoordinate,
@@ -1657,6 +1759,10 @@ exports.generateReport = async (req, res, next) => {
         handFootLandMarks: physicalExam[1],
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
         physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
+        physicalExamPositive: positiveAnatomicalLandmarks,
+        physicalExamNegative: negativeAnatomicalLandmarks,
+        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 ? "":"none",
+        physicalExamNegativeStyle: negativeAnatomicalLandmarks.length > 0 ? "":"none",
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
         treatmentPlan: problem.dignosis.treatmentPlan,
@@ -1664,10 +1770,12 @@ exports.generateReport = async (req, res, next) => {
         // medicalEquipment: appendAndToArray(problem.dignosis.medicalEquipment),
         range: problem.dignosis.rangeOfMotion,
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
-        strength:strength?strength[1]:[],
-        spain:strength?strength[0]:[],
-        spainStyle:strength[0].length ==0 ? "none":"",
-        strengthStyle:strength[1].length ==0 ? "none":"",
+        strength:strength != undefined?strength[1]:[],
+        spain:strength != undefined? `${strength[0].length > 0 ? strength[0]:[]}` :[],
+        spainStyle:strength !== undefined? `${strength[0].length === 0 ? "none":""}` : "none",
+        // strengthStyle:strength[1].length ==0 ? "none":"",
+        strengthStyle:strength !== undefined? `${strength[1].length === 0 ? "none":""}` : "none",
+
         Reflexes: problem.dignosis.reflexes,
         ReflexesStyles:problem.dignosis.reflexes.length == 0 ?"none" : "",
         ST: STA,
@@ -1680,7 +1788,7 @@ exports.generateReport = async (req, res, next) => {
         sMC: str_SMC ? str_SMC : "none",
         maritalStatus: patient.socialHistory.maritalStatus,
         handDominance: patient.socialHistory.handDominance,
-        handDominanceText: patient.socialHistory.handDominance==="ambidextrous" ? `${patient.socialHistory.handDominance}` : `${patient.socialHistory.handDominance} hand dominant`,
+        handDominanceText: patient.socialHistory.handDominance==="ambidextrous" ? `${patient.socialHistory.handDominance}` : `${patient.socialHistory.handDominance}-hand dominant`,
         occupation:patient.socialHistory.occupation,
         occupationText: patient.socialHistory.occupation ? ` who works as an ${patient.socialHistory.occupation.toLowerCase()}` : "",
         smokes: getSocial(patient.socialHistory),
@@ -2188,6 +2296,9 @@ exports.generateFollowUp = async (req, res, next) => {
     let strength= getStrength(followUp.followUpVisit.strength);
     let physicalExam = getPhysicalExam(followUp.followUpVisit.physicalExam);
     const STA = getPassST(followUp.followUpVisit.specialTests);
+    const negativeST = getFailST(followUp.followUpVisit.specialTests);
+
+    console.log("Negative Special Tests", negativeST)
     var combine_arr_DD
     var arrDDnew 
     if (followUp.followUpVisit.differentialDignosis != undefined) {
@@ -2233,7 +2344,17 @@ exports.generateFollowUp = async (req, res, next) => {
     }
 
     let strToTheIncludes = getTreatments(followUp.followUpVisit.toTheInclude);
+
    
+    let positiveAnatomicalLandmarks = getPositiveTenderAnatomicalFollowUp(followUp.followUpVisit.physicalExam)
+    let negativeAnatomicalLandmarks = getNegativeTenderAnatomicalFollowUp(followUp.followUpVisit.physicalExam)
+   
+
+    let medicalEqpArr = followUp.followUpVisit.medicalEquipment;
+
+    console.log("Medical Equipments", medicalEqpArr)
+
+
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
       format: 'A4',
@@ -2260,7 +2381,7 @@ exports.generateFollowUp = async (req, res, next) => {
         // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
         injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
         improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful for ${followUp.patientInWaitingRoom.injectionHelpDetail}.`,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma, including ":"no trauma.",
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma":"no trauma.",
         strength:strength[1],
         strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
         skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
@@ -2274,6 +2395,10 @@ exports.generateFollowUp = async (req, res, next) => {
         handFootLandMarks: physicalExam[1],
         physicalExamText: problem.dignosis.physicalExam.length >= 1  || problem.dignosis.physicalExamThreeDModal.length >= 1 ? "The Patient has tenderness to palpation at:" : "",
         physicalExamThreeDModal: followUp.followUpVisit.physicalExamThreeDModal,
+        physicalExamPositive: positiveAnatomicalLandmarks,
+        physicalExamNegative: negativeAnatomicalLandmarks,
+        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 ? "":"none",
+        physicalExamNegativeStyle: negativeAnatomicalLandmarks.length > 0 ? "":"none",
         vitals:problem.dignosis.vitals,
         vitalStyle,
         BMI:followUp.followUpVisit.vitals.BMI?`BMI:  ${followUp.followUpVisit.vitals.BMI}`:"",
@@ -2285,6 +2410,8 @@ exports.generateFollowUp = async (req, res, next) => {
         cardiovascular:followUp.followUpVisit.vitals.cardiovascular?`CV:  ${followUp.followUpVisit.vitals.cardiovascular}`:"", 
         pulmonary:followUp.followUpVisit.vitals.pulmonary?`Pulm:  ${followUp.followUpVisit.vitals.pulmonary}`:"",
         ST: STA,
+        negativeSt: negativeST,
+        negativeHeading:negativeST.length >= 1 ? "The patient has a negative:" : "",
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         RadiationDistribution:problem.dignosis.radiationDistribution,
         RadiationDistributionTxt:problem.dignosis.radiationDistribution.length >=1 ? "Distribution Of Radiation:":'',
@@ -2295,23 +2422,23 @@ exports.generateFollowUp = async (req, res, next) => {
         DDarrayNew: ` ${arrDDnew}`,
         DDarrayOld:  getTreatments(getDDStr(problem.dignosis.differentialDignosis)),
         // assessmentText: followUp.followUpVisit.assessmentUpdate === "none" ? "" : `${followUp.followUpVisit.assessmentUpdate} `,
-        assessmentUpdate : assessmentUpdateText != "" ? ` consistent with ${assessmentUpdateText}}` : ",",
+        assessmentUpdate : assessmentUpdateText != "" ? ` consistent with ${assessmentUpdateText}.` : ",",
         allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
-        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `in ${followUp.followUpVisit.suggestedFollowup}.`,
+        suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `The patient will follow up in ${followUp.followUpVisit.suggestedFollowup}.`,
         hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
         pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
         ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail: fallsTraumaDetailText === "" ? "" : `"${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
-        medicalEquipmentArr: followUp.followUpVisit.medicalEquipment,
-        medicalEquipment:appendAndToArray(followUp.followUpVisit.medicalEquipment),
-        medicalEquipmentText:followUp.followUpVisit.medicalEquipment.length >= 1 ? "The patient was provided with" :"",
-        dot:followUp.followUpVisit.medicalEquipment.length >= 1 ? "." : "",
+        thrumaDetail: fallsTraumaDetailText === "" ? "." : `", including ${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
+        medicalEquipmentArr: medicalEqpArr,
+        medicalEquipmentText: medicalEqpArr > 0 ? "The patient was provided with" :"",
+        dot:medicalEqpArr.length > 0 ? "." : "",
+        // medicalEquipment: appendAndToArray(medicalEqpArr),
         problem_areasToUpperCase,
         problem_concatenated,
         signatureUrl:followUp.signature.eSignaturePhotoUrl,
@@ -2356,6 +2483,15 @@ exports.generateOpNote = async (req, res, next) => {
       let result = appendAndToArray(diagnosedStr)
       return result;
     }
+
+    const getCptArr = (cptCode, chiefComplaint) => {
+      var tempCptCodeArr = []
+      console.log("Chief Complaint", chiefComplaint)
+      for(i=0; i<cptCode.length; i++){
+        tempCptCodeArr.push(`${chiefComplaint} ${cptCode[i].name}`)
+      }
+      return tempCptCodeArr;
+    }
     // console.log(operation)
     // console.log(patient)
     // console.log(problem)
@@ -2385,6 +2521,11 @@ exports.generateOpNote = async (req, res, next) => {
     if (operation.vitals.pulmonary == undefined){
       operation.vitals.pulmonary = ""
     }
+
+    let newCptCode = getCptArr(operation.cPTCode, fullBodyText)
+
+    console.log("CPT code Names Arr",newCptCode)
+    console.log("Chief Complaints", fullBodyText)
     
     var vitalStyle = "none"
     if (operation.vitals.BMI.trim() === "" && operation.vitals.height.trim() === "" && operation.vitals.weight.trim() === "" && operation.vitals.heartrate.trim() === "" && operation.vitals.respiratory.trim() === "" && operation.vitals.cardiovascular === "" && operation.vitals.pulmonary === "") {
@@ -2430,6 +2571,8 @@ exports.generateOpNote = async (req, res, next) => {
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
     
+    // console.log("New CPT codes",diagnosis)
+
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -2453,8 +2596,9 @@ exports.generateOpNote = async (req, res, next) => {
         hisORHer:patient.gender == "male"?"his" :"her",
         MRN: patient.insurance.membershipId,
         suggestedFollowUp:operation.suggestedFollowup,
-        SurgeryPerformed: appendAndToArray(getSurgeryPerformed(operation.surgicalHistory)),
+        SurgeryPerformed: appendAndToArray(getSurgeryPerformed(operation.cPTCode)),
         DD: diagnosis,
+        NewCPTArr: newCptCode,
         fullBodyText,
         vitals:problem.dignosis.vitals,
         vitalStyle,

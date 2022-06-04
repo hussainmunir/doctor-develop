@@ -25,7 +25,7 @@
     {{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, {{pronounLowercase}} {{hasBeen}} compliant
          with treatment plan{{pTreatmentPlanIncluding}}{{ ptreatmentPlane}}. {{pronoun}} states
         that since last visit, symptoms are {{symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
-        level intensity. {{injectionDetail}}{{improveDetail}} The patient admits to {{fallsOrTrauma}} {{thrumaDetail}}
+        level intensity. {{injectionDetail}}{{improveDetail}} The patient admits to {{fallsOrTrauma}}{{thrumaDetail}}
         <br></br>
         <strong>{{allergiesText}}</strong>
         <ol style="margin-top: 0px; padding-top: 0px;">
@@ -63,7 +63,8 @@
     </br>
     <strong>Skin:</strong> {{skin}} 
     <br></br>
-    <strong>{{physicalExamText}}</strong>
+
+    <!-- <strong>{{physicalExamText}}</strong>
     <ul style="margin-top: 0px; padding-top: 0px;">
     {{#each handFootLandMarks}}
     <li>{{this}}</li>
@@ -74,7 +75,23 @@
     {{#each physicalExamThreeDModal}}
     <li>{{this}}</li>
     {{/each}}
-    </ul>
+    </ul> -->
+
+    <p1 style = "display: {{physicalExamPositiveStyle}}"><strong>The patient has tenderness to palpation at:</strong>
+        {{#each physicalExamPositive}}
+        <li>{{this}}</li>
+        {{/each}}
+        {{#each physicalExamThreeDModal}}
+            <li>{{this}}</li>
+            {{/each}}
+    </p1>
+    <br>
+    <p1 style = "display: {{physicalExamNegativeStyle}}"><strong>The patient has no tenderness at:</strong>
+        {{#each physicalExamNegative}}
+        <li>{{this}}</li>
+        {{/each}}
+    </p1>
+    <br>
     <strong>{{rangeOFMotion}}</strong>
     <ul style="margin-top: 0px; padding-top: 0px;">
         {{#each followUpVisit.rangeOfMotion}}
@@ -122,6 +139,12 @@
             <li>{{this}}</li>
             {{/each}}
         </ul>
+        <strong>{{negativeHeading}}</strong>
+        <ul style="margin-top: 0px; padding-top: 0px;">
+            {{#each negativeSt}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul> 
         <strong>{{RadiationDistributionTxt}}</strong>
         <ul style="margin-top: 0px; padding-top: 0px;" >
           {{#each RadiationDistribution}}
@@ -155,7 +178,7 @@
         </li>
         {{/each}} 
     </ul>
-    {{suggestedFollowUp}} {{medicalEquipmentText}} {{medicalEquipment}}{{dot}} The patient is happy with the
+    {{suggestedFollowUp}} The patient is happy with the
     plan moving forward.
 
     <br> <br>

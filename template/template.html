@@ -70,7 +70,7 @@
     <div class="blue">
         <p><strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}</p>
         <strong>History Of Presenting Illness:</strong><br>
-            {{name}} is a very pleasant {{age}} year old, {{handDominanceText}}, {{gender}}{{occupationText}}. He comes in today complaining of {{symptomsDuration}}
+            {{name}} is a very pleasant {{age}} year old, {{handDominanceText}} {{gender}}{{occupationText}}. He comes in today complaining of {{symptomsDuration}}
              {{problems}} {{toHasortoHer}} {{problemAreas}}.
             {{pronoun}} states the symptoms have been present since {{onset}}, at {{intensity}} level intensity and developed {{symptomsDevelop}}.
             {{pronoun}} {{injury}}.
@@ -171,10 +171,10 @@
             <!-- <div style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}"> -->
             <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
             <p1 style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">
-            {{generalExamPatientIs}}{{generalExamWhoAppears}}
+            {{generalExamPatientIs}} {{gender}}{{generalExamWhoAppears}}
             {{generalExamHas}} {{pronoun}} is able to follow instructions.
             {{generalExamAndis}} {{generalExamGaitIs}}</p1>
-        </p>      
+            </p>      
         <strong style = "display: {{vitalStyle}}">Vitals:</strong>
             <li style="margin-top: 0px; padding-top: 0px; list-style-type: none;">{{height}}</li>
             <li style="list-style-type: none;">{{weight}}</li>
@@ -199,7 +199,7 @@
                     {{/each}}
                 </ul>
             </p1>
-            
+<!--             
             <p1><strong>{{physicalExamText}}</strong>
                     {{#each handFootLandMarks}}
                     <li>{{this}}</li>
@@ -210,6 +210,20 @@
                     {{#each physicalExamThreeDModal}}
                     <li>{{this}}</li>
                     {{/each}}
+            </p1> -->
+
+            <p1 style = "display: {{physicalExamPositiveStyle}}"><strong>The patient has tenderness to palpation at:</strong>
+                {{#each physicalExamPositive}}
+                <li>{{this}}</li>
+                {{/each}}
+                {{#each physicalExamThreeDModal}}
+                    <li>{{this}}</li>
+                    {{/each}}
+            </p1>
+            <p1 style = "display: {{physicalExamNegativeStyle}}"><strong>The patient has no tenderness at:</strong>
+                {{#each physicalExamNegative}}
+                <li>{{this}}</li>
+                {{/each}}
             </p1>
         
 
@@ -334,7 +348,7 @@
             </li>
             {{/each}} 
         </ul>
-        <p>The patient will follow up {{followup}}. </p>
+        <p>The patient will follow up{{followup}} </p>
     </div>
     <br> <br>
     <div>

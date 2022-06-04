@@ -261,6 +261,7 @@ const user = new mongoose.Schema({
             progress:String,
             byDesignation:String,
             companyName: String,
+            location: String,
             photos: [{
                 url: String,
                 public_id: String
