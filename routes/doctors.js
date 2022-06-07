@@ -17,6 +17,7 @@ const { getDoctorById,
     companiesAllDoctors,
     putOperation,
     UploadSurgicalSiteOperation,
+    UploadSkinPictureFollowUp,
     putDoctorFollowUp,
     generateFollowUp,
     generateOpNote,
@@ -51,6 +52,7 @@ router.get('/companiesAllDoctors/:companyName',companiesAllDoctors)
 router.put('/updateDiagnosis/:pID', checkAuth, diagnosis);
 router.put('/uploadSkinPicture', checkAuth, UploadSkinPictureNewProblem);
 router.put('/uploadSurgicalSitePicture', checkAuth, UploadSurgicalSiteOperation);
+router.put('/uploadFollowUpSkinPicture', checkAuth, UploadSkinPictureFollowUp);
 
 router.put('/addPatientRoom/:pID', checkAuth, addRoom);
 router.put('/createTemplate/:doctorId', checkAuth, createTemplate);

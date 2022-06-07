@@ -145,6 +145,39 @@ const followUpSchema = new mongoose.Schema({
         },
         physicalExamThreeDModal: [String],
         rangeOfMotion: [String],
+        generalExam: {
+            patientIs: [String],
+            whoAppears: [String],
+            has: [String],
+            andIs: [String],
+            gaitIs: [String]
+
+        },
+        skin: [
+            {
+                name: String,
+                location:String,
+                size:String,
+                description: String,
+                skinPhotos: [{
+                    url: String,
+                    public_id: String
+                }]
+            }
+        ],
+        vascularExam: [ 
+            {
+                partName: String,
+                pulseLabel: String,
+                value: String,
+            }
+            ],
+            sensationExam: [ 
+                {
+                    sensationValue: String,
+                    nerveDistribution: String,
+                }
+                ],
         physicalExam: [
             {
                 name: String,

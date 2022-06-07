@@ -144,6 +144,27 @@ const operationSchema = new mongoose.Schema({
             }]
         }
     ],
+    generalExam: {
+        patientIs: [String],
+        whoAppears: [String],
+        has: [String],
+        andIs: [String],
+        gaitIs: [String]
+
+    },
+    vascularExam: [ 
+        {
+            partName: String,
+            pulseLabel: String,
+            value: String,
+        }
+        ],
+        sensationExam: [ 
+            {
+                sensationValue: String,
+                nerveDistribution: String,
+            }
+            ],
     rangeOfMotion: [String],
     muscularStrengthTesting: [muscularStrength],
     reflexes: [reflexesSchema],

@@ -300,6 +300,7 @@ exports.searchCode = async (req, res, next) => {
   }
 }
 
+
 exports.UploadSkinPictureNewProblem = async (req, res, next) => {
   console.log(req.body)
   console.log(req.files)
@@ -361,6 +362,88 @@ exports.UploadSkinPictureNewProblem = async (req, res, next) => {
       const updatedDiagnosisSkin = await Problem.findOneAndUpdate({ _id: req.body.problemId }, { $push: { "dignosis.skin": toBeAdded } })
       // console.log(updatedDiagnosisSkin.diagnosis.skin)
       if (!updatedDiagnosisSkin) {
+        return res.status(400).json({
+          success: false,
+          data: null
+        })
+      }
+      else {
+        return res.status(200).json({
+          success: true,
+          data: toBeAdded
+        })
+      }
+
+    }
+  }
+
+  catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+
+}
+
+exports.UploadSkinPictureFollowUp = async (req, res, next) => {
+  console.log(req.body)
+  console.log(req.files)
+  try {
+    const followUp = await FollowUpModal.findOne({ _id: req.body.problemId })
+    // console.log(p)
+    if (!followUp) {
+      return res.status(404).json({
+        "message": "Problem not found"
+      })
+    }
+    else {
+      var toBeAdded = {
+        size: req.body.size,
+        description: req.body.description,
+        location: req.body.location,
+        name: req.body.name,
+        skinPhotos: [],
+      }
+      if (req.files) {
+        // if (req.files.photos) {
+
+          if (Array.isArray(req.files.photos)) {
+            for (i = 0; i < req.files.photos.length; i++) {
+              console.log("checking for photos")
+              const urlId = await uploadImage(req.files.photos[i], next)
+              console.log(urlId)
+              var setPhotos = {
+                "url": urlId.url,
+                "public_id": urlId.public_id
+              }
+              toBeAdded.skinPhotos[i] = setPhotos
+              console.log(setPhotos)
+            }
+          }
+          else {
+            const urlId = await uploadImage(req.files.photos, next)
+            console.log("checking for photo")
+            var setPhotos = {
+              "url": urlId.url,
+              "public_id": urlId.public_id
+            }
+            toBeAdded.skinPhotos[0] = setPhotos
+            console.log(setPhotos)
+          }
+        
+        // }
+
+      }
+      // var setPhotos = {
+      //   "url": "https://res.cloudinary.com/macro-soar-technologies/image/upload/v1653324532/qfgv9k3wtnkhwkihl3l9.jpg",
+      //   "public_id": "qfgv9k3wtnkhwkihl3l9"
+      // }
+      // for (i = 0; i < 1; i++) {
+        // toBeAdded.skinPhotos[0] = setPhotos
+      // }
+      
+      console.log(toBeAdded)
+      const updatedFollowUpSkin = await FollowUpModal.findOneAndUpdate({ _id: req.body.problemId }, { $push: { "followUpVisit.skin": toBeAdded } })
+      // console.log(updatedDiagnosisSkin.diagnosis.skin)
+      if (!updatedFollowUpSkin) {
         return res.status(400).json({
           success: false,
           data: null
