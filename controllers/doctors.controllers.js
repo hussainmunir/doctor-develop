@@ -35,6 +35,7 @@ function appendAndToArray(arr){
   if (tempArr.length == 1){
     str = str.replace(/,(?=[^,]*$)/, ' and')
   }
+  str = str.replace(", and"," and")
   // let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
     console.log("str",str)
     console.log("temp arr length", tempArr.length)
@@ -1168,29 +1169,55 @@ const getProblems= (symptoms) => {
    symptoms[i] === 'Catching' || symptoms[i] === 'Swelling'|| symptoms[i] === 'Grinding' ||
     symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
     symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
-     symptoms[i] === 'tingling' ){
+     symptoms[i] === 'tingling' || symptoms[i] === 'locking' || symptoms[i] === 'Locking'){
      painless.push(` ${symptoms[i]}`);
      
    }
 }
-if(painless.length >= 1 && pain.length >=1){
-painless.splice(painless.length+1,0," and ")
+if(pain.length == 0){
+painless.splice(painless.length-1,0,"and")
+console.log("Painless arr after and logic",painless)
 }
 if(pain.length >= 1){
   pain.splice(pain.length+1,0," pain")
   }
 
-if(painless.length == 0){
-  let arr= [painless,pain];
-  let concatenatedArray = arr.join('')
-  // return concatenatedArray ;
-}
+// if(painless.length == 0){
+//   let arr= [painless,pain];
+//   let concatenatedArray = arr.join('')
+//   // return concatenatedArray ;
+// }
 let painStr = pain.toString();
 let removeCommaPain =painStr.replace(/,([^,]*)$/, '$1');
 let painlessStr = painless.toString();
-let removeCommaPainless =painlessStr.replace(/,([^,]*)$/, '$1');
-let concatenatedArray = [removeCommaPainless,removeCommaPain]
-let removeCommaConcatenatedArray = concatenatedArray.join('')
+// let removeCommaPainless =painlessStr.replace(/,([^,]*)$/, '$1');
+// removeCommaPainless = removeCommaPainless.replace(", and"," and")
+let concatenatedArray = []
+
+if (pain.length != 0){
+  concatenatedArray = [painlessStr,removeCommaPain]
+concatenatedArray.splice(concatenatedArray.length-1,0," and ")
+}
+else{
+  concatenatedArray = [painlessStr]
+}
+console.log("After first splice arr",concatenatedArray)
+let removeCommaConcatenatedArray = concatenatedArray.join(',')
+
+removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace(", and"," and")
+if (pain.length == 0){
+// removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace(", and"," and")
+removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace("and ,"," and")
+}
+if (pain.length != 0){
+  // removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace(", and"," and")
+  removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace("and ,","and")
+}
+else {
+  removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace(",and"," and")
+  removeCommaConcatenatedArray = removeCommaConcatenatedArray.replace("and,"," and")
+}
+console.log("symptoms string arr",removeCommaConcatenatedArray)
 return removeCommaConcatenatedArray ;
 }
 
@@ -1599,18 +1626,22 @@ const getProblemConcatenated = (symptoms) => {
    symptoms[i] === 'Catching' || symptoms[i] === 'Swelling'|| symptoms[i] === 'Grinding' ||
     symptoms[i] === 'Tingling' || symptoms[i] === 'numbness' || symptoms[i] === 'weakness' || symptoms[i] === 'buckling' || 
     symptoms[i] === 'catching' || symptoms[i] === 'swelling'|| symptoms[i] === 'grinding' ||
-     symptoms[i] === 'tingling' ){
+     symptoms[i] === 'tingling' || symptoms[i] === 'locking' || symptoms[i] === 'Locking' ){
      painless.push(` ${symptoms[i]}`);
      
    }
 }
-if(painless.length >= 1){
+if(painless.length > 1){
 painless.splice(painless.length-1,0," and ")
+
 }
 
 
+
+
 const  painlessString= painless.toString();
-const painlessCopy = painlessString.replace(/,([^,]*)$/, '$1');
+var painlessCopy = painlessString.replace(/,([^,]*)$/, '$1');
+painlessCopy = painlessCopy.replace(", and"," and")
 let concatenatedArray = [...pain,painlessCopy]
 if(painlessCopy.length == 0){
  let commaRemove= concatenatedArray.join("")
@@ -2396,6 +2427,14 @@ exports.generateFollowUp = async (req, res, next) => {
     }
     let arr_DD = getDDStr(combine_arr_DD);
     let str_DD = getTreatments(arr_DD);
+    let pronoun;
+    if (patient.gender === 'male') { pronoun = 'He' }
+    else if (patient.gender === 'female') { pronoun = 'She' }
+    else { pronoun = 'They' }
+    let pronounLowercase;
+    if (patient.gender === 'male') { pronounLowercase = 'he' }
+    else if (patient.gender === 'female') { pronounLowercase = 'she' }
+    else { pronounLowercase = 'they' }
     let medicationsName = getCurrMed(patient.currentMedications);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -2437,6 +2476,29 @@ exports.generateFollowUp = async (req, res, next) => {
 
     console.log("Medical Equipments", medicalEqpArr)
 
+    let general_exam = getGeneralExam(followUp.followUpVisit.generalExam)
+
+    let generalExamPatientIsText = ""
+    if (problem.dignosis.generalExam.patientIs != undefined){
+      if (problem.dignosis.generalExam.patientIs.length > 0){
+        if (problem.dignosis.generalExam.patientIs[0] === "a&o x 3"){
+          generalExamPatientIsText = "an awake, alert and oriented"
+        } 
+        else {
+          generalExamPatientIsText = `${problem.dignosis.generalExam.patientIs[0]}`
+        }
+        
+      }
+    }
+
+    var generalExamStyle = ""
+
+    if (followUp.followUpVisit.generalExam.patientIs.length < 1 && followUp.followUpVisit.generalExam.whoAppears.length < 1 && followUp.followUpVisit.generalExam.andIs.length < 1 && followUp.followUpVisit.generalExam.gaitIs.length < 1) {
+      generalExamStyle = "none"
+    }
+    const patientName = `${patient.fname} ${patient.lname}`;
+
+    let skinFullBodyCoordinate2 = getSkin2(followUp.followUpVisit.skin)
 
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
@@ -2464,10 +2526,12 @@ exports.generateFollowUp = async (req, res, next) => {
         // injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "yes" ? ` The patient reports improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}` : ` The patient reports no improvement in symptoms since receiving injection at last visit${injectionDetailDotOrComma}`,
         injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
         improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful for ${followUp.patientInWaitingRoom.injectionHelpDetail}.`,
-        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma":"no trauma.",
+        fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma":"no trauma",
         strength:strength[1],
         strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
-        skin:!getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
+        skin2: skinFullBodyCoordinate2,
+        skinText:followUp.followUpVisit.skin.length >= 1 ? "Skin Exam positive for:" : "",
+        // skin:getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         // workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         workDType: followUp.followUpVisit.workDutyType === "Full Duty" ? "Full duty" : `${followUp.followUpVisit.workDutyType} - ${strWDIncludes}  greater than ${followUp.followUpVisit.greaterThan} to the ${followUp.followUpVisit.toThe} ${strToTheIncludes} until next
         visit in ${followUp.followUpVisit.nextVisit}`,
@@ -2482,6 +2546,13 @@ exports.generateFollowUp = async (req, res, next) => {
         physicalExamNegative: negativeAnatomicalLandmarks,
         physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 ? "":"none",
         physicalExamNegativeStyle: negativeAnatomicalLandmarks.length > 0 ? "":"none",
+        generalExam: general_exam ? general_exam : "General Exam Not Added",
+        generalExamPatientIs: generalExamPatientIsText != "" ? `${patientName} is ${generalExamPatientIsText}` : "",
+        generalExamWhoAppears: general_exam.whoAppears != "" ? `. ${pronoun} ${general_exam.whoAppears}` : "",
+        generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
+        generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
+        generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamSectionStyle: generalExamStyle,
         vitals:problem.dignosis.vitals,
         vitalStyle,
         BMI:followUp.followUpVisit.vitals.BMI?`BMI:  ${followUp.followUpVisit.vitals.BMI}`:"",
@@ -2517,7 +2588,7 @@ exports.generateFollowUp = async (req, res, next) => {
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
         treatmentPlane:followUp.followUpVisit.treatmentPlan,
-        thrumaDetail: fallsTraumaDetailText === "" ? "." : `", including ${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`,
+        thrumaDetail: fallsTraumaDetailText === "" ? "." : `, including "${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`.replace("..","."),
         medicalEquipmentArr: medicalEqpArr,
         medicalEquipmentText: medicalEqpArr > 0 ? "The patient was provided with" :"",
         dot:medicalEqpArr.length > 0 ? "." : "",
@@ -2721,7 +2792,7 @@ exports.generateOpNote = async (req, res, next) => {
         designations:doctorName.designations,
         painDetail:operation.painDetail === "" ? "" : ` including ${operation.painDetail} `,
         ReflexesStyles:operation.reflexes.length == 0 ?"none" : "",
-        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating with${patientAmbulatingWithA}` : "is ambulating without any assistive devices.",
+        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating ` : "is ambulating without any assistive devices.",
         assistiveDevice:`${appendAndToArray(assistiveDevices)}${operation.patientAmbulating.assistiveDevice.length >=1 ? ".":""}`,
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",

@@ -272,7 +272,24 @@ const user = new mongoose.Schema({
             }],
 
         }
-    ]
+    ],
+    authorizationDetails: 
+        {
+        patientName:String,
+        dateOfBirth: String,
+        address : String,
+        representativeName: String,
+        patientRelationship: String,
+        diseaseTesting: Boolean,
+        signature: {
+            eSignaturePhotoUrl: String,
+            public_id: String,
+            date: String,
+            isSignature:Boolean,
+        },
+    }
+
+    
 
 });
 

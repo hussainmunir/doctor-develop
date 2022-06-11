@@ -24,7 +24,7 @@
     <h2>History Of Presenting Illness</h2>
     {{patient.fname}} {{patient.lname}}  presents today for follow up. Since last appointment, {{pronounLowercase}} {{hasBeen}} compliant
          with treatment plan{{pTreatmentPlanIncluding}}{{ ptreatmentPlane}}. {{pronoun}} states
-        that since last visit, symptoms are {{symptoms}}, and grades his pain {{patientInWaitingRoom.painScale}} 
+        that since last visit, symptoms are {{symptoms}} and {{pronounLowercase}} grades {{hisORHer}} pain {{patientInWaitingRoom.painScale}} 
         level intensity. {{injectionDetail}}{{improveDetail}} The patient admits to {{fallsOrTrauma}}{{thrumaDetail}}
         <br></br>
         <strong>{{allergiesText}}</strong>
@@ -39,12 +39,20 @@
             <li>{{this}}</li>
             {{/each}}
         </ol>
-    <h2>Physical Examination: </h2>
+    <!-- <h2>Physical Examination: </h2>
     {{patient.fname}},{{patient.lname}} is an awake, alert and oriented {{patient.gender}} that
         appears {{hisORHer}} stated age. {{pronoun}} has a pleasant demeanor. {{pronoun}} is able to follow
-        commands appropriately. {{pronoun}} is in no acute distress.
+        commands appropriately. {{pronoun}} is in no acute distress. -->
+        <p>
+            <strong>Physical Examination: </strong><br>
+            <!-- <div style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}"> -->
+            <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
+            <p1 style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">
+            {{generalExamPatientIs}} {{gender}}{{generalExamWhoAppears}}
+            {{generalExamHas}} {{pronoun}} is able to follow instructions.
+            {{generalExamAndis}} {{generalExamGaitIs}}</p1>
+        </p> 
     
-<br></br>
     <strong style = "display: {{vitalStyle}}">Vitals:</strong>
     <!-- <li style="list-style-type: none;">Ht:  {{vitals.height}}</li>
     <li style="list-style-type: none;">Wt:  {{vitals.weight}}</li>
@@ -61,8 +69,23 @@
     <li style="list-style-type: none;">{{cardiovascular}}</li>
     <li style="list-style-type: none;">{{pulmonary}}</li>
     </br>
-    <strong>Skin:</strong> {{skin}} 
-    <br></br>
+    <!-- <strong>Skin:</strong> {{skin}} 
+    <br></br> -->
+
+    <p1><strong>{{skinText}}</strong>
+        <ul style="margin-top: 0px; padding-top: 0px;">
+            {{#each skin2}}
+            <li style="margin-top: 0px; padding-top: 0px;">{{this.skinText}}</li>
+            <div style = "display:{{this.skinImgStyle}}; margin-top: 0px; padding-top: 0px;">
+            {{#each this.skinImg}}
+           <img src={{this.url}} alt="" style = "width:176px;height:176px; image-orientation: from-image; object-fit: contain;text-align:center margin-top: 0px; padding-top: 0px; display: {{this.skinImgStyle}}">
+           <script type="text/javascript" src="exif.js"></script>
+           <script type="text/javascript" src="rotate.js"></script>
+            {{/each}}
+            </div>
+            {{/each}}
+        </ul>
+    </p1>
 
     <!-- <strong>{{physicalExamText}}</strong>
     <ul style="margin-top: 0px; padding-top: 0px;">

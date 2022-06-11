@@ -9,6 +9,7 @@ const { getPatient,
     updatePatient,
     deletePatient,
     registerUser,
+    updatePatientAuthoriationSignature,
     loginUser,
     patientPhotoUpload,
     testUser,
@@ -41,6 +42,7 @@ const router = express.Router();
 
 // .post(createPatients)
 router.post('/register', registerUser);
+router.post('/updatePatientSignature',updatePatientAuthoriationSignature )
 router.post('/login', loginUser)
 router.post('/getPatientLabs', checkAuth, getPatientLabs);
 router.post('/patientfollowup', postPatientFollowUp);

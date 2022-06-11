@@ -395,6 +395,8 @@ exports.registerUser = async (req, res, next) => {
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
 
+    console.log(body)
+
     let surgHistArr = [];
     if (Array.isArray(JSON.parse(req.body.surgicalHistName))) {
       for (let i = 0; i < JSON.parse(req.body.surgicalHistName).length; i++) {
@@ -470,7 +472,13 @@ exports.registerUser = async (req, res, next) => {
       "reviewSystem.hemotologic": JSON.parse(body.hemotologic),
       "reviewSystem.musculoskeletal": JSON.parse(body.musculoskeletal),
       "reviewSystem.endocrine": JSON.parse(body.endocrine),
-      "reviewSystem.psychiatric": JSON.parse(body.psychiatric)
+      "reviewSystem.psychiatric": JSON.parse(body.psychiatric),
+      "authorizationDetails.patientName": body.patientName,
+      "authorizationDetails.dateOfBirth": body.dateOfBirth,
+      "authorizationDetails.address": body.address,
+      "authorizationDetails.representativeName": body.representativeName,
+      "authorizationDetails.patientRelationship": body.patientRelationship,
+      "authorizationDetails.diseaseTesting": body.diseaseTesting
 
     });
 
@@ -509,17 +517,18 @@ exports.registerUser = async (req, res, next) => {
     // }
 
     // patient.currentMedications = currMedArr; ---
-
-    setTimeout(async () => {
+    // var result = {};
+    // setTimeout(async () => {
       console.log("after setting fields " + patient)
-      const result = await patient.save();
-    }, 2000);
+     var result = await patient.save();
+    // }, 2000);
 
 
-
+console.log("Patient data after signup",result)
     res.status(200).json({
       success: true,
-      message: 'Signup successful'
+      message: 'Signup successful',
+      data: result._id
     });
   } catch (ex) {
     console.log('ex', ex);
@@ -538,6 +547,68 @@ exports.registerUser = async (req, res, next) => {
         .status(500);
     }
   }
+}
+
+
+exports.updatePatientAuthoriationSignature = async (req, res, next) => {
+  try {
+    console.log("Coming in signature Update Function", req.body)
+    console.log(req.files)
+    const p = await Patient.findOne({ _id: req.body.patientId })
+    console.log("Patient To update", p)
+    if (!p) {
+      return res.status(404).json({
+        "message": "Patient not found"
+      })
+    }
+    else {
+      
+      if (req.files) {
+        if (req.files.signaturePhoto) { 
+            const urlId = await uploadImage(req.files.signaturePhoto, next)
+            var toBeAdded = {
+              IsSignature: true,
+              eSignaturePhotoUrl:urlId.url,
+              public_id:urlId.public_id,
+              date: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+            }
+            
+          
+        }
+         
+      }
+  }
+  console.log("to be Added",toBeAdded)
+  // const p = await Patient.findOne({ '_id': req.body.problemId })
+  
+  const updateSignature = await Patient.findOneAndUpdate({ _id: req.body.patientId }, { $set: { "authorizationDetails.signature": toBeAdded } } )
+  // const updatedOperationSurgicalSite = await Operation.findOneAndUpdate({ _id: req.body.problemId }, { $push: { "surgicalSiteExam": toBeAdded } })
+  if (!updateSignature) {
+    console.log("not successful")
+    return res.status(400).json({
+      success: false,
+      data: null
+     
+    })
+    
+  }
+  else {
+    console.log("signature successful")
+    return res.status(200).json({
+      success: true,
+      data: updateSignature
+    })
+    
+  }
+}
+
+
+
+catch (err) {
+next(new ErrorResponse(err.message, 500))
+}
+
+
 }
 
 
