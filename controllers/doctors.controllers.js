@@ -894,6 +894,48 @@ const getNegativeTenderAnatomicalFollowUp = (tenderAnatomical) => {
   return newArr;
 }
 
+const getVascularExam = (vascularExam) => {
+  let newVascularArr = [];
+
+  vascularExam.forEach(vascularObj => {
+    newVascularArr.push(`${vascularObj.pulseLabel} ${vascularObj.value}` )
+
+  });
+console.log(newVascularArr)
+return newVascularArr;
+}
+
+const getSensationExam = (sensationExam) => {
+  let newsensationExamArr = [];
+
+  sensationExam.forEach(sensationExamObj => {
+
+    if (sensationExamObj.sensationValue == "normal"){
+    newsensationExamArr.push(`${"Normal sensation distally"}` )
+    }
+    if (sensationExamObj.sensationValue == "diminished"){
+      if (sensationExamObj.nerveDistribution == "" ){
+        newsensationExamArr.push(`${"Diminished sensation"}`)
+      }
+      else {
+        newsensationExamArr.push(`${"Diminished sensation"} - ${sensationExamObj.nerveDistribution}`)
+      }
+      
+      }
+      if (sensationExamObj.sensationValue == "absent"){
+        if (sensationExamObj.nerveDistribution == "" ){
+          newsensationExamArr.push(`${"Absent sensation"}`)
+        }
+          else{
+          newsensationExamArr.push(`${"Absent sensation"} - ${sensationExamObj.nerveDistribution}`)
+          }
+        }
+  });
+console.log(newsensationExamArr)
+return newsensationExamArr;
+}
+
+
 const getSocial = (sH) => {
   let checked = {
     doesSmoke: "No",
@@ -1802,6 +1844,11 @@ exports.generateReport = async (req, res, next) => {
     console.log("positive anatomical landmarks",getPositiveTenderAnatomical(problem.dignosis.physicalExam))
     console.log("negative anatomical landmarks",getNegativeTenderAnatomical(problem.dignosis.physicalExam))
    
+
+    let vascularExamText = getVascularExam(problem.dignosis.vascularExam)
+    let sensationExamText = getSensationExam(problem.dignosis.sensationExam)
+
+
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -1860,6 +1907,10 @@ exports.generateReport = async (req, res, next) => {
         skin: skinFullBodyCoordinate,
         skin2: skinFullBodyCoordinate2,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
+        vascularExam: vascularExamText,
+        sensationExam: sensationExamText,
+        vascularExamStyle: problem.dignosis.vascularExam.length > 0 ? "":"none",
+        sensationExamStyle: problem.dignosis.sensationExam.length > 0 ? "":"none",
         problemAreas: problem_areas ? problem_areas : "none",
         problem_areasToUpperCase,
         rosGeneral: ros_general ? ros_general : "none",
@@ -1875,7 +1926,7 @@ exports.generateReport = async (req, res, next) => {
         physicalExamThreeDModal:problem.dignosis.physicalExamThreeDModal,
         physicalExamPositive: positiveAnatomicalLandmarks,
         physicalExamNegative: negativeAnatomicalLandmarks,
-        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 ? "":"none",
+        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 || problem.dignosis.physicalExamThreeDModal.length > 0 ? "":"none",
         physicalExamNegativeStyle: negativeAnatomicalLandmarks.length > 0 ? "":"none",
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
@@ -2500,6 +2551,12 @@ exports.generateFollowUp = async (req, res, next) => {
 
     let skinFullBodyCoordinate2 = getSkin2(followUp.followUpVisit.skin)
 
+
+
+
+    let vascularExamText = getVascularExam(followUp.followUpVisit.vascularExam)
+    let sensationExamText = getSensationExam(followUp.followUpVisit.sensationExam)
+
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
       format: 'A4',
@@ -2533,6 +2590,10 @@ exports.generateFollowUp = async (req, res, next) => {
         skinText:followUp.followUpVisit.skin.length >= 1 ? "Skin Exam positive for:" : "",
         // skin:getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         // workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        vascularExam: vascularExamText,
+        sensationExam: sensationExamText,
+        vascularExamStyle: followUp.followUpVisit.vascularExam.length > 0 ? "":"none",
+        sensationExamStyle: followUp.followUpVisit.sensationExam.length > 0 ? "":"none",
         workDType: followUp.followUpVisit.workDutyType === "Full Duty" ? "Full duty" : `${followUp.followUpVisit.workDutyType} - ${strWDIncludes}  greater than ${followUp.followUpVisit.greaterThan} to the ${followUp.followUpVisit.toThe} ${strToTheIncludes} until next
         visit in ${followUp.followUpVisit.nextVisit}`,
         followUpVisit:followUp.followUpVisit,
@@ -2727,6 +2788,10 @@ exports.generateOpNote = async (req, res, next) => {
     
     // console.log("New CPT codes",diagnosis)
 
+    let vascularExamText = getVascularExam(operation.vascularExam)
+    let sensationExamText = getSensationExam(operation.sensationExam)
+
+
     const options = {
       format: 'A4',
       orientation: 'potrait',
@@ -2768,6 +2833,10 @@ exports.generateOpNote = async (req, res, next) => {
         skin:skinText,
         skin2: skinText2,
         skinText: operation.surgicalSiteExam.length > 0 ? "Incision is" : "",
+        vascularExam: vascularExamText,
+        sensationExam: sensationExamText,
+        vascularExamStyle: operation.vascularExam.length > 0 ? "":"none",
+        sensationExamStyle: operation.sensationExam.length > 0 ? "":"none",
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         // spainStyle:strength[0].length ==0 ? "none":"",
         // strength:strength?strength[1]:[],

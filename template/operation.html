@@ -76,6 +76,19 @@
         </ul>
     </p1>
 
+    <p1 style = "display: {{vascularExamStyle}}"><strong>Vascular Exam:</strong>
+        {{#each vascularExam}}
+        <li>{{this}}</li>
+        {{/each}}
+    </p1>
+    <br>
+    <p1 style = "display: {{sensationExamStyle}}"><strong>Sensation Exam:</strong>
+        {{#each sensationExam}}
+        <li>{{this}}</li>
+        {{/each}}
+    </p1>
+    <br>
+
     <!-- <h2>The patient has tenderness to palpation at:</h2>
     <h2>{{rangeOFMotion}}</h2>    
     <ul>
