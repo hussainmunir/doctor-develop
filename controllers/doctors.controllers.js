@@ -20,8 +20,8 @@ var count = 0;
 
 
 
-
-function appendAndToArray(arr){
+const appendAndToArray = (arr) => {
+// function appendAndToArray(arr){
   var tempArr = []
   tempArr = arr
   if(tempArr.length > 1){
@@ -36,11 +36,14 @@ function appendAndToArray(arr){
     str = str.replace(/,(?=[^,]*$)/, ' and')
   }
   str = str.replace(", and"," and")
+  str = str.replace("and,","and")
+  str = str.replace(" Rest, ice, compression elevation"," Rest, ice, compression and elevation")
+  str = str.replace(" and Rest, ice, compression and elevation",", Rest, ice, compression and elevation")
   // let removeLastComma =  str.replace(/,([^,]*)$/, '$1')
     console.log("str",str)
     console.log("temp arr length", tempArr.length)
     tempArr = tempArr.filter(e => e !== 'and'); 
-    arr.splice(arr.indexOf('and'), 1);
+    tempArr.splice(arr.indexOf('and'), 1);
     return str;
 }
 
@@ -935,6 +938,32 @@ console.log(newsensationExamArr)
 return newsensationExamArr;
 }
 
+const getTreatmentPlan = (treatmentPlan) => {
+var treatmentArr = []
+treatmentPlan.map((item)=>{
+  if (item.treatmentDetail != undefined){
+
+    if (item.treatmentDetail != "") {
+      treatmentArr.push(`${item.treatmentName} - ${item.treatmentDetail}`)
+    }
+    else {
+      treatmentArr.push(item.treatmentName)
+    }
+
+  }
+  else {
+    if (item.treatmentName != undefined){
+      treatmentArr.push(item.treatmentName)
+    }
+  }
+
+  
+})
+
+
+return treatmentArr;
+}
+
 
 const getSocial = (sH) => {
   let checked = {
@@ -1305,8 +1334,10 @@ const getTreatments = (fullBodyCoordinates) => {
     return false
   }
   else {
-    const lower =bodyCoordinates.toLowerCase();
- 
+    let lower =bodyCoordinates.toLowerCase();
+    lower =  lower.replace(",  and"," and")
+    lower = lower.replace(", and"," and")
+console.log("alliviating factors",lower)
     return lower;
   }
 }
@@ -1879,7 +1910,7 @@ exports.generateReport = async (req, res, next) => {
         toHasortoHer:pronoun == "He"? "to his" : "to her",
         onset: moment(problem.symptomsStarted).format('MMMM Do, YYYY'),
         intensity: `${problem.symptomsAtBest} to ${problem.symptomsAtWorst}`,
-        injury: problem.injury.Details ? `admits to injury: " ${injuryDetails}"` : "denies any injury",
+        injury: problem.injury.Details ? `admits to injury: "${injuryDetails}"` : "denies any injury",
         aggrevatingFactors: str_aggFactors,
         alleviatingFactors: str_allFactors,
         symtompsRadiate: pRadiateStr,
@@ -2557,6 +2588,8 @@ exports.generateFollowUp = async (req, res, next) => {
     let vascularExamText = getVascularExam(followUp.followUpVisit.vascularExam)
     let sensationExamText = getSensationExam(followUp.followUpVisit.sensationExam)
 
+    let treatmentPlanArr = getTreatmentPlan(followUp.followUpVisit.treatmentPlan)
+
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
       format: 'A4',
@@ -2637,7 +2670,7 @@ exports.generateFollowUp = async (req, res, next) => {
         DDarrayNew: ` ${arrDDnew}`,
         DDarrayOld:  getTreatments(getDDStr(problem.dignosis.differentialDignosis)),
         // assessmentText: followUp.followUpVisit.assessmentUpdate === "none" ? "" : `${followUp.followUpVisit.assessmentUpdate} `,
-        assessmentUpdate : assessmentUpdateText != "" ? ` consistent with ${assessmentUpdateText}.` : ",",
+        assessmentUpdate: assessmentUpdateText != "" ? ` consistent with ${assessmentUpdateText}.` : ",",
         allergiesText:patient.allergies.length >= 1? 'Allergies:' : '',
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
@@ -2648,7 +2681,7 @@ exports.generateFollowUp = async (req, res, next) => {
         ptreatmentPlane:appendAndToArray(followUp.patientInWaitingRoom.treatmentPlanFollow).toLowerCase(),
         symptoms : followUp.patientInWaitingRoom.symptoms? `${followUp.patientInWaitingRoom.symptoms.toLowerCase()}` : "",
         treatmentPlanIncludesText: followUp.followUpVisit.treatmentPlan.length >= 1 ? "Treatment plan includes:": "",
-        treatmentPlane:followUp.followUpVisit.treatmentPlan,
+        treatmentPlane:treatmentPlanArr,
         thrumaDetail: fallsTraumaDetailText === "" ? "." : `, including "${followUp.patientInWaitingRoom.fallsTraumaDetail}"${fallsOrTraumaDetailDot}`.replace("..","."),
         medicalEquipmentArr: medicalEqpArr,
         medicalEquipmentText: medicalEqpArr > 0 ? "The patient was provided with" :"",
@@ -2710,8 +2743,16 @@ exports.generateOpNote = async (req, res, next) => {
     // console.log(operation)
     // console.log(patient)
     // console.log(problem)
-
-
+    const patientName = `${patient.fname} ${patient.lname}`;
+    let hisORHer = patient.gender == "male"?"his" :"her";
+    let pronoun;
+    if (patient.gender === 'male') { pronoun = 'He' }
+    else if (patient.gender === 'female') { pronoun = 'She' }
+    else { pronoun = 'They' }
+    let pronounLowercase;
+    if (patient.gender === 'male') { pronounLowercase = 'he' }
+    else if (patient.gender === 'female') { pronounLowercase = 'she' }
+    else { pronounLowercase = 'they' }
     let strength= getStrength(operation.muscularStrengthTesting);
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
@@ -2739,17 +2780,13 @@ exports.generateOpNote = async (req, res, next) => {
 
     let newCptCode = getCptArr(operation.cPTCode, fullBodyText)
 
-    console.log("CPT code Names Arr",newCptCode)
-    console.log("Chief Complaints", fullBodyText)
     
     var vitalStyle = "none"
     if (operation.vitals.BMI.trim() === "" && operation.vitals.height.trim() === "" && operation.vitals.weight.trim() === "" && operation.vitals.heartrate.trim() === "" && operation.vitals.respiratory.trim() === "" && operation.vitals.cardiovascular === "" && operation.vitals.pulmonary === "") {
       vitalStyle = "none"
-      console.log("Vitals Style None")
     }
     else {
       vitalStyle = ""
-      console.log("Vitals Style Show")
     }
 
    let spainStyleTemp
@@ -2791,6 +2828,31 @@ exports.generateOpNote = async (req, res, next) => {
     let vascularExamText = getVascularExam(operation.vascularExam)
     let sensationExamText = getSensationExam(operation.sensationExam)
 
+    var assistiveDevicesText = ` ${appendAndToArray(assistiveDevices)}`
+    if (assistiveDevicesText == " " || assistiveDevicesText == "  "){
+      assistiveDevicesText = assistiveDevicesText.replace(" "," without any assistive devices")
+    }
+   
+
+    let general_exam = getGeneralExam(operation.generalExam)
+    let generalExamPatientIsText = ""
+    if (operation.generalExam.patientIs != undefined){
+      if (operation.generalExam.patientIs.length > 0){
+        if (operation.generalExam.patientIs[0] === "a&o x 3"){
+          generalExamPatientIsText = "an awake, alert and oriented"
+        } 
+        else {
+          generalExamPatientIsText = `${operation.generalExam.patientIs[0]}`
+        }
+        
+      }
+    }
+    var generalExamStyle = ""
+
+    if (operation.generalExam.patientIs.length < 1 && operation.generalExam.whoAppears.length < 1 && operation.generalExam.andIs.length < 1 && operation.generalExam.gaitIs.length < 1) {
+      generalExamStyle = "none"
+    }
+
 
     const options = {
       format: 'A4',
@@ -2829,7 +2891,14 @@ exports.generateOpNote = async (req, res, next) => {
         respiratory:operation.vitals.respiratory?`RR:  ${operation.vitals.respiratory}`:"",
         cardiovascular:operation.vitals.cardiovascular ?`CV:  ${operation.vitals.cardiovascular}`:"",
         pulmonary:operation.vitals.pulmonary?`Pulm:  ${operation.vitals.pulmonary}`:"",
-        patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, the patient admits to ${patientAdmitsArr}.` : "",
+        patientAdmits: operation.patientAdmits.length >= 1 ? ` Since surgery, ${pronounLowercase} admits to ${patientAdmitsArr.toLowerCase()}.` : "",
+        generalExam: general_exam ? general_exam : "General Exam Not Added",
+        generalExamPatientIs: generalExamPatientIsText != "" ? `${patientName} is ${generalExamPatientIsText}` : "",
+        generalExamWhoAppears: general_exam.whoAppears != "" ? `. ${pronoun} ${general_exam.whoAppears}` : "",
+        generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
+        generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
+        generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamSectionStyle: generalExamStyle,
         skin:skinText,
         skin2: skinText2,
         skinText: operation.surgicalSiteExam.length > 0 ? "Incision is" : "",
@@ -2861,10 +2930,10 @@ exports.generateOpNote = async (req, res, next) => {
         designations:doctorName.designations,
         painDetail:operation.painDetail === "" ? "" : ` including ${operation.painDetail} `,
         ReflexesStyles:operation.reflexes.length == 0 ?"none" : "",
-        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating ` : "is ambulating without any assistive devices.",
-        assistiveDevice:`${appendAndToArray(assistiveDevices)}${operation.patientAmbulating.assistiveDevice.length >=1 ? ".":""}`,
+        patientAmbulating:operation.patientAmbulating.assistiveDevice.length >=1? `is ambulating` : "is ambulating without any assistive devices.",
+        assistiveDevice:`${assistiveDevicesText}${operation.patientAmbulating.assistiveDevice.length >=1 ?".":""}`,
         ambulatingStyle:operation.patientAmbulating.ambulating ? "" :"none",
-        isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory",
+        isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory.",
         medicationtxt:operation.medicationRequired ? "with medication" : "without medication",
         treatmentPlan:operation.treatmentPlan,
         treatmentPlanStr: operation.treatmentPlan.length > 0 ? `Treatment plan includes:` : "",
@@ -3063,6 +3132,7 @@ exports.getFollowUp = async (req, res, next) => {
   }
 
 }
+
 
 
 exports.uploadImage = async (req, res, next) => {

@@ -142,6 +142,9 @@ const followUpSchema = new mongoose.Schema({
             pulmonary: {
                 type: String,
             },
+            temperature: {
+                type: String,
+            },
         },
         physicalExamThreeDModal: [String],
         rangeOfMotion: [String],
@@ -169,7 +172,8 @@ const followUpSchema = new mongoose.Schema({
             {
                 partName: String,
                 pulseLabel: String,
-                value: String,
+                left: String,
+                right: String,
             }
             ],
             sensationExam: [ 

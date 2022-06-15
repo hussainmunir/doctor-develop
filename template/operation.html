@@ -18,22 +18,29 @@
     <strong>Date of Encounter:</strong> {{date}}<br><br>
     <strong>Return:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> S/P {{fullBodyText}} {{DD}}<br>
+    <strong>Date of Surgery:</strong> {{operation.operationDate}}<br>
     <strong>Work Duty:</strong> {{workDType}}<br><br>
   
    <h2>History of Presenting Illness</h2>
-        <p>{{patient.fname}} {{patient.lname}}  presents today for first post-op visit up.{{patientAdmits}} 
+        <p>{{patient.fname}} {{patient.lname}}  presents today for {{hisORHer}} first post-op visit.{{patientAdmits}} 
             <!-- Since surgery, the patient admits to -->
             <!-- {{#each operation.patientAdmits}}
             {{this}}
             {{/each}}. -->
             {{pronoun}} states {{hisORHer}} pain is  {{isPain}} 
             {{medicationtxt}}{{painDetail}}. Pain is graded at {{operation.painScale}} level intensity. {{pronoun}}
-          <span style="display: {{ambulatingStyle}};"> {{patientAmbulating}} {{assistiveDevice}}</span> {{isNotAmbulating}}
+          <span style="display: {{ambulatingStyle}};"> {{patientAmbulating}}{{assistiveDevice}}</span> {{isNotAmbulating}}
         </p> 
 
-<p><strong>Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
+<!-- <p><strong>Physical Examination:</strong> {{patient.fname}} {{patient.lname}} is an awake, alert and oriented {{gender}} that
     appears {{hisORHer}} stated age. {{pronoun}} has a pleasant demeanor. {{pronoun}} is able to follow
-    commands appropriately. {{pronoun}} is in no acute distress.</p>
+    commands appropriately. {{pronoun}} is in no acute distress.</p> -->
+    <strong>Physical Examination: </strong><br>
+    <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
+            <p1 style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">
+            {{generalExamPatientIs}} {{gender}}{{generalExamWhoAppears}}
+            {{generalExamHas}} {{pronoun}} is able to follow instructions.
+            {{generalExamAndis}} {{generalExamGaitIs}}</p1>
 
     <!-- <strong>Physical Examination: </strong><br>
     <strong style = "margin-top: 0px; padding-top: 0px; display: {{generalExamSectionStyle}}">General Examination: </strong>
@@ -82,7 +89,7 @@
         {{/each}}
     </p1>
     <br>
-    <p1 style = "display: {{sensationExamStyle}}"><strong>Sensation Exam:</strong>
+    <p1 style = "display: {{sensationExamStyle}}"><strong>Neuro Exam:</strong>
         {{#each sensationExam}}
         <li>{{this}}</li>
         {{/each}}

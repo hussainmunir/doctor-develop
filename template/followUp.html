@@ -8,6 +8,7 @@
     <style>
         h1{text-decoration: underline;}
         h2{margin: 2px; font-size: 16px;}
+        
     </style>
 </head>
 <body>
@@ -106,13 +107,13 @@
         {{/each}}
     </p1>
     <br>
-    <p1 style = "display: {{sensationExamStyle}}"><strong>Sensation Exam:</strong>
+    <p1 style = "display: {{sensationExamStyle}}"><strong>Neuro Exam:</strong>
         {{#each sensationExam}}
         <li>{{this}}</li>
         {{/each}}
     </p1>
     <br>
-    
+
     <p1 style = "display: {{physicalExamPositiveStyle}}"><strong>The patient has tenderness to palpation at:</strong>
         {{#each physicalExamPositive}}
         <li>{{this}}</li>
@@ -205,7 +206,8 @@
     <ul>
         {{#each treatmentPlane}}
         <li>
-            {{this.treatmentName}}{{this.treatmentDetail}}
+            <!-- {{this.treatmentName}}{{this.treatmentDetail}} -->
+            {{this}}
         </li>
         {{/each}}   
         {{#each medicalEquipmentArr}}
@@ -230,3 +232,66 @@
     
 </body>
 </html>
+<style type="text/css">
+    .box{
+        height:50px;
+        width:200px;
+        background-color:blue;
+    }
+    .box--image {     
+        position:relative;    
+        max-width:200px; 
+        outline:solid 1px red;
+    }
+    
+    .box--image:before {
+        content:"";
+        display:block; 
+        padding-top:100%;
+    }
+    
+    .box--image img {    
+        left:50%;
+        position:absolute;          
+        top:50%;
+        transform:rotate(90deg) translate(-50%,-50%);
+        transform-origin:top left;
+        width:200px;
+    }
+    .rotateimg180 {
+  -webkit-transform:rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+    .img {
+    object-fit: contain;
+        }
+        .trick {
+  display: inline-block;
+  vertical-align: middle;
+  height: 150px;
+}
+
+.box{
+  width: 20%;
+  height: 60%;
+  margin: auto;
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  resize: both;
+  overflow: hidden;
+  border: 5px solid red;
+ } 
+
+.box > img{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -50%); 
+}
+
+.box > img.max{ width:auto; height:100%; }
+    </style>

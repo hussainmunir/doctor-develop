@@ -142,15 +142,14 @@
             <li>{{this.name}} </li>
             {{/each}}
         </ul>
-     </div>
 
-        <br><strong>Family History:</strong><br>
+        <strong>Family History:</strong><br>
             <strong>Mother's Conditions:</strong> {{mMC}}</br>
             <strong>Fathers's Conditions:</strong> {{fMC}}</br>
             <strong>Grand Parents Conditions:</strong> {{gPMC}}</br>
             <strong>Siblings Conditions:</strong> {{sMC}}
         </p>
-        <br><strong>Social History:</strong><br>
+        <strong>Social History:</strong><br>
             <strong>Occupation:</strong> {{occupation}}</br>
             <strong>Martial Status:</strong> {{maritalStatus}}</br>
             <strong>Smokes:</strong> {{smokes.doesSmoke}}</br>
@@ -218,7 +217,7 @@
                 {{/each}}
             </p1>
             <br>
-            <p1 style = "display: {{sensationExamStyle}}"><strong>Sensation Exam:</strong>
+            <p1 style = "display: {{sensationExamStyle}}"><strong>Neuro Exam:</strong>
                 {{#each sensationExam}}
                 <li>{{this}}</li>
                 {{/each}}
@@ -347,8 +346,7 @@
         <p><strong>Plan: </strong>{{name}} presents signs and symptoms consistent with: {{DD}} <br> {{#each DD}}
             {{this.desc}},
             {{/each}}</p>
-        <p>Diagnosis{{diagnosticSudiesTextTwo}} and treatment plan was reviewed with the patient at today’s visit.<br>
-            Treatment plan includes: </p>
+        <p>Diagnosis{{diagnosticSudiesTextTwo}} and treatment plan was reviewed with the patient at today’s visit. Treatment plan includes: </p>
         <ul>
             {{#each treatmentPlan}}
             <li>

@@ -134,6 +134,9 @@ const operationSchema = new mongoose.Schema({
         pulmonary: {
             type: String,
         },
+        temperature: {
+            type: String,
+        },
     },
     surgicalSiteExam: [
         {
@@ -156,7 +159,8 @@ const operationSchema = new mongoose.Schema({
         {
             partName: String,
             pulseLabel: String,
-            value: String,
+            left: String,
+            right: String,
         }
         ],
         sensationExam: [ 

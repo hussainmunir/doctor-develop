@@ -238,6 +238,9 @@ const hpiProblemSchema = new mongoose.Schema({
             pulmonary: {
                 type: String,
             },
+            temperature: {
+                type: String,
+            },
         },
        
         radiationDistribution: {
@@ -268,7 +271,9 @@ const hpiProblemSchema = new mongoose.Schema({
         {
             partName: String,
             pulseLabel: String,
-            value: String,
+            left: String,
+            right: String,
+
         }
         ],
         sensationExam: [ 
