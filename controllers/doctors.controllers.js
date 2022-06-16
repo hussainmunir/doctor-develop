@@ -901,7 +901,21 @@ const getVascularExam = (vascularExam) => {
   let newVascularArr = [];
 
   vascularExam.forEach(vascularObj => {
-    newVascularArr.push(`${vascularObj.pulseLabel} ${vascularObj.value}` )
+    let rightVal= ""
+    let leftVal= ""
+
+    if (vascularObj.right != undefined){
+      if (vascularObj.right != ""){
+        rightVal = ` right: ${vascularObj.right}`
+      }
+    }
+    if (vascularObj.left != undefined){
+      if (vascularObj.left != ""){
+        leftVal = ` left: ${vascularObj.right}`
+      }
+    }
+    
+    newVascularArr.push(`${vascularObj.pulseLabel}${rightVal}${leftVal}`)
 
   });
 console.log(newVascularArr)
@@ -2000,6 +2014,7 @@ exports.generateReport = async (req, res, next) => {
         grtrThan: problem.dignosis.greaterThan ? problem.dignosis.greaterThan : '',
         nextVisit: problem.dignosis.nextVisit,
         vitalStyle,
+        Temp:problem.dignosis.vitals.temperature?`Temp:  ${problem.dignosis.vitals.temperature}`:"",
         BMI:problem.dignosis.vitals.BMI?`BMI:  ${problem.dignosis.vitals.BMI}`:"",
         height:problem.dignosis.vitals.height?`Ht:  ${problem.dignosis.vitals.height}`:"",
         weight:problem.dignosis.vitals.weight?`Wt:  ${problem.dignosis.vitals.weight}`:"",
@@ -2649,6 +2664,7 @@ exports.generateFollowUp = async (req, res, next) => {
         generalExamSectionStyle: generalExamStyle,
         vitals:problem.dignosis.vitals,
         vitalStyle,
+        Temp:followUp.followUpVisit.vitals.temperature?`Temp:  ${followUp.followUpVisit.vitals.temperature}`:"",
         BMI:followUp.followUpVisit.vitals.BMI?`BMI:  ${followUp.followUpVisit.vitals.BMI}`:"",
         height:followUp.followUpVisit.vitals.height?`Ht:  ${followUp.followUpVisit.vitals.height}`:"",
         weight:followUp.followUpVisit.vitals.weight?`Wt:  ${followUp.followUpVisit.vitals.weight}`:"",
@@ -2883,6 +2899,7 @@ exports.generateOpNote = async (req, res, next) => {
         fullBodyText,
         vitals:problem.dignosis.vitals,
         vitalStyle,
+        Temp:operation.vitals.temperature?`Temp:  ${operation.vitals.temperature}`:"",
         BMI:operation.vitals.BMI?`BMI:  ${operation.vitals.BMI}`:"",
         height:operation.vitals.height?`Ht:  ${operation.vitals.height}`:"",
         weight:operation.vitals.weight?`Wt:  ${operation.vitals.weight}`:"",
