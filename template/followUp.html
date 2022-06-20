@@ -67,6 +67,7 @@
     <li style="list-style-type: none;">{{BP}}</li>
     <li style="list-style-type: none;">{{heartrate}}</li>
     <li style="list-style-type: none;">{{respiratory}}</li>
+    <li style="list-style-type: none;">{{Temp}}</li>
     <li style="list-style-type: none;">{{cardiovascular}}</li>
     <li style="list-style-type: none;">{{pulmonary}}</li>
     </br>
@@ -102,11 +103,27 @@
     </ul> -->
 
     <p1 style = "display: {{vascularExamStyle}}"><strong>Vascular Exam:</strong>
-        {{#each vascularExam}}
+        <!-- {{#each vascularExam}}
         <li>{{this}}</li>
         {{/each}}
     </p1>
+    <br> -->
+    <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">
+        <tr>
+            <th style="border: 1px solid black; font-size: 14px;text-align:center; min-width: 50px;">Right</th>
+            <th style="border: 1px solid black; font-size: 14px; text-align:center; min-width: 100px;">Name</th>
+            <th style="border: 1px solid black; font-size: 14px; min-width: 50px; text-align:center;">Left</th>
+        </tr>
+        {{#each vascularExamObj}}
+        <tr>
+            <td style="border: 1px solid black; text-align:center;">{{this.right}}</td>
+            <td style="border: 1px solid black; text-align:center">{{this.pulseLabel}}</td>
+            <td style="border: 1px solid black; text-align:center;">{{this.left}}</td>
+        </tr>
+        {{/each}}
+    </table>
     <br>
+    </p1>
     <p1 style = "display: {{sensationExamStyle}}"><strong>Neuro Exam:</strong>
         {{#each sensationExam}}
         <li>{{this}}</li>
@@ -129,12 +146,15 @@
         {{/each}}
     </p1>
     <br>
+    <div style="display: {{rangeOfMotionStyle}};">
     <strong>{{rangeOFMotion}}</strong>
     <ul style="margin-top: 0px; padding-top: 0px;">
         {{#each followUpVisit.rangeOfMotion}}
         <li>{{this}}</li>
         {{/each}}
     </ul>
+    <br>
+    </div>
     <div style = "display: {{strengthStyle}}">
     <h2>Strength:</h2>
     <table style="text-align: left; border: 1px solid black; border-collapse: collapse;">

@@ -911,7 +911,7 @@ const getVascularExam = (vascularExam) => {
     }
     if (vascularObj.left != undefined){
       if (vascularObj.left != ""){
-        leftVal = ` left: ${vascularObj.right}`
+        leftVal = ` left: ${vascularObj.left}`
       }
     }
     
@@ -957,17 +957,17 @@ var treatmentArr = []
 treatmentPlan.map((item)=>{
   if (item.treatmentDetail != undefined){
 
-    if (item.treatmentDetail != "") {
-      treatmentArr.push(`${item.treatmentName} - ${item.treatmentDetail}`)
+    if (item.treatmentDetail.replace("-","").trim() != "") {
+      treatmentArr.push(`${item.treatmentName} - ${item.treatmentDetail}`.replace("-  -","-"))
     }
     else {
-      treatmentArr.push(item.treatmentName)
+      treatmentArr.push(item.treatmentName.replace("-",""))
     }
 
   }
   else {
     if (item.treatmentName != undefined){
-      treatmentArr.push(item.treatmentName)
+      treatmentArr.push(item.treatmentNamee.replace("-",""))
     }
   }
 
@@ -1893,6 +1893,7 @@ exports.generateReport = async (req, res, next) => {
     let vascularExamText = getVascularExam(problem.dignosis.vascularExam)
     let sensationExamText = getSensationExam(problem.dignosis.sensationExam)
 
+    let treatmentPlanArr = getTreatmentPlan(problem.dignosis.treatmentPlan)
 
     const options = {
       format: 'A4',
@@ -1953,6 +1954,7 @@ exports.generateReport = async (req, res, next) => {
         skin2: skinFullBodyCoordinate2,
         skinText:problem.dignosis.skin.length >= 1 ? "Skin Exam positive for:" : "",
         vascularExam: vascularExamText,
+        vascularExamObj: problem.dignosis.vascularExam,
         sensationExam: sensationExamText,
         vascularExamStyle: problem.dignosis.vascularExam.length > 0 ? "":"none",
         sensationExamStyle: problem.dignosis.sensationExam.length > 0 ? "":"none",
@@ -1976,9 +1978,11 @@ exports.generateReport = async (req, res, next) => {
         DD: str_DD ? str_DD : "none",
         DDarray:arr_DD,
         treatmentPlan: problem.dignosis.treatmentPlan,
+        treatmentPlane:treatmentPlanArr,
         medicalEquipmentArr: problem.dignosis.medicalEquipment,
         // medicalEquipment: appendAndToArray(problem.dignosis.medicalEquipment),
         range: problem.dignosis.rangeOfMotion,
+        rangeOfMotionStyle: problem.dignosis.rangeOfMotion.length > 0 ? "":"none",
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
         strength:strength != undefined?strength[1]:[],
         spain:strength != undefined? `${strength[0].length > 0 ? strength[0]:[]}` :[],
@@ -2064,6 +2068,79 @@ exports.getWaitingList = async (req, res, next) => {
       count: waiting.length,
       success: true,
       data: waiting
+    })
+  } catch (err) {
+    next(new ErrorResponse(err.message, 500))
+  }
+}
+
+exports.combineRelatedProblemsList = async (req, res, next) => {
+  try {
+    let problemId = req.body.problemId;
+    console.log(problemId)
+    const problem = await Problem.find({ 'isChecked': true, "_id": problemId }).lean();
+    const operation = await Operation.find({ 'isChecked': true, "problemId": problemId }).lean();
+    const followUpModal = await FollowUpModal.find({ 'isChecked': true, "problemId": problemId }).lean();
+  
+   for(i=0; i<problem.length; i++){
+    const patient = await Patient.findOne({ _id: problem[i].patientID}).lean();
+   
+    problem.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+
+   }
+   
+   for(i=0; i<operation.length; i++){
+    const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
+   
+    operation.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   for(i=0; i<followUpModal.length; i++){
+    const patient = await Patient.findOne({ _id: followUpModal[i].patientId}).lean();
+   
+    followUpModal.forEach((wait) => {wait.currentPatientMedication=patient.currentMedications})
+    
+   }
+   
+
+    if (!problem && !operation && !followUpModal) {
+      res.status(200).json({
+        data: "No thing in problems list",
+
+      })
+    }
+    var followUpArray = [];
+   for(i=0; i<followUpModal.length; i++){
+     let obj = {}
+     obj.waitingListType="followUp";
+     obj.problem={};
+     obj.followUp=followUpModal[i];
+     obj.postOp={};
+     followUpArray.push(obj)
+   }
+   var problemArray = [];
+   for(i=0; i<problem.length; i++){
+     let obj = {}
+     obj.waitingListType="problem";
+     obj.followUp={};
+     obj.problem=problem[i];
+     obj.postOp={};
+     problemArray.push(obj)
+   }
+   var operationArray = [];
+   for(i=0; i<operation.length; i++){
+     let obj = {}
+     obj.waitingListType="operation";
+     obj.problem={};
+     obj.followUp={};
+     obj.postOp=operation[i];
+     operationArray.push(obj)
+   }
+   const waitingList = followUpArray.concat(problemArray,operationArray)
+    res.status(200).json({
+      success: true,
+      data: waitingList
     })
   } catch (err) {
     next(new ErrorResponse(err.message, 500))
@@ -2569,6 +2646,8 @@ exports.generateFollowUp = async (req, res, next) => {
     let negativeAnatomicalLandmarks = getNegativeTenderAnatomicalFollowUp(followUp.followUpVisit.physicalExam)
    
 
+    console.log("positive tenderAnatomical",positiveAnatomicalLandmarks)
+
     let medicalEqpArr = followUp.followUpVisit.medicalEquipment;
 
     console.log("Medical Equipments", medicalEqpArr)
@@ -2576,13 +2655,13 @@ exports.generateFollowUp = async (req, res, next) => {
     let general_exam = getGeneralExam(followUp.followUpVisit.generalExam)
 
     let generalExamPatientIsText = ""
-    if (problem.dignosis.generalExam.patientIs != undefined){
-      if (problem.dignosis.generalExam.patientIs.length > 0){
-        if (problem.dignosis.generalExam.patientIs[0] === "a&o x 3"){
+    if (followUp.followUpVisit.generalExam.patientIs != undefined){
+      if (followUp.followUpVisit.generalExam.patientIs.length > 0){
+        if (followUp.followUpVisit.generalExam.patientIs[0] === "a&o x 3"){
           generalExamPatientIsText = "an awake, alert and oriented"
         } 
         else {
-          generalExamPatientIsText = `${problem.dignosis.generalExam.patientIs[0]}`
+          generalExamPatientIsText = `${followUp.followUpVisit.generalExam.patientIs[0]}`
         }
         
       }
@@ -2639,6 +2718,7 @@ exports.generateFollowUp = async (req, res, next) => {
         // skin:getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
         // workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
         vascularExam: vascularExamText,
+        vascularExamObj: followUp.followUpVisit.vascularExam,
         sensationExam: sensationExamText,
         vascularExamStyle: followUp.followUpVisit.vascularExam.length > 0 ? "":"none",
         sensationExamStyle: followUp.followUpVisit.sensationExam.length > 0 ? "":"none",
@@ -2653,7 +2733,7 @@ exports.generateFollowUp = async (req, res, next) => {
         physicalExamThreeDModal: followUp.followUpVisit.physicalExamThreeDModal,
         physicalExamPositive: positiveAnatomicalLandmarks,
         physicalExamNegative: negativeAnatomicalLandmarks,
-        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 ? "":"none",
+        physicalExamPositiveStyle: positiveAnatomicalLandmarks.length > 0 || followUp.followUpVisit.physicalExamThreeDModal.length > 0 ? "":"none",
         physicalExamNegativeStyle: negativeAnatomicalLandmarks.length > 0 ? "":"none",
         generalExam: general_exam ? general_exam : "General Exam Not Added",
         generalExamPatientIs: generalExamPatientIsText != "" ? `${patientName} is ${generalExamPatientIsText}` : "",
@@ -2691,6 +2771,7 @@ exports.generateFollowUp = async (req, res, next) => {
         medications: medicationsName,
         medicationsText:medicationsName.length >=1 ? 'Medications:' : '',
         rangeOFMotion:followUp.followUpVisit.rangeOfMotion.length >=1?"Range of motion:":"",
+        rangeOfMotionStyle: followUp.followUpVisit.rangeOfMotion.length > 0 ? "":"none",
         suggestedFollowUp:followUp.followUpVisit.suggestedFollowup === "" ? "" : `The patient will follow up in ${followUp.followUpVisit.suggestedFollowup}.`,
         hasBeen:followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? "has been" : "has not been",
         pTreatmentPlanIncluding: followUp.patientInWaitingRoom.treatmentPlanFollow.length >= 1 ? " including ": "", 
@@ -2831,10 +2912,10 @@ exports.generateOpNote = async (req, res, next) => {
     strengthTemp = []
     spainTemp = []
   }
-  console.log(spainStyleTemp)
-  console.log(strengthTemp)
-  console.log(spainTemp)
-  console.log(tempStrengthStyle)
+  console.log("spain style",spainStyleTemp)
+  console.log("strength temp",strengthTemp)
+  console.log("spain temp",spainTemp)
+  console.log("temp strength style",tempStrengthStyle)
 
     const operationNote = fs.readFileSync('./template/operation.html', 'utf-8');
     // res.status(200).json({data:Note})
@@ -2849,7 +2930,8 @@ exports.generateOpNote = async (req, res, next) => {
       assistiveDevicesText = assistiveDevicesText.replace(" "," without any assistive devices")
     }
    
-
+    let treatmentPlanArr = getTreatmentPlan(operation.treatmentPlan)
+    console.log("Treatment Plan array: ",treatmentPlanArr)
     let general_exam = getGeneralExam(operation.generalExam)
     let generalExamPatientIsText = ""
     if (operation.generalExam.patientIs != undefined){
@@ -2918,11 +3000,13 @@ exports.generateOpNote = async (req, res, next) => {
         generalExamSectionStyle: generalExamStyle,
         skin:skinText,
         skin2: skinText2,
-        skinText: operation.surgicalSiteExam.length > 0 ? "Incision is" : "",
+        skinText: operation.surgicalSiteExam.length > 0 ? "Incision:" : "",
         vascularExam: vascularExamText,
+        vascularExamObj: operation.vascularExam,
         sensationExam: sensationExamText,
         vascularExamStyle: operation.vascularExam.length > 0 ? "":"none",
         sensationExamStyle: operation.sensationExam.length > 0 ? "":"none",
+        rangeOfMotionStyle: operation.rangeOfMotion.length > 0 ? "":"none",
         rangeOFMotion:operation.rangeOfMotion.length >=1?"Range of motion:":"",
         // spainStyle:strength[0].length ==0 ? "none":"",
         // strength:strength?strength[1]:[],
@@ -2935,7 +3019,7 @@ exports.generateOpNote = async (req, res, next) => {
         positiveHeading: STA.length >= 1 ? "The patient has a positive: " : '',
         negativeST: negativeSTA,
         negativeHeading:negativeSTA.length >= 1 ? "The patient has a negative:" : "",
-        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${appendAndToArray(operation.medicalEquipment)}.`:"",
+        medicalEquipment:operation.medicalEquipment.length >= 1 ? ` The patient was provided with ${appendAndToArray(operation.medicalEquipment).toLowerCase()}.`:"",
         medicalEquipmentArr:operation.medicalEquipment,
         isPain:operation.isPain? "controlled" : "not controlled",
         patientAmbulating:operation.patientAmbulating.ambulating,
@@ -2953,6 +3037,7 @@ exports.generateOpNote = async (req, res, next) => {
         isNotAmbulating:operation.patientAmbulating.ambulating ? "" : "is not ambulatory.",
         medicationtxt:operation.medicationRequired ? "with medication" : "without medication",
         treatmentPlan:operation.treatmentPlan,
+        treatmentPlane:treatmentPlanArr,
         treatmentPlanStr: operation.treatmentPlan.length > 0 ? `Treatment plan includes:` : "",
       },
       path: `${process.env.REPORT_UPLOAD_PATH}/${operation._id}.pdf`
