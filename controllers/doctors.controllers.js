@@ -787,9 +787,19 @@ const getAge = (dob) => {
 const getPassST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
-    let bodypart =specialTest.bodyPart;
+    var bodypart = ""
+   
+    if (specialTest.bodyPart == "Back" || specialTest.bodyPart == "Neck"){
+      console.log("Body part special test ",specialTest.bodyPart)
+      bodypart = ""
+    }
+    else {
+      
+      bodypart = specialTest.bodyPart;
+    }
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="true") {
+        
         newArr.push(`${s.testName} on the Left ${bodypart}`)
       }
       if (s.isRightPass =="true") {
@@ -802,7 +812,15 @@ const getPassST = (st) => {
 const getFailST = (st) => {
   let newArr = [];
   st.forEach(specialTest => {
-    let bodypart =specialTest.bodyPart;
+    var bodypart = "";
+    if (specialTest.bodyPart == "Back" || specialTest.bodyPart == "Neck"){
+      console.log("Body part special test ",specialTest.bodyPart)
+      bodypart = ""
+    }
+    else {
+      
+      bodypart = specialTest.bodyPart;
+    }
     specialTest.test.forEach(s => {
       if (s.isLeftPass =="false")  {
 
@@ -2010,6 +2028,7 @@ exports.generateReport = async (req, res, next) => {
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe} ${strToTheIncludes} until next
         visit in ${problem.dignosis.nextVisit}`, // Array
         workDIncludes: strWDIncludes ? strWDIncludes : '',
+        workDutyStyle: problem.dignosis.workDutyType === "" ? "none" : "",
         diagnosticSudies:problem.dignosis.diagnosticStudies ? problem.dignosis.diagnosticStudies: " ", // Array
         diagnosticSudiesText:problem.dignosis.diagnosticStudies.length >=1 ? "Diagnostic Studies:" : "",
         diagnosticSudiesTextTwo:problem.dignosis.diagnosticStudies.length >=1 ? ", diagnostic studies," : "",
@@ -2724,6 +2743,7 @@ exports.generateFollowUp = async (req, res, next) => {
         sensationExamStyle: followUp.followUpVisit.sensationExam.length > 0 ? "":"none",
         workDType: followUp.followUpVisit.workDutyType === "Full Duty" ? "Full duty" : `${followUp.followUpVisit.workDutyType} - ${strWDIncludes}  greater than ${followUp.followUpVisit.greaterThan} to the ${followUp.followUpVisit.toThe} ${strToTheIncludes} until next
         visit in ${followUp.followUpVisit.nextVisit}`,
+        workDutyStyle: followUp.followUpVisit.workDutyType === "" ? "none" : "",
         followUpVisit:followUp.followUpVisit,
         Reflexes: followUp.followUpVisit.reflexes,
         ReflexesStyles:followUp.followUpVisit.reflexes.length == 0 ?"none" : "",
@@ -2967,6 +2987,7 @@ exports.generateOpNote = async (req, res, next) => {
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(operation.date).format('MMMM Do, YYYY'),
         workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
+        workDutyStyle: problem.dignosis.workDutyType === "" ? "none" : "",
         problem_areasToUpperCase,
         problem_concatenated,
         gender:patient.gender,

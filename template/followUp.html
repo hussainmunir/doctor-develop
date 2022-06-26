@@ -19,7 +19,7 @@
     <br>
     <strong>Follow-up:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> {{DD}}</br>
-    <strong>Work Duty:</strong> {{workDType}}<br><br>
+    <p1 style="display: {{workDutyStyle}};"><strong>Work Duty:</strong> {{workDType}}</p1><br><br>
     <strong>Chief Complaint:</strong> {{problem_areasToUpperCase}} {{problem_concatenated}}
 <br></br>
     <h2>History Of Presenting Illness</h2>
@@ -240,10 +240,10 @@
     plan moving forward.
 
     <br> <br>
-    <div>
-        <strong>Work Duty:</strong>
-        <p>{{workDType}}</p>
+    <div style="display: {{workDutyStyle}};">
+        <strong>Work Duty:</strong> {{workDType}}
     </div>
+    <br>
     <div >
         <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
          <img src={{signatureUrl}} alt="" style={{imageStyle}}><br>

@@ -19,7 +19,7 @@
     <strong>Return:</strong> {{suggestedFollowUp}}<br>
     <strong>Diagnosis:</strong> S/P {{fullBodyText}} {{DD}}<br>
     <strong>Date of Surgery:</strong> {{operation.operationDate}}<br>
-    <strong>Work Duty:</strong> {{workDType}}<br><br>
+    <p1 style="display: {{workDutyStyle}};"><strong>Work Duty:</strong> {{workDType}}</p1><br><br>
   
    <h2>History of Presenting Illness</h2>
         <p>{{patient.fname}} {{patient.lname}}  presents today for {{hisORHer}} first post-op visit.{{patientAdmits}} 
@@ -215,6 +215,17 @@
         </ul>
         The patient will follow up in {{suggestedFollowUp}}.{{medicalEquipment}} The patient is happy with the
         plan moving forward.</p>
+
+        <br> <br>
+        <div style="display: {{workDutyStyle}};">
+            <strong>Work Duty:</strong> {{workDType}}
+        </div>
+        <br>
+        <div >
+            <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
+             <img src={{signatureUrl}} alt="" style={{imageStyle}}><br>
+             <strong>{{signatureDate}}</strong>
+         </div>
  
 </body>
 </html>

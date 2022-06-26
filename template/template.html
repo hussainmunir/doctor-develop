@@ -62,9 +62,10 @@
     <!-- <strong>Work Duty:</strong> {{workDType}} - {{workDIncludes}} to the {{toThe}} {{toTheInclude}} greater than
     {{grtrThan}} until next
     visit on {{nextVisit}} <br> -->
+    <p1 style="display: {{workDutyStyle}};">
     <strong>Work Duty:</strong>
     {{workDType}}
-    </p>
+    </p1>
     <!-- <h3>Medications Prescribed: {medications}</h3> <br /><br /> -->
 
     <div class="blue">
@@ -335,25 +336,26 @@
        </div>
         <!-- <p>The patient has tenderness to palpation at: </p><ul>{{#each physicalExam}} <li> {{this}} </li> {{/each}}</ul> -->
         <strong>{{positiveHeading}}</strong>
-        <ul>
+        <!-- <ul> -->
             {{#each ST}}
             <li>{{this}}</li>
             {{/each}}
-        </ul>
+        <!-- </ul> -->
         <strong>{{negativeHeading}}</strong>
-        <ul>
+        <!-- <ul> -->
             {{#each negativeST}}
             <li>{{this}}</li>
             {{/each}}
-        </ul> 
+        <!-- </ul>  -->
     </div>
+    <br>
   <strong>{{RadiationDistributionTxt}}</strong>
-  <ul >
+  <!-- <ul > -->
     {{#each RadiationDistribution}}
     <li>{{this}}</li>
     {{/each}}
-</ul>
-
+<!-- </ul> -->
+<br>
     <div class="green">
         <strong>{{diagnosticSudiesText}}</strong>
         {{#each diagnosticSudies}}
@@ -381,13 +383,14 @@
         <p>The patient will follow up{{followup}} </p>
     </div>
     <br> <br>
-    <div>
-        <strong>Work Duty:</strong>
-        <p>{{workDType}}</p>
+    <div style="display: {{workDutyStyle}};">
+        <strong >Work Duty:</strong> {{workDType}}
+        
         <!-- i remove this code 
             {{workDIncludes}} to the {{toThe}} {{toTheInclude}} greater than {{grtrThan}} until next
             visit on {{nextVisit}}. -->
     </div>
+    <br>
    <div >
    <div style="display: {{doctorNameStyle}};"> {{doctorName}}, {{designations}}<br></div>
     <img src={{signatureUrl}} alt="" style={{imageStyle}}><br>
