@@ -1112,8 +1112,9 @@ const getStrength = (array) => {
   var spain =[]
   var strength=[]
   for(i=0; i<array.length;i++){
-    if(array[i].strengthName.trim() ==="Cervical Spine Flexion" || array[i].strengthName.trim() ==="Cervical Spine Extension" || array[i].strengthName.trim() ==="Thoracic/Lumbar Flexion" ||array[i].strengthName.trim() ==="Thoracic/Lumbar Extension"){
+    if(array[i].strengthName.trim() ==="Cervical Spine Flexion" || array[i].strengthName.trim() ==="Cervical Spine Extension" || array[i].strengthName.trim() ==="Thoracic/Lumbar Flexion" || array[i].strengthName.trim() ==="Thoracic/Lumbar Extension"){
   spain.push(array[i])
+
   
   }else{
    strength.push(array[i])
@@ -1841,6 +1842,8 @@ exports.generateReport = async (req, res, next) => {
     let arr_DD = getDDStr(problem.dignosis.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
     let strength= getStrength(problem.dignosis.strength);
+  console.log("Spine strength:",strength[0])
+
     let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
     let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
 
@@ -1912,6 +1915,37 @@ exports.generateReport = async (req, res, next) => {
     let sensationExamText = getSensationExam(problem.dignosis.sensationExam)
 
     let treatmentPlanArr = getTreatmentPlan(problem.dignosis.treatmentPlan)
+
+    let spainStyleTemp
+    let strengthTemp
+    let spainTemp
+    let tempStrengthStyle
+ 
+    if (strength != undefined){
+    if (strength.length > 0) {
+     spainStyleTemp = strength[0].length ==0 ? "none":""
+     tempStrengthStyle = strength[1].length ==0 ? "none":""
+     strengthTemp = strength?strength[1]:[]
+     spainTemp = strength?strength[0]:[]
+    }
+    else {
+     spainStyleTemp = "none"
+     tempStrengthStyle = "none"
+     strengthTemp = []
+     spainTemp = []
+   }
+ 
+   }
+   else {
+     spainStyleTemp = "none"
+     tempStrengthStyle = "none"
+     strengthTemp = []
+     spainTemp = []
+   }
+   console.log("spain style",spainStyleTemp)
+   console.log("strength temp",strengthTemp)
+   console.log("spain temp",spainTemp)
+   console.log("temp strength style",tempStrengthStyle)
 
     const options = {
       format: 'A4',
@@ -2002,12 +2036,16 @@ exports.generateReport = async (req, res, next) => {
         range: problem.dignosis.rangeOfMotion,
         rangeOfMotionStyle: problem.dignosis.rangeOfMotion.length > 0 ? "":"none",
         rangeOFMotion:problem.dignosis.rangeOfMotion.length >=1?"Range of motion:":"",
-        strength:strength != undefined?strength[1]:[],
-        spain:strength != undefined? `${strength[0].length > 0 ? strength[0]:[]}` :[],
-        spainStyle:strength !== undefined? `${strength[0].length === 0 ? "none":""}` : "none",
+        // strength:strength != undefined?strength[1]:[],
+        // spain:strength[0] === undefined ? [] : `${strength[0].length > 0 ? strength[0] : []}`,
+        // spain:strength[0] === undefined ? [] : strength[0],
+        // spainStyle:strength !== undefined? `${strength[0].length === 0 ? "none":""}` : "none",
         // strengthStyle:strength[1].length ==0 ? "none":"",
-        strengthStyle:strength !== undefined? `${strength[1].length === 0 ? "none":""}` : "none",
-
+        // strengthStyle:strength !== undefined? `${strength[1].length === 0 ? "none":""}` : "none",
+        spainStyle:spainStyleTemp,
+        strength:strengthTemp,
+        spain:spainTemp,
+        strengthStyle: tempStrengthStyle,
         Reflexes: problem.dignosis.reflexes,
         ReflexesStyles:problem.dignosis.reflexes.length == 0 ?"none" : "",
         ST: STA,
@@ -2703,6 +2741,38 @@ exports.generateFollowUp = async (req, res, next) => {
 
     let treatmentPlanArr = getTreatmentPlan(followUp.followUpVisit.treatmentPlan)
 
+
+    let spainStyleTemp
+   let strengthTemp
+   let spainTemp
+   let tempStrengthStyle
+
+   if (strength != undefined){
+   if (strength.length > 0) {
+    spainStyleTemp = strength[0].length ==0 ? "none":""
+    tempStrengthStyle = strength[1].length ==0 ? "none":""
+    strengthTemp = strength?strength[1]:[]
+    spainTemp = strength?strength[0]:[]
+   }
+   else {
+    spainStyleTemp = "none"
+    tempStrengthStyle = "none"
+    strengthTemp = []
+    spainTemp = []
+  }
+
+  }
+  else {
+    spainStyleTemp = "none"
+    tempStrengthStyle = "none"
+    strengthTemp = []
+    spainTemp = []
+  }
+  console.log("spain style",spainStyleTemp)
+  console.log("strength temp",strengthTemp)
+  console.log("spain temp",spainTemp)
+  console.log("temp strength style",tempStrengthStyle)
+
     const followUpNote = fs.readFileSync('./template/followUp.html', 'utf-8');
     const options = {
       format: 'A4',
@@ -2730,8 +2800,12 @@ exports.generateFollowUp = async (req, res, next) => {
         injectionDetail:followUp.patientInWaitingRoom.didInjectionHelp === "" ? "": injectionDetail,
         improveDetail:followUp.patientInWaitingRoom.injectionHelpDetail === "" ? "" :` and states that it was helpful for ${followUp.patientInWaitingRoom.injectionHelpDetail}.`,
         fallsOrTrauma:followUp.patientInWaitingRoom.fallsOrTrauma? " trauma":"no trauma",
-        strength:strength[1],
-        strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
+        // strength:strength[1],
+        // strengthStyle:followUp.followUpVisit.strength.length == 0 ?"none" : "",
+        spainStyle:spainStyleTemp,
+        strength:strengthTemp,
+        spain:spainTemp,
+        strengthStyle: tempStrengthStyle,
         skin2: skinFullBodyCoordinate2,
         skinText:followUp.followUpVisit.skin.length >= 1 ? "Skin Exam positive for:" : "",
         // skin:getTreatments(patient.reviewSystem.skin)?"none":getTreatments(patient.reviewSystem.skin),
