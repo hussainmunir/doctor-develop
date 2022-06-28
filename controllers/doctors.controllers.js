@@ -2217,6 +2217,8 @@ exports.combineWaitingList = async (req, res, next) => {
     
 
    }
+
+   
    
    for(i=0; i<operation.length; i++){
     const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
@@ -2290,6 +2292,7 @@ exports.combineProblemListForDoctor = async (req, res, next) => {
     
 
    }
+
    
    for(i=0; i<operation.length; i++){
     const patient = await Patient.findOne({ _id: operation[i].patientId}).lean();
@@ -2948,8 +2951,8 @@ exports.generateOpNote = async (req, res, next) => {
     let problem_areas = getTreatments(problem.fullBodyCoordinates);
     let problem_areasToUpperCase =problem_areas?problem_areas.charAt(0).toUpperCase() + problem_areas.slice(1):"";
     let problem_concatenated = getProblemConcatenated(problem.symptoms) 
-    let strWDIncludes = getTreatments(problem.dignosis.workDutyIncludes);
-    let strToTheIncludes = getTreatments(problem.dignosis.toTheInclude);
+    let strWDIncludes = getTreatments(operation.workDutyIncludes);
+    let strToTheIncludes = getTreatments(operation.toTheInclude);
     let arr_DD = getDDStr(operation.differentialDignosis);
     let str_DD = getTreatments(arr_DD);
     const STA = getPassST(problem.dignosis.specialTests);
@@ -3060,8 +3063,8 @@ exports.generateOpNote = async (req, res, next) => {
         Age:getAge(patient.dateOfBirth),
         dateOfBirth:moment(patient.dateOfBirth).format('MMMM Do, YYYY'),
         date: moment(operation.date).format('MMMM Do, YYYY'),
-        workDType: problem.dignosis.workDutyType === "Full Duty" ? "Full duty" : `${problem.dignosis.workDutyType} - ${strWDIncludes}  greater than ${problem.dignosis.greaterThan} to the ${problem.dignosis.toThe}${strToTheIncludes} until next`,
-        workDutyStyle: problem.dignosis.workDutyType === "" ? "none" : "",
+        workDType: operation.workDutyType === "Full Duty" ? "Full duty" : `${operation.workDutyType} - ${strWDIncludes}  greater than ${operation.greaterThan} to the ${operation.toThe}${strToTheIncludes} until next`,
+        workDutyStyle: operation.workDutyType === "" ? "none" : "",
         problem_areasToUpperCase,
         problem_concatenated,
         gender:patient.gender,
