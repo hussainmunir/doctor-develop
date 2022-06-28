@@ -181,6 +181,12 @@ const operationSchema = new mongoose.Schema({
     surgicalHistory: [surgicalHistorySchema],
     differentialDignosis: [ddschema],
     fullBodyCoordinates: [String],
+    workDutyType : String,
+    workDutyIncludes : [String],
+    toThe: String,
+    toTheInclude : [String],
+    greaterThan : String,
+    nextVisit: String,
     isChecked:{ 
         type:Boolean,
         default:false
