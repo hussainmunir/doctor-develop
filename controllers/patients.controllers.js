@@ -482,9 +482,11 @@ exports.registerUser = async (req, res, next) => {
 
     });
 
-    if (!req.files) {
-      return next(new ErrorResponse(`Please upload a file`, 404));
-    }
+    // if (!req.files) {
+    //   return next(new ErrorResponse(`Please upload a file`, 404));
+    // }
+
+    if (req.files) {
 
     if (req.files.frontPhoto) {
       console.log('i am in frontPhoto upload for signup')
@@ -498,7 +500,7 @@ exports.registerUser = async (req, res, next) => {
       patient.insurance.backPhoto.url = urlId.url
       patient.insurance.backPhoto.public_id = urlId.public_id
     }
-
+  }
 
     // ImageDataUploadFunction(req, patient);
     // --- let currMedArr = [];

@@ -77,7 +77,7 @@ router.get('/combinePreviousVisit', checkAuth, combinePreviousVisite);
 router.post('/combinePreviousVisitForDoctor', combineProblemListForDoctor);
 router.post('/combineRelatedProblemsListForDoctor', combineRelatedProblemsList);
 
-router.get('/getcptCode',checkAuth,getCptCode);
+router.get('/getcptCode',getCptCode);
 router.get('/getFollowUpById/:followUpId', checkAuth, getFollowUp);
 router.get('/getPostOpById/:postOpId', checkAuth, getPostOp);
 router.get('/getcptCode',checkAuth,getCptCode);
