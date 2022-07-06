@@ -16,11 +16,11 @@ const contactSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: [true, 'Please add Phone number']
+        // required: [true, 'Please add Phone number']
     },
     address: {
         type: String,
-        required: [true, 'Please add an adress'],
+        // required: [true, 'Please add an adress'],
     },
     unit: {
         type: String,
@@ -73,11 +73,11 @@ const surgicalHistorySchema = new mongoose.Schema({
 const emergencyContactSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Please add emergency contact name']
+        // required: [true, 'Please add emergency contact name']
     },
     phoneNumber: {
         type: String,
-        required: [true, 'Please add emergency contact phone number']
+        // required: [true, 'Please add emergency contact phone number']
         // maxlength: [14, 'Please enter a valid phone number'],
         // minlength: [10, 'Please enter a valid phone number']
     }
@@ -86,19 +86,19 @@ const emergencyContactSchema = new mongoose.Schema({
 const familyHistorySchema = new mongoose.Schema({
     motherMConditions: {
         type: [String],
-        required: [true, 'Please add mother medical conditions']
+        // required: [true, 'Please add mother medical conditions']
     },
     fatherMConditions: {
         type: [String],
-        required: [true, 'Please add father medical conditions']
+        // required: [true, 'Please add father medical conditions']
     },
     grandparentMConditions: {
         type: [String],
-        required: [true, 'Please add grand parent medical conditions']
+        // required: [true, 'Please add grand parent medical conditions']
     },
     siblingsMConditions: {
         type: [String],
-        required: [true, 'Please add sublings medical conditions']
+        // required: [true, 'Please add sublings medical conditions']
     }
 
 });
@@ -106,7 +106,7 @@ const familyHistorySchema = new mongoose.Schema({
 const smokeSchema = new mongoose.Schema({
     isSmoke: {
         type: Boolean,
-        required: [true, 'Please enter if you smoke or not'],
+        // required: [true, 'Please enter if you smoke or not'],
         default: false
     },
     numberOfPacks: {
@@ -138,15 +138,13 @@ const socialHistorySchema = new mongoose.Schema({
     drink: drinkAlcholSchema,
     maritalStatus: {
         type: String,
-        required: [true, 'Please add your marital status']
     },
     handDominance: {
         type: String,
-        required: [true, 'Please Enter Your Dominant Hand']
     },
     occupation: {
         type: String,
-        required: [true, 'Please Enter Your Occupation']
+        // required: [true, 'Please Enter Your Occupation']
     }
 });
 
@@ -191,7 +189,6 @@ const reviewOfSystemsSchema = new mongoose.Schema({
 const user = new mongoose.Schema({
     fname: {
         type: String,
-        required: [true, 'Please add first name'],
     },
     mname: {
         type: String,
@@ -199,7 +196,6 @@ const user = new mongoose.Schema({
     },
     lname: {
         type: String,
-        required: [true, 'Please add last name'],
     },
     suffix: {
         type: String,
@@ -207,7 +203,6 @@ const user = new mongoose.Schema({
     },
     gender: {
         type: String,
-        required: [true, "Please select a gender"]
     },
     password: {
         type: String,
@@ -216,14 +211,12 @@ const user = new mongoose.Schema({
     },
     dateOfBirth: {
         type: Date,
-        required: [true, 'Please add date of birth'],
         min: '1900-01-01',
         max: Date.now()
     },
     contact: contactSchema,
     pharmacy: {
         type: [String],
-        required: [true, 'Please add pharmacy']
     },
     insurance: insuranceSchema,
     emergencyContact: emergencyContactSchema,
