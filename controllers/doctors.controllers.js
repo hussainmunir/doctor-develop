@@ -1119,9 +1119,8 @@ const getStrength = (array) => {
   }else{
    strength.push(array[i])
   }
- 
- var wrapper=[spain,strength]; 
-}
+
+var wrapper=[spain,strength]; 
 return wrapper;
 }
 const getPhysicalExam = (physicalExam) => {
@@ -1424,12 +1423,30 @@ const getGeneralExam = (generalExam) => {
   }
   }
 
+  var tempOther = "" 
+  if (generalExam.other != undefined) {
+    if (generalExam.other.length > 0){
+    if (generalExam.other.trim() != ""){
+
+      if (generalExam.other.trim().charAt(generalExam.other.trim().length-1) != ".") {
+        tempOther = generalExam.other.trim() + "."
+    }
+    else {
+      tempOther = `${generalExam.other}`
+    }
+     
+    }    
+  }
+  }
+
   const finalGeneralExam = {
     "whoAppears": tempWhoAppears,
     "has": tempHas,
     "andIs": tempAndIs,
-    "gaitIs": tempGaitIs 
+    "gaitIs": tempGaitIs,
+    "other":  tempOther
   }
+
   if (tempPatientIs != "") {
   if (generalExam.patientIs[0][0].toUpperCase() === 'A' || generalExam.patientIs[0][0].toUpperCase() === 'E' || generalExam.patientIs[0][0].toUpperCase() === 'I'
     || generalExam.patientIs[0][0].toUpperCase() === 'O' || generalExam.patientIs[0][0].toUpperCase() === 'U') {
@@ -1811,12 +1828,12 @@ exports.generateReport = async (req, res, next) => {
     if (str_aggFactors) {
       str_aggFactors = str_aggFactors.toLowerCase();
     }
+
     let str_allFactors = getTreatments(problem.alleviatingFactors);
     if (str_allFactors) {
       str_allFactors = str_allFactors.toLowerCase();
     }
 
-    
   
     let medicationsName = getCurrMed(patient.currentMedications);
     let newMedicationsName = getCurrMed(problem.currentMedications);
@@ -2001,6 +2018,7 @@ exports.generateReport = async (req, res, next) => {
         generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
         generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
         generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamOther: general_exam.other != "" ? `${general_exam.other}` : "",
         generalExamSectionStyle: generalExamStyle,
         skin: skinFullBodyCoordinate,
         skin2: skinFullBodyCoordinate2,
@@ -2098,7 +2116,8 @@ exports.generateReport = async (req, res, next) => {
 
     pdf.create(document, options).then(result => res.download(`${process.env.REPORT_UPLOAD_PATH}/${problem._id}.${patient._id}.pdf`))
   } catch (err) {
-    return next(new ErrorResponse(err.message + "in main document function", 500))
+    // return next(new ErrorResponse(err.message + "in main document function", 500))
+    return next(new ErrorResponse(err, 500))
   }
 }
 
@@ -2838,6 +2857,7 @@ exports.generateFollowUp = async (req, res, next) => {
         generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
         generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
         generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamOther: general_exam.other != "" ? `${general_exam.other}` : "",
         generalExamSectionStyle: generalExamStyle,
         vitals:problem.dignosis.vitals,
         vitalStyle,
@@ -3095,6 +3115,7 @@ exports.generateOpNote = async (req, res, next) => {
         generalExamHas : general_exam.has != "" ? `${pronoun} has ${general_exam.has}` : "",
         generalExamAndis: general_exam.andIs != "" ? `${pronoun} is ${general_exam.andIs}` : "",
         generalExamGaitIs: general_exam.gaitIs != "" ? `Gait is ${general_exam.gaitIs}.` : "",
+        generalExamOther: general_exam.other != "" ? `${general_exam.other}` : "",
         generalExamSectionStyle: generalExamStyle,
         skin:skinText,
         skin2: skinText2,

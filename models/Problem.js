@@ -252,7 +252,8 @@ const hpiProblemSchema = new mongoose.Schema({
             whoAppears: [String],
             has: [String],
             andIs: [String],
-            gaitIs: [String]
+            gaitIs: [String],
+            other: String
 
         },
         skin: [
