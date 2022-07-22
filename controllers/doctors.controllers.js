@@ -1120,6 +1120,7 @@ const getStrength = (array) => {
    strength.push(array[i])
   }
 
+}
 var wrapper=[spain,strength]; 
 return wrapper;
 }
